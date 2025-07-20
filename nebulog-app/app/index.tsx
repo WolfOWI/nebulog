@@ -1,85 +1,101 @@
-import React from "react";
-import Gradient from "@/assets/Icons/Gradient";
-import DocumentData from "@/assets/Icons/DocumentData";
-import LightBulbPerson from "@/assets/Icons/LightbulbPerson";
-import Rocket from "@/assets/Icons/Rocket";
-import Logo from "@/assets/Icons/Logo";
-import { Box } from "@/components/ui/box";
-import { ScrollView } from "react-native";
+import React, { useState } from "react";
 import { Text } from "@/components/ui/text";
+import { Input, InputField } from "@/components/ui/input";
+import { Button, ButtonText } from "@/components/ui/button";
+import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
+import { Heading } from "@/components/ui/heading";
+import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
+import { Link, router } from "expo-router";
+import { SafeAreaView, ScrollView } from "react-native";
+import Logo from "@/assets/Icons/Logo";
 
-import { Link } from "expo-router";
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-const FeatureCard = ({ iconSvg: IconSvg, name, desc }: any) => {
+  const handleLogin = async () => {
+    // if (!email || !password) {
+    // TODO: Message - Fill in the fields
+    //   return;
+    // }
+
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      // Navigate to home after successful login
+      router.push("/home");
+    }, 1000);
+  };
+
   return (
-    <Box
-      className="flex-column border border-w-1 border-outline-700 md:flex-1 m-2 p-4 rounded"
-      key={name}
-    >
-      <Box className="items-center flex flex-row">
-        <Text>
-          <IconSvg />
-        </Text>
-        <Text className="text-typography-white font-medium ml-2 text-xl">
-          {name}
-        </Text>
-      </Box>
-      <Text className="text-typography-400 mt-2">{desc}</Text>
-    </Box>
-  );
-};
-
-export default function Home() {
-  return (
-    <Box className="flex-1 bg-black h-[100vh]">
-      <ScrollView
-        style={{ height: "100%" }}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <Box className="absolute h-[500px] w-[500px] lg:w-[700px] lg:h-[700px]">
-          <Gradient />
-        </Box>
-        <Box className="flex flex-1 items-center my-16 mx-5 lg:my-24 lg:mx-32">
-          <Box className="gap-10 base:flex-col sm:flex-row justify-between sm:w-[80%] md:flex-1">
-            <Box className="bg-background-template py-2 px-6 rounded-full items-center flex-column md:flex-row md:self-start">
-              <Text className="text-typography-white font-normal">
-                Get started by editing
-              </Text>
-              <Text className="text-typography-white font-medium ml-2">
-                ./App.tsx
-              </Text>
-            </Box>
-            <Link href="/tabs/">
-              <Box className="bg-background-template py-2 px-6 rounded-full items-center flex-column sm:flex-row md:self-start">
-                <Text className="text-typography-white font-normal">
-                  Explore Tab Navigation
-                </Text>
-              </Box>
-            </Link>
-          </Box>
-          <Box className="flex-1 justify-center items-center h-[20px] w-[300px] lg:h-[160px] lg:w-[400px]">
+    <SafeAreaView className="flex-1 bg-background-0">
+      <ScrollView>
+        <VStack className="flex-1 justify-center items-center px-6 py-8">
+          {/* Logo */}
+          <VStack className="items-center mb-8">
             <Logo />
-          </Box>
+          </VStack>
 
-          <Box className="flex-column md:flex-row">
-            <FeatureCard
-              iconSvg={DocumentData}
-              name="Docs"
-              desc="Find in-depth information about gluestack features and API."
-            />
-            <FeatureCard
-              iconSvg={LightBulbPerson}
-              name="Learn"
-              desc="Learn about gluestack in an interactive course with quizzes!"
-            />
-            <FeatureCard
-              iconSvg={Rocket}
-              name="Deploy"
-              desc="Instantly drop your gluestack site to a shareable URL with vercel."
-            />
-          </Box>
-        </Box>
+          {/* Welcome Text */}
+          <VStack className="items-center mb-8">
+            <Heading className="text-typography-900 text-2xl font-bold mb-2">Welcome Back</Heading>
+            <Text className="text-typography-600 text-center">
+              Sign in to your account to continue
+            </Text>
+          </VStack>
+
+          {/* Login Form */}
+          <VStack className="w-full max-w-sm space-y-4">
+            <FormControl>
+              <FormControlLabel>
+                <FormControlLabelText className="text-typography-700 font-medium mb-1">
+                  Email
+                </FormControlLabelText>
+              </FormControlLabel>
+              <Input>
+                <InputField
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </Input>
+            </FormControl>
+
+            <FormControl>
+              <FormControlLabel>
+                <FormControlLabelText className="text-typography-700 font-medium mb-1">
+                  Password
+                </FormControlLabelText>
+              </FormControlLabel>
+              <Input>
+                <InputField
+                  placeholder="Enter your password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                />
+              </Input>
+            </FormControl>
+
+            <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
+              <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
+            </Button>
+          </VStack>
+
+          {/* Sign Up Link */}
+          <HStack className="mt-6">
+            <Text className="text-typography-600">Don't have an account? </Text>
+            <Link href="/signup" asChild>
+              <Text className="text-primary-600 font-medium">Sign up</Text>
+            </Link>
+          </HStack>
+        </VStack>
       </ScrollView>
-    </Box>
+    </SafeAreaView>
   );
 }
