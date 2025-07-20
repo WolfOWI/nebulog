@@ -6,8 +6,9 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
-import { SafeAreaView, ScrollView } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 
 export default function Profile() {
   const [name, setName] = useState("John Doe");
@@ -26,9 +27,11 @@ export default function Profile() {
         <VStack className="flex-1 px-6">
           {/* Header */}
           <HStack className="justify-end items-center mb-8">
-            <Button variant="outline" size="sm" onPress={handleClose}>
-              <MaterialIcons name="close" size={24} color="#ffffff" />
-            </Button>
+            <LeftwardSwipeBtn
+              onSwipeComplete={handleClose}
+              iconName="close"
+              touchMessage="Swipe to Close"
+            />
           </HStack>
 
           {/* Profile Header */}
