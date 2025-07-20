@@ -14,6 +14,11 @@ export default function Home() {
         <VStack className="flex-1 px-6">
           {/* Header */}
           <HStack className="justify-end items-center mb-8 gap-4">
+            <Link href="/location" asChild>
+              <Button variant="outline" size="sm">
+                <ButtonText>📍 Location</ButtonText>
+              </Button>
+            </Link>
             <Link href="/profile" asChild>
               <Button variant="outline" size="sm">
                 <ButtonText>Profile</ButtonText>
