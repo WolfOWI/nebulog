@@ -10,25 +10,18 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 export default function Home() {
-  // ref
+  // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // variables
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
-
-  // callbacks
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    // console.log("handleSheetChanges", index);
   }, []);
-
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.expand();
   }, []);
-
   const handleDismiss = useCallback(() => {
     bottomSheetRef.current?.close();
   }, []);
-
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     []

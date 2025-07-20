@@ -7,6 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Profile() {
   const [name, setName] = useState("John Doe");
@@ -15,7 +16,7 @@ export default function Profile() {
     "Live is like a box of chocolates. You never know what you're gonna get."
   );
 
-  const handleBack = () => {
+  const handleClose = () => {
     router.push("/home");
   };
 
@@ -24,9 +25,9 @@ export default function Profile() {
       <ScrollView>
         <VStack className="flex-1 px-6">
           {/* Header */}
-          <HStack className="justify-between items-center mb-8">
-            <Button variant="outline" size="sm" onPress={handleBack}>
-              <ButtonText>← Back</ButtonText>
+          <HStack className="justify-end items-center mb-8">
+            <Button variant="outline" size="sm" onPress={handleClose}>
+              <MaterialIcons name="close" size={24} color="#ffffff" />
             </Button>
           </HStack>
 
