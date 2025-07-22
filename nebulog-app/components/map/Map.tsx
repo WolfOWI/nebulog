@@ -37,8 +37,8 @@ const fakeReflections = [
     content:
       "Today I witnessed the most amazing sunrise. The way the light hit the buildings created such a peaceful atmosphere. It reminded me to appreciate the simple moments in life.",
     timestamp: "2024-01-15 06:30",
-    mood: "Peaceful",
-    tags: ["sunrise", "gratitude", "peace"],
+    mood: "Lost",
+    tags: ["sunrise", "gratitude", "joy"],
   },
   {
     id: "2",

@@ -14,6 +14,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        grief: {
+          500: "#598A94",
+        },
         primary: {
           0: "rgb(var(--color-primary-0)/<alpha-value>)",
           50: "rgb(var(--color-primary-50)/<alpha-value>)",
