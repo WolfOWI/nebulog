@@ -8,7 +8,7 @@ import { Link } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import MapComponent from "@/components/Map";
+import MapComponent from "@/components/map/Map";
 import { Location as LocationType } from "@/lib/types";
 
 export default function Home() {
@@ -31,6 +31,7 @@ export default function Home() {
 
   const [location, setLocation] = useState<LocationType | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
   const mapRef = useRef<any>(null);
 
   const handleGetLocation = async () => {
@@ -49,7 +50,12 @@ export default function Home() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-background-0 relative h-full w-full">
-        <MapComponent ref={mapRef} showUserLocation={true} className="absolute inset-0 z-0" />
+        <MapComponent
+          ref={mapRef}
+          showUserLocation={true}
+          className="absolute inset-0 z-0"
+          onReflectionPanelChange={setIsReflectionPanelOpen}
+        />
 
         {/* Top overlay */}
         <SafeAreaView>
@@ -69,9 +75,12 @@ export default function Home() {
 
         {/* Bottom overlay*/}
         <SafeAreaView className="absolute bottom-0 left-0 right-0 ">
-          <VStack className="items-start pb-8 px-4">
+          <VStack
+            className="items-start pb-8 px-4"
+            style={{ opacity: isReflectionPanelOpen ? 0 : 1 }}
+          >
             <Button onPress={handleGetLocation} disabled={isLoadingLocation}>
-              <ButtonText>📍 My Location</ButtonText>
+              <ButtonText>{"My Location"}</ButtonText>
             </Button>
 
             <Button onPress={handlePresentModalPress} className="mt-4">
