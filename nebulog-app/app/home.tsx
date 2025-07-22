@@ -8,6 +8,7 @@ import { Link } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { writeNote } from "../services/firebaseTest";
 
 export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks
@@ -22,6 +23,20 @@ export default function Home() {
   const handleDismiss = useCallback(() => {
     bottomSheetRef.current?.close();
   }, []);
+
+  const handleFirebaseTest = async () => {
+    const result = await writeNote();
+    if (result.success) {
+      alert(`Firebase test successful! Document ID: ${result.id}`);
+    } else {
+      alert(
+        `Firebase test failed: ${
+          result.error instanceof Error ? result.error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     []
@@ -53,6 +68,11 @@ export default function Home() {
 
             <VStack className="items-center mb-8">
               <Heading className="text-typography-900 text-3xl font-bold mb-2">Home</Heading>
+
+              {/* Firebase Test Button */}
+              <Button onPress={handleFirebaseTest} className="mt-4" size="lg" variant="outline">
+                <ButtonText>🔥 Test Firebase</ButtonText>
+              </Button>
 
               {/* Button to open bottom sheet */}
               <Button onPress={handlePresentModalPress} className="mt-4" size="lg">
