@@ -1,10 +1,32 @@
-// User related types
+import { Timestamp } from "react-native-reanimated/lib/typescript/commonTypes";
+
 export interface User {
-  id: string;
+  id?: string;
   username: string;
   email: string;
   bio?: string;
-  avatar?: string;
+  createdAt: Timestamp;
+  streakCount: number;
+  totalReflections: number;
+  totalEchoes: number;
+  echoedReflections?: Record<string, boolean>;
+  blockedUserIds?: Record<string, boolean>;
+  lastReflectDate?: Timestamp;
+}
+
+export interface Reflection {
+  id?: string;
+  authorId: string;
+  text: string;
+  visibility: "public" | "private";
+  location?: {
+    lat: number;
+    long: number;
+  };
+  locationLabel?: string;
+  moodTag?: string;
+  createdAt: Timestamp;
+  echoCount: number;
 }
 
 // Auth related types
