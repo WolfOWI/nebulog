@@ -3,6 +3,7 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { VStack } from "@/components/ui/vstack";
+import { customMapStyle } from "@/styles/mapStyles";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -104,6 +105,7 @@ const MapComponent = forwardRef<any, MapComponentProps>(
           showsCompass={true}
           showsScale={true}
           onRegionChangeComplete={onRegionChange}
+          customMapStyle={customMapStyle}
         >
           {/* User location marker */}
           {userLocation && showUserLocation && (
