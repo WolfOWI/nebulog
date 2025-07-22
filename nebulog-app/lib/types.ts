@@ -19,14 +19,16 @@ export interface Reflection {
   authorId: string;
   text: string;
   visibility: "public" | "private";
-  location?: {
-    lat: number;
-    long: number;
-  };
+  location?: Location;
   locationLabel?: string;
   moodTag?: string;
   createdAt: Timestamp;
   echoCount: number;
+}
+
+export interface Location {
+  lat: number;
+  long: number;
 }
 
 // Auth related types

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
@@ -8,7 +8,8 @@ import { Link } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import { writeNote } from "../services/firebaseTest";
+import MapComponent from "@/components/Map";
+import { Location as LocationType } from "@/lib/types";
 
 export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks
@@ -23,64 +24,61 @@ export default function Home() {
   const handleDismiss = useCallback(() => {
     bottomSheetRef.current?.close();
   }, []);
-
-  const handleFirebaseTest = async () => {
-    const result = await writeNote();
-    if (result.success) {
-      alert(`Firebase test successful! Document ID: ${result.id}`);
-    } else {
-      alert(
-        `Firebase test failed: ${
-          result.error instanceof Error ? result.error.message : "Unknown error"
-        }`
-      );
-    }
-  };
-
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     []
   );
 
+  const [location, setLocation] = useState<LocationType | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const mapRef = useRef<any>(null);
+
+  const handleGetLocation = async () => {
+    setIsLoadingLocation(true);
+    try {
+      if (mapRef.current && mapRef.current.getCurrentLocation) {
+        await mapRef.current.getCurrentLocation();
+      }
+    } catch (error) {
+      console.error("Error getting location:", error);
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1 bg-background-0">
-        <ScrollView>
-          <VStack className="flex-1 px-6">
-            {/* Header */}
-            <HStack className="justify-end items-center mb-8 gap-4">
-              <Link href="/location" asChild>
-                <Button variant="outline" size="sm">
-                  <ButtonText>📍 Location</ButtonText>
-                </Button>
-              </Link>
-              <Link href="/profile" asChild>
-                <Button variant="outline" size="sm">
-                  <ButtonText>Profile</ButtonText>
-                </Button>
-              </Link>
-              <Link href="/" asChild>
-                <Button variant="outline" size="sm">
-                  <ButtonText>Log Out</ButtonText>
-                </Button>
-              </Link>
-            </HStack>
+      <SafeAreaView className="flex-1 bg-background-0 relative h-full w-full">
+        <MapComponent ref={mapRef} showUserLocation={true} className="absolute inset-0 z-0" />
 
-            <VStack className="items-center mb-8">
-              <Heading className="text-typography-900 text-3xl font-bold mb-2">Home</Heading>
-
-              {/* Firebase Test Button */}
-              <Button onPress={handleFirebaseTest} className="mt-4" size="lg" variant="outline">
-                <ButtonText>🔥 Test Firebase</ButtonText>
+        {/* Top overlay */}
+        <SafeAreaView>
+          <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
+            <Link href="/profile" asChild>
+              <Button>
+                <ButtonText>Profile</ButtonText>
               </Button>
-
-              {/* Button to open bottom sheet */}
-              <Button onPress={handlePresentModalPress} className="mt-4" size="lg">
-                <ButtonText>Open Bottom Sheet</ButtonText>
+            </Link>
+            <Link href="/" asChild>
+              <Button>
+                <ButtonText>Log Out</ButtonText>
               </Button>
-            </VStack>
+            </Link>
+          </HStack>
+        </SafeAreaView>
+
+        {/* Bottom overlay*/}
+        <SafeAreaView className="absolute bottom-0 left-0 right-0 ">
+          <VStack className="items-start pb-8 px-4">
+            <Button onPress={handleGetLocation} disabled={isLoadingLocation}>
+              <ButtonText>📍 My Location</ButtonText>
+            </Button>
+
+            <Button onPress={handlePresentModalPress} className="mt-4">
+              <ButtonText>Bottom Sheet</ButtonText>
+            </Button>
           </VStack>
-        </ScrollView>
+        </SafeAreaView>
 
         {/* Bottom Sheet */}
         <BottomSheet
@@ -96,6 +94,7 @@ export default function Home() {
           handleIndicatorStyle={{
             backgroundColor: "#d1d5db",
           }}
+          style={{ zIndex: 999 }}
         >
           <BottomSheetView className="flex-1 px-6 py-4">
             <VStack className="items-center mb-6">
