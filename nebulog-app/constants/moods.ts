@@ -2,7 +2,7 @@ import { getMoodIcon } from "./moodIcons";
 
 export const mood = {
   Unselected: {
-    subemotions: "Neutral",
+    subemotions: "Unselected Mood",
     symbol: "Unknown Planet",
     color: "slate-200",
     icon: getMoodIcon("unselected"),
@@ -33,7 +33,7 @@ export const mood = {
   },
   Stillness: {
     subemotions: "Peace, Calm, Serenity",
-    symbol: "Starry Night",
+    symbol: "Crystal Moon",
     color: "purple-300",
     icon: getMoodIcon("stillness"),
   },
