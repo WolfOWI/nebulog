@@ -90,22 +90,19 @@ export default function LeftwardSwipeBtn({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View
-        style={{ width: "100%", position: "relative", backgroundColor: "red" }}
-        onLayout={handleLayout}
-      >
+      <View style={{ width: "100%", position: "relative" }} onLayout={handleLayout}>
         {/* Show swipe instruction when touched */}
         {showMessage && (
           <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000">
-            <MaterialIcons name="arrow-back" size={24} color="#ffffff" />
+            <MaterialIcons name="arrow-back" size={24} color="#f8fafc" />
             <Text className="text-white text-center text-lg">{touchMessage}</Text>
           </View>
         )}
 
         {/* The animated button */}
         <Animated.View style={[animatedStyle]}>
-          <View className="flex justify-center items-center self-end bg-green-500 w-12 h-12 rounded-full">
-            <MaterialIcons name={iconName} size={24} color="#ffffff" />
+          <View className="flex justify-center items-center self-end bg-transparent border border-slate-50 w-12 h-12 rounded-full">
+            <MaterialIcons name={iconName} size={24} color="#f8fafc" />
           </View>
         </Animated.View>
       </View>

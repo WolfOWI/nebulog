@@ -5,13 +5,7 @@ export const customMapStyle = [
     elementType: "labels.text.fill",
     stylers: [
       {
-        saturation: 36,
-      },
-      {
-        color: "#000000",
-      },
-      {
-        lightness: 40,
+        color: "#E2E8F0",
       },
     ],
   },
@@ -23,10 +17,7 @@ export const customMapStyle = [
         visibility: "on",
       },
       {
-        color: "#000000",
-      },
-      {
-        lightness: 16,
+        color: "#0F172B",
       },
     ],
   },
@@ -44,10 +35,7 @@ export const customMapStyle = [
     elementType: "geometry.fill",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 20,
+        color: "#1F2637",
       },
     ],
   },
@@ -56,10 +44,7 @@ export const customMapStyle = [
     elementType: "geometry.stroke",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 17,
+        color: "#1F2637",
       },
       {
         weight: 1.2,
@@ -71,10 +56,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 20,
+        color: "#0F172B",
       },
     ],
   },
@@ -83,10 +65,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 21,
+        color: "#1F2637",
       },
     ],
   },
@@ -95,10 +74,7 @@ export const customMapStyle = [
     elementType: "geometry.fill",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 17,
+        color: "#1F2637",
       },
     ],
   },
@@ -107,10 +83,7 @@ export const customMapStyle = [
     elementType: "geometry.stroke",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 29,
+        color: "#1F2637",
       },
       {
         weight: 0.2,
@@ -122,10 +95,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 18,
+        color: "#1F2637",
       },
     ],
   },
@@ -134,10 +104,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 16,
+        color: "#1F2637",
       },
     ],
   },
@@ -146,10 +113,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 19,
+        color: "#1F2637",
       },
     ],
   },
@@ -158,10 +122,7 @@ export const customMapStyle = [
     elementType: "geometry",
     stylers: [
       {
-        color: "#000000",
-      },
-      {
-        lightness: 17,
+        color: "#0F172B",
       },
     ],
   },
