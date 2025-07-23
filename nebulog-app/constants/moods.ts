@@ -1,76 +1,112 @@
 import { getMoodIcon } from "./moodIcons";
 
 export const mood = {
-  Unselected: {
+  unselected: {
     subemotions: "Unselected Mood",
-    symbol: "Unknown Planet",
-    color: "slate-200",
+    spaceObject: "Unknown Planet",
+    colorHex: "#6A7282",
+    colorName: "slate-200",
+    textColor: "text-slate-200",
+    borderColor: "border-slate-200",
     icon: getMoodIcon("unselected"),
   },
-  Joy: {
+  joy: {
     subemotions: "Happiness, Hope, Excitement",
-    symbol: "Shooting Star",
-    color: "amber-300",
+    spaceObject: "Shooting Star",
+    colorHex: "#FFD230",
+    colorName: "amber-300",
+    textColor: "text-amber-300",
+    borderColor: "border-amber-300",
     icon: getMoodIcon("joy"),
   },
-  Gratitude: {
+  gratitude: {
     subemotions: "Thankfulness, Appreciation, Nostalgia",
-    symbol: "Glowing Star",
-    color: "orange-400",
+    spaceObject: "Glowing Star",
+    colorHex: "#FF8904",
+    colorName: "orange-400",
+    textColor: "text-orange-400",
+    borderColor: "border-orange-400",
     icon: getMoodIcon("gratitude"),
   },
-  Growth: {
+  growth: {
     subemotions: "Change, Restarting, Evolving",
-    symbol: "Catalyst Rocket",
-    color: "emerald-300",
+    spaceObject: "Catalyst Rocket",
+    colorHex: "#5EE9B5",
+    colorName: "emerald-300",
+    textColor: "text-emerald-300",
+    borderColor: "border-emerald-300",
     icon: getMoodIcon("growth"),
   },
-  Connection: {
+  connection: {
     subemotions: "Belonging, Empathy, Love",
-    symbol: "Twin Stars",
-    color: "pink-400",
+    spaceObject: "Twin Stars",
+    colorHex: "#FB64B6",
+    colorName: "pink-400",
+    textColor: "text-pink-400",
+    borderColor: "border-pink-400",
     icon: getMoodIcon("connection"),
   },
-  Stillness: {
+  stillness: {
     subemotions: "Peace, Calm, Serenity",
-    symbol: "Crystal Moon",
-    color: "purple-300",
+    spaceObject: "Crystal Moon",
+    colorHex: "#A2F4FD",
+    colorName: "purple-300",
+    textColor: "text-purple-300",
+    borderColor: "border-purple-300",
     icon: getMoodIcon("stillness"),
   },
-  Wonder: {
+  wonder: {
     subemotions: "Curiosity, Awe, Amazement",
-    symbol: "Nebula Bloom",
-    color: "violet-400",
+    spaceObject: "Nebula Bloom",
+    colorHex: "#A684FF",
+    colorName: "violet-400",
+    textColor: "text-violet-400",
+    borderColor: "border-violet-400",
     icon: getMoodIcon("wonder"),
   },
-  Anger: {
+  anger: {
     subemotions: "Frustration, Rage, Irritation",
-    symbol: "Meteor Storm",
-    color: "red-500",
+    spaceObject: "Meteor Storm",
+    colorHex: "#FB2C36",
+    colorName: "red-500",
+    textColor: "text-red-500",
+    borderColor: "border-red-500",
     icon: getMoodIcon("anger"),
   },
-  Turbulence: {
+  turbulence: {
     subemotions: "Anxiety, Shame, Confusion",
-    symbol: "Solar Flare",
-    color: "orange-600",
+    spaceObject: "Solar Flare",
+    colorHex: "#FF6900",
+    colorName: "orange-600",
+    textColor: "text-orange-600",
+    borderColor: "border-orange-600",
     icon: getMoodIcon("turbulence"),
   },
-  Sadness: {
+  sadness: {
     subemotions: "Shame, Disappointment, Melancholy",
-    symbol: "Frozen Planet",
-    color: "sky-500",
+    spaceObject: "Frozen Planet",
+    colorHex: "#0069A8",
+    colorName: "sky-500",
+    textColor: "text-sky-500",
+    borderColor: "border-sky-500",
     icon: getMoodIcon("sadness"),
   },
-  Grief: {
+  grief: {
     subemotions: "Emptiness, Loss, Despair",
-    symbol: "Black Hole",
-    color: "grief-500",
+    spaceObject: "Black Hole",
+    colorHex: "#0B4F4A",
+    colorName: "grief-500",
+    textColor: "text-grief-500",
+    borderColor: "border-grief-500",
     icon: getMoodIcon("grief"),
   },
-  Lost: {
+  lost: {
     subemotions: "Lonely, Stuck, Directionless",
-    symbol: "Lost Satellite",
-    color: "gray-400",
+    spaceObject: "Lost Satellite",
+    colorHex: "#99A1AF",
+    colorName: "gray-400",
+    textColor: "text-gray-400",
+    borderColor: "border-gray-400",
     icon: getMoodIcon("lost"),
   },
 };

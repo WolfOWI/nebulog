@@ -1,17 +1,15 @@
-import { Timestamp } from "react-native-reanimated/lib/typescript/commonTypes";
-
 export interface User {
   id?: string;
   username: string;
   email: string;
   bio?: string;
-  createdAt: Timestamp;
+  createdAt: string;
   streakCount: number;
   totalReflections: number;
   totalEchoes: number;
   echoedReflections?: Record<string, boolean>;
   blockedUserIds?: Record<string, boolean>;
-  lastReflectDate?: Timestamp;
+  lastReflectDate?: string;
 }
 
 export interface Reflection {
@@ -21,8 +19,8 @@ export interface Reflection {
   visibility: "public" | "private";
   location?: Location;
   locationLabel?: string;
-  moodTag?: string;
-  createdAt: Timestamp;
+  mood?: string;
+  createdAt: string;
   echoCount: number;
 }
 
