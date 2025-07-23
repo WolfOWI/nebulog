@@ -6,20 +6,32 @@ export default {
     slug: "nebulog",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/nebulog-main-icon.png",
     scheme: "myapp",
-    userInterfaceStyle: "automatic",
+    userInterfaceStyle: "dark",
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      icon: "./assets/images/nebulog-ios-notif-icon.png",
+      splash: {
+        image: "./assets/images/nebulog-splash-icon.png",
+        resizeMode: "contain",
+        backgroundColor: "#0F172B",
+      },
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
       },
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff",
+        foregroundImage: "./assets/images/nebulog-adaptive-icon.png",
+        backgroundColor: "#0F172B",
+      },
+      icon: "./assets/images/nebulog-android-notif-icon.png",
+      splash: {
+        image: "./assets/images/nebulog-splash-icon.png",
+        resizeMode: "contain",
+        backgroundColor: "#0F172B",
       },
       config: {
         googleMaps: {
@@ -37,10 +49,10 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/images/nebulog-splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#0F172B",
         },
       ],
       "expo-font",
