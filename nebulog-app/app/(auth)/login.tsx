@@ -11,6 +11,7 @@ import { SafeAreaView, ScrollView } from "react-native";
 import Logo from "@/assets/icons/Logo";
 import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
+import LaunchButton from "@/components/buttons/LaunchButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -113,9 +114,15 @@ export default function Login() {
               </Input>
             </FormControl>
 
-            <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
+            {/* <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
-            </Button>
+            </Button> */}
+            <LaunchButton
+              onLaunch={() => console.log("Launched!")}
+              iconName="rocket-launch"
+              holdDuration={2000} // 2 seconds
+              size={100}
+            />
             {/* TODO: Remove this later */}
             <Button className="mt-4" onPress={tempQuickLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Quick Login" : "Quick Login"}</ButtonText>
