@@ -53,8 +53,21 @@ export default function Profile() {
             <Heading className="text-typography-900 text-2xl font-bold mb-2">
               {user.username}
             </Heading>
-            <Text className="text-typography-600 text-center mb-2">{user.email}</Text>
             {user.bio && <Text className="text-typography-600 text-center">{user.bio}</Text>}
+            <HStack className="justify-between items-center w-full mt-4 px-4">
+              <VStack className="items-center w-1/3">
+                <Text className="text-slate-50 text-center text-2xl ">{user.streakCount}</Text>
+                <Text className="text-slate-400 text-center">day streak</Text>
+              </VStack>
+              <VStack className="items-center w-1/3">
+                <Text className="text-slate-50 text-center text-2xl ">{user.totalReflections}</Text>
+                <Text className="text-slate-400 text-center">reflections</Text>
+              </VStack>
+              <VStack className="items-center w-1/3">
+                <Text className="text-slate-50 text-center text-2xl ">{user.totalEchoes}</Text>
+                <Text className="text-slate-400 text-center">echoes</Text>
+              </VStack>
+            </HStack>
           </VStack>
 
           {/* Logout Button */}
