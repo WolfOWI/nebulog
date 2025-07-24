@@ -17,6 +17,27 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="editprofile"
+        options={{
+          title: "Edit Profile",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="profileiconselect"
+        options={{
+          title: "Profile Icon Select",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="profilecolourpick"
+        options={{
+          title: "Profile Colour Pick",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

@@ -12,6 +12,7 @@ import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
+import { getMoodIcon } from "@/constants/moodIcons";
 
 export default function MyProfile() {
   const { user } = useUser();
@@ -54,10 +55,14 @@ export default function MyProfile() {
           <VStack className="items-center mb-8">
             <Avatar className="w-24 h-24 mb-4">
               <AvatarImage
-                source={{
-                  uri: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                }}
+                className="w-24 h-24 rounded-full"
+                style={{ backgroundColor: user.profileColor || "#4ECDC4" }}
               />
+              {getMoodIcon(user.profileIcon || "default", {
+                width: 48,
+                height: 48,
+                fill: "#FFFFFF",
+              })}
             </Avatar>
             <HStack className="items-center mb-2 gap-2">
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
