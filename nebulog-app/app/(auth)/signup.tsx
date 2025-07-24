@@ -63,12 +63,12 @@ export default function Signup() {
           {/* Welcome Text */}
           <VStack className="items-center mb-8">
             <Heading className="text-typography-900 text-2xl font-bold mb-2">
-              Create Account
+              Join Our Community!
             </Heading>
             <HStack className="">
               <Text className="text-typography-600">Already have an account? </Text>
               <Link href="/Login" asChild>
-                <Text className="text-primary-600 font-bold">Sign in</Text>
+                <Text className="text-primary-600 font-bold">Log in</Text>
               </Link>
             </HStack>
           </VStack>
@@ -135,7 +135,7 @@ export default function Signup() {
               </FormControlLabel>
               <Input>
                 <InputField
-                  placeholder="Confirm your password"
+                  placeholder="Enter your password again"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
