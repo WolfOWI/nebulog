@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "@/services/authServices";
 interface UserContextType {
   user: User | null;
   loading: boolean;
+  updateUserContext: (updates: Partial<User>) => void;
 }
 
 // Create context for user state
@@ -24,7 +25,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return () => userStateListener();
   }, []);
 
-  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>;
+  const updateUserContext = (updates: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
+  return (
+    <UserContext.Provider value={{ user, loading, updateUserContext }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 // Custom hook to access user state
