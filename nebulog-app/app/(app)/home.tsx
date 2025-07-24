@@ -61,7 +61,7 @@ export default function Home() {
         {/* Top overlay */}
         <SafeAreaView>
           <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
-            <Button onPress={() => router.push("/profile")}>
+            <Button onPress={() => router.push("/myprofile")}>
               <ButtonText>Profile</ButtonText>
             </Button>
           </HStack>

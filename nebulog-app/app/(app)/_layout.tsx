@@ -11,9 +11,9 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
-        name="profile"
+        name="myprofile"
         options={{
-          title: "Profile",
+          title: "My Profile",
           headerShown: false,
         }}
       />
