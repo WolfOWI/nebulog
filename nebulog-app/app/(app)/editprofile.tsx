@@ -10,20 +10,20 @@ import { SafeAreaView, ScrollView, View, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
-import { getMoodIcon } from "@/constants/moodIcons";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
+import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
   const [username, setUsername] = useState("");
-  const [profileIcon, setProfileIcon] = useState("default");
+  const [profileIcon, setProfileIcon] = useState("ufo-outline");
   const [profileColor, setProfileColor] = useState("#4ECDC4");
 
   // Load user data when component mounts
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
-      setProfileIcon(user.profileIcon || "default");
+      setProfileIcon(user.profileIcon || "ufo-outline");
       setProfileColor(user.profileColor || "#3992ba");
     }
   }, [user]);
@@ -100,11 +100,7 @@ export default function EditProfile() {
                   className="w-10 h-10 rounded-full mr-3 items-center justify-center"
                   style={{ backgroundColor: profileColor }}
                 >
-                  {getMoodIcon(profileIcon, {
-                    width: 24,
-                    height: 24,
-                    fill: "#FFFFFF",
-                  })}
+                  <ProfileIcon name={profileIcon} size={24} color="#FFFFFF" />
                 </View>
                 <Text className="text-typography-900">
                   {profileIcon.charAt(0).toUpperCase() + profileIcon.slice(1)}

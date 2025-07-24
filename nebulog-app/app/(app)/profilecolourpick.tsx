@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
@@ -8,7 +8,6 @@ import { SafeAreaView, View, ScrollView } from "react-native";
 import ColorPicker from "react-native-wheel-color-picker";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import { useUser } from "@/contexts/UserContext";
-import { getMoodIcon } from "@/constants/moodIcons";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getIconColourFromBgColour } from "@/utils/colourUtility";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
@@ -78,7 +77,7 @@ export default function ProfileColourPick() {
 
         {/* Current Avatar Preview */}
         <View className="items-center">
-          <ProfileAvatar bgColour={selectedColor} icon={user?.profileIcon || "default"} />
+          <ProfileAvatar bgColour={selectedColor} icon={user?.profileIcon || "ufo-outline"} />
         </View>
 
         {/* Color Picker Component */}

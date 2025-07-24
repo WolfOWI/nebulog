@@ -82,7 +82,7 @@ export default function AvatarHoldBtn({ onHoldComplete, holdDuration = 500 }: Av
           onPressOut={cancelHold}
           style={{ minWidth: 48, minHeight: 48 }}
         >
-          <ProfileAvatar bgColour={user?.profileColor} icon={user?.profileIcon} />
+          <ProfileAvatar bgColour={user?.profileColor} icon={user?.profileIcon || "ufo-outline"} />
         </Pressable>
       </View>
     </View>

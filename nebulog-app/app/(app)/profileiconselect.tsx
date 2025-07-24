@@ -5,27 +5,14 @@ import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView, View, Pressable } from "react-native";
-import { getMoodIcon } from "@/constants/moodIcons";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import { useUser } from "@/contexts/UserContext";
-
-const moodOptions = [
-  "joy",
-  "gratitude",
-  "growth",
-  "connection",
-  "stillness",
-  "wonder",
-  "anger",
-  "turbulence",
-  "sadness",
-  "grief",
-  "lost",
-];
+import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
+import { profileIconNames } from "@/constants/ProfileIconOptions";
 
 export default function ProfileIconSelect() {
   const { user, updateUserContext } = useUser();
-  const [selectedIcon, setSelectedIcon] = useState(user?.profileIcon || "default");
+  const [selectedIcon, setSelectedIcon] = useState(user?.profileIcon || "ufo-outline");
 
   const handleClose = () => {
     router.back();
@@ -61,21 +48,21 @@ export default function ProfileIconSelect() {
 
           {/* Icon Grid */}
           <View className="flex-row flex-wrap justify-between mb-8">
-            {moodOptions.map((mood) => (
+            {profileIconNames.map((icon) => (
               <Pressable
-                key={mood}
-                onPress={() => setSelectedIcon(mood)}
-                className={`w-20 h-20 items-center justify-center rounded-2xl mb-4 ${
-                  selectedIcon === mood
+                key={icon}
+                onPress={() => setSelectedIcon(icon)}
+                className={`w-20 h-20 items-center justify-center rounded-2xl ${
+                  selectedIcon === icon
                     ? "bg-primary-500 border-2 border-primary-600"
                     : "bg-background-50 border border-border-200"
                 }`}
               >
-                {getMoodIcon(mood, {
-                  width: 40,
-                  height: 40,
-                  fill: selectedIcon === mood ? "#FFFFFF" : "#6B7280",
-                })}
+                <ProfileIcon
+                  name={icon}
+                  size={40}
+                  color={selectedIcon === icon ? "#374151" : "#6B7280"}
+                />
               </Pressable>
             ))}
           </View>

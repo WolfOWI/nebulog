@@ -12,7 +12,6 @@ import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
-import { getMoodIcon } from "@/constants/moodIcons";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { defaultProfileColour } from "@/constants/Colors";
 
@@ -55,7 +54,7 @@ export default function MyProfile() {
         <VStack className="flex-1 px-6">
           {/* Profile Header */}
           <VStack className="items-center mb-8">
-            <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon} />
+            <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon || "ufo-outline"} />
             <HStack className="items-center mb-2 gap-2">
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
               <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />
