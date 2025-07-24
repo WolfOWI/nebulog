@@ -9,22 +9,24 @@ import { router } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
+import { logOutUser } from "@/services/authServices";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Profile() {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [bio, setBio] = useState(
-    "Live is like a box of chocolates. You never know what you're gonna get."
-  );
+  const { user } = useUser();
 
   const handleClose = () => {
     router.back();
   };
 
-  const handleLogout = () => {
-    // TODO: Add logout logic here
-    router.push("/(auth)/login");
+  const handleLogout = async () => {
+    await logOutUser();
+    router.replace("/(auth)/login");
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
@@ -48,9 +50,11 @@ export default function Profile() {
                 }}
               />
             </Avatar>
-            <Heading className="text-typography-900 text-2xl font-bold mb-2">{name}</Heading>
-            <Text className="text-typography-600 text-center mb-2">{email}</Text>
-            <Text className="text-typography-600 text-center">{bio}</Text>
+            <Heading className="text-typography-900 text-2xl font-bold mb-2">
+              {user.username}
+            </Heading>
+            <Text className="text-typography-600 text-center mb-2">{user.email}</Text>
+            {user.bio && <Text className="text-typography-600 text-center">{user.bio}</Text>}
           </VStack>
 
           {/* Logout Button */}

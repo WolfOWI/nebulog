@@ -58,7 +58,7 @@ export default function Login() {
           </VStack>
 
           {/* Error Message */}
-          {error ? <Text className="text-red-500 text-center mb-4">{error}</Text> : null}
+          {error ? <Text className="text-red-400 text-center mb-4">{error}</Text> : null}
 
           {/* Login Form */}
           <VStack className="w-full max-w-sm space-y-4">
