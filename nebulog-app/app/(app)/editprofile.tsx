@@ -12,7 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
-import { updateUserDetails } from "@/services/userServices";
+import { isUsernameTaken, updateUserDetails } from "@/services/userServices";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
@@ -33,15 +33,22 @@ export default function EditProfile() {
     router.back();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (user?.id) {
-      updateUserDetails(user.id, {
-        username,
-      });
-      updateUserContext({
-        username,
-      });
-      router.back();
+      // Check if username is already taken
+      const isTaken = await isUsernameTaken(username);
+      if (isTaken) {
+        console.error("Username already taken");
+        return;
+      }
+
+      try {
+        updateUserDetails(user.id, { username }); // Update Firestore DB
+        updateUserContext({ username: username }); // Update Global Context
+        router.back();
+      } catch (error) {
+        console.error("Error updating user username: ", error);
+      }
     } else {
       console.error("User ID not found, cannot update user details");
     }

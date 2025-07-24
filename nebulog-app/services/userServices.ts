@@ -1,6 +1,15 @@
 // User Services
 import { db } from "@/config/firebaseConfig";
-import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  getDocs,
+  where,
+  query,
+} from "firebase/firestore";
 import { User } from "@/lib/types";
 
 /**
@@ -53,7 +62,6 @@ export const getUserById = async (id: string): Promise<User> => {
   }
 };
 
-// Update user details
 /**
  * Update user details
  * @param userId - User's id
@@ -66,5 +74,21 @@ export const updateUserDetails = async (userId: string, userData: Partial<User>)
     await updateDoc(userDoc, userData);
   } catch (error) {
     throw new Error("Error updating user details: " + error);
+  }
+};
+
+/**
+ * Check if username is already taken
+ * @param username - User's username
+ * @returns Boolean
+ */
+export const isUsernameTaken = async (username: string) => {
+  const userDoc = collection(db, "users");
+  const q = query(userDoc, where("username", "==", username));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    return false;
+  } else {
+    return true;
   }
 };
