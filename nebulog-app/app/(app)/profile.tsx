@@ -16,6 +16,7 @@ export default function Profile() {
   const [bio, setBio] = useState(
     "Live is like a box of chocolates. You never know what you're gonna get."
   );
+
   const handleClose = () => {
     router.back();
   };

@@ -9,6 +9,7 @@ import { FormControl, FormControlLabel, FormControlLabelText } from "@/component
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
 import Logo from "@/assets/Icons/Logo";
+import { signUpUser } from "@/services/authServices";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -18,27 +19,31 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async () => {
-    // if (!name || !email || !password || !confirmPassword) {
-    //   // TODO: Add error handling
-    //   return;
-    // }
+    if (password.length < 6) {
+      console.log("Password must be at least 6 characters long");
+      return;
+    }
 
-    // if (password !== confirmPassword) {
-    //   // TODO: Add error handling
-    //   return;
-    // }
+    if (password !== confirmPassword) {
+      console.log("Passwords do not match");
+      return;
+    }
 
-    // if (password.length < 6) {
-    //   // TODO: Add error handling
-    //   return;
-    // }
+    if (!name || !email || !password || !confirmPassword) {
+      console.log("Please fill in all fields");
+      return;
+    }
 
     setIsLoading(true);
-    // TODO: Add authentication logic here
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const user = await signUpUser({ username: name, email, password });
+      console.log("User created: ", user);
       router.push("/(app)/home");
-    }, 1000);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error creating user: ", error);
+      setIsLoading(false);
+    }
   };
 
   return (

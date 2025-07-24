@@ -3,6 +3,8 @@ export interface User {
   username: string;
   email: string;
   bio?: string;
+  profileIcon?: string;
+  profileColor?: string;
   createdAt: string;
   streakCount: number;
   totalReflections: number;
@@ -39,7 +41,6 @@ export interface SignupCredentials {
   username: string;
   email: string;
   password: string;
-  confirmPassword: string;
 }
 
 // Navigation types
