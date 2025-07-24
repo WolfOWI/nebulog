@@ -1,6 +1,6 @@
 // User Services
 import { db } from "@/config/firebaseConfig";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { User } from "@/lib/types";
 
 /**
@@ -34,7 +34,6 @@ export const createNewUserDoc = async (userId: string, username: string, email: 
   }
 };
 
-// Get user by id
 /**
  * Get user by id
  * @param id - User's id
@@ -51,5 +50,21 @@ export const getUserById = async (id: string): Promise<User> => {
     };
   } else {
     throw new Error("User not found");
+  }
+};
+
+// Update user details
+/**
+ * Update user details
+ * @param userId - User's id
+ * @param userData - User's data
+ * @returns Nothing
+ */
+export const updateUserDetails = async (userId: string, userData: Partial<User>) => {
+  try {
+    const userDoc = doc(db, "users", userId);
+    await updateDoc(userDoc, userData);
+  } catch (error) {
+    throw new Error("Error updating user details: " + error);
   }
 };

@@ -11,6 +11,7 @@ import { useUser } from "@/contexts/UserContext";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getIconColourFromBgColour } from "@/utils/colourUtility";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
+import { updateUserDetails } from "@/services/userServices";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
@@ -23,8 +24,13 @@ export default function ProfileColourPick() {
   };
 
   const handleSave = () => {
-    updateUserContext({ profileColor: selectedColor });
-    router.back();
+    if (user?.id) {
+      updateUserDetails(user.id, { profileColor: selectedColor }); // Update Firestore DB
+      updateUserContext({ profileColor: selectedColor }); // Update Context
+      router.back();
+    } else {
+      console.error("User ID not found, cannot update user details");
+    }
   };
 
   const handleColorChange = (color: string) => {

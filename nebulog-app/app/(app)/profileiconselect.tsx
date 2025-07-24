@@ -9,6 +9,7 @@ import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import { useUser } from "@/contexts/UserContext";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { profileIconNames } from "@/constants/ProfileIconOptions";
+import { updateUserDetails } from "@/services/userServices";
 
 export default function ProfileIconSelect() {
   const { user, updateUserContext } = useUser();
@@ -19,8 +20,13 @@ export default function ProfileIconSelect() {
   };
 
   const handleSave = () => {
-    updateUserContext({ profileIcon: selectedIcon });
-    router.back();
+    if (user?.id) {
+      updateUserDetails(user.id, { profileIcon: selectedIcon }); // Update Firestore DB
+      updateUserContext({ profileIcon: selectedIcon }); // Update Global Context
+      router.back();
+    } else {
+      console.error("User ID not found, cannot update user details");
+    }
   };
 
   return (

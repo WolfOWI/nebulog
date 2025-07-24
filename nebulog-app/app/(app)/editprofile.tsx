@@ -12,6 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
+import { updateUserDetails } from "@/services/userServices";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
@@ -33,12 +34,17 @@ export default function EditProfile() {
   };
 
   const handleSave = () => {
-    updateUserContext({
-      username,
-      profileIcon,
-      profileColor,
-    });
-    router.back();
+    if (user?.id) {
+      updateUserDetails(user.id, {
+        username,
+      });
+      updateUserContext({
+        username,
+      });
+      router.back();
+    } else {
+      console.error("User ID not found, cannot update user details");
+    }
   };
 
   const handleIconSelect = () => {
