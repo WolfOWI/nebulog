@@ -6,11 +6,12 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
-import { router } from "expo-router";
-import { SafeAreaView, ScrollView } from "react-native";
-import Logo from "@/assets/icons/Logo";
+import { Link, router } from "expo-router";
+import { SafeAreaView, ScrollView, Image } from "react-native";
 import { signUpUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
+import LaunchButton from "@/components/buttons/LaunchButton";
+import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -57,25 +58,26 @@ export default function Signup() {
       <ScrollView>
         <VStack className="flex-1 justify-center items-center px-6 py-8">
           {/* Logo */}
-          <VStack className="items-center mb-8">
-            <Logo />
-          </VStack>
+          <Image source={nebulogText} className="w-[150px] h-6 object-cover mb-12" />
 
           {/* Welcome Text */}
           <VStack className="items-center mb-8">
             <Heading className="text-typography-900 text-2xl font-bold mb-2">
               Create Account
             </Heading>
-            <Text className="text-typography-600 text-center">
-              Sign up to get started with your account
-            </Text>
+            <HStack className="">
+              <Text className="text-typography-600">Already have an account? </Text>
+              <Link href="/Login" asChild>
+                <Text className="text-primary-600 font-bold">Sign in</Text>
+              </Link>
+            </HStack>
           </VStack>
 
           {/* Error Message */}
           {error ? <Text className="text-red-400 text-center mb-4">{error}</Text> : null}
 
           {/* Signup Form */}
-          <VStack className="w-full max-w-sm space-y-4">
+          <VStack className="w-full gap-4 mb-24">
             <FormControl>
               <FormControlLabel>
                 <FormControlLabelText className="text-typography-700 font-medium mb-1">
@@ -140,19 +142,15 @@ export default function Signup() {
                 />
               </Input>
             </FormControl>
-
-            <Button className="mt-4" onPress={handleSignup} disabled={isLoading}>
-              <ButtonText>{isLoading ? "Creating account..." : "Sign Up"}</ButtonText>
-            </Button>
           </VStack>
-
-          {/* Login Link */}
-          <HStack className="mt-6">
-            <Text className="text-typography-600">Already have an account? </Text>
-            <Text className="text-primary-600 font-medium" onPress={() => router.back()}>
-              Sign in
-            </Text>
-          </HStack>
+          <LaunchButton
+            iconName="person-add"
+            onLaunch={handleSignup}
+            label="Hold to Sign Up"
+            holdDuration={500}
+            size={88}
+            fillColor="#34d399"
+          />
         </VStack>
       </ScrollView>
     </SafeAreaView>
