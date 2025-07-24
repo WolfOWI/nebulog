@@ -152,7 +152,7 @@ export default function LaunchButton({
           onPressIn={startHold}
           onPressOut={isFull ? completeLaunch : cancelHold}
           //   className="w-full border-2 bg-slate-800 rounded-2xl border-[#f8fafc] justify-center items-center overflow-hidden relative gap-2"
-          className="w-full rounded-2xl justify-center items-center overflow-hidden relative gap-2"
+          className="w-full rounded-2xl justify-center items-center overflow-hidden relative gap-2 "
           style={{
             height: size,
           }}

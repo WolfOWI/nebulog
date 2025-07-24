@@ -14,6 +14,8 @@ import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { isUsernameTaken, updateUserDetails } from "@/services/userServices";
 import Toast from "react-native-toast-message";
+import LaunchButton from "@/components/buttons/LaunchButton";
+import { logOutUser } from "@/services/authServices";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
@@ -32,10 +34,6 @@ export default function EditProfile() {
       setBio(user.bio || "");
     }
   }, [user]);
-
-  const handleClose = () => {
-    router.back();
-  };
 
   const handleSave = async () => {
     if (user?.id) {
@@ -110,6 +108,11 @@ export default function EditProfile() {
     router.push("/ProfileColourPick" as any);
   };
 
+  const handleLogout = async () => {
+    await logOutUser();
+    router.replace("/(auth)/Login" as any);
+  };
+
   if (!user) return null;
 
   return (
@@ -117,9 +120,9 @@ export default function EditProfile() {
       {/* Header */}
       <View className="m-4">
         <LeftwardSwipeBtn
-          onSwipeComplete={handleClose}
-          iconName="close"
-          touchMessage="Swipe to Close"
+          onSwipeComplete={handleSave}
+          iconName="check"
+          touchMessage="Swipe to Save"
         />
       </View>
 
@@ -198,9 +201,19 @@ export default function EditProfile() {
           </VStack>
 
           {/* Save Button */}
-          <Button onPress={handleSave} className="mb-6">
+          {/* <Button onPress={handleSave} className="mb-6">
             <ButtonText>Save Changes</ButtonText>
-          </Button>
+          </Button> */}
+        </VStack>
+        <VStack className="mt-12 mb-12">
+          <LaunchButton
+            iconName="logout"
+            onLaunch={handleLogout}
+            label="Hold to Log Out"
+            holdDuration={2000}
+            size={88}
+            fillColor="#991b1b"
+          />
         </VStack>
       </ScrollView>
     </SafeAreaView>

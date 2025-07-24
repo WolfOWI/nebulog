@@ -30,11 +30,6 @@ export default function MyProfile() {
     }
   };
 
-  const handleLogout = async () => {
-    await logOutUser();
-    router.replace("/(auth)/Login" as any);
-  };
-
   if (!user) {
     return null;
   }
@@ -57,7 +52,7 @@ export default function MyProfile() {
             <HStack className="items-center mt-3 mb-2 gap-3">
               <View className="w-12 h-12" />
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
-              <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />
+              <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="more-horiz" />
             </HStack>
             {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
             <HStack className="justify-between items-center w-full mt-4 px-4">
@@ -75,11 +70,6 @@ export default function MyProfile() {
               </VStack>
             </HStack>
           </VStack>
-
-          {/* Logout Button */}
-          <Button onPress={handleLogout} variant="outline" className="mt-4">
-            <ButtonText>Log Out</ButtonText>
-          </Button>
         </VStack>
       </ScrollView>
     </SafeAreaView>
