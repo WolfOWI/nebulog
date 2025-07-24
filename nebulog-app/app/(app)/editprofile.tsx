@@ -42,11 +42,11 @@ export default function EditProfile() {
   };
 
   const handleIconSelect = () => {
-    router.push("/profileiconselect");
+    router.push("/(app)/ProfileIconSelect" as any);
   };
 
   const handleColorSelect = () => {
-    router.push("/profilecolourpick");
+    router.push("/ProfileColourPick" as any);
   };
 
   if (!user) return null;

@@ -8,7 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { Link, router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
-import Logo from "@/assets/Icons/Logo";
+import Logo from "@/assets/icons/Logo";
 import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 
@@ -31,7 +31,7 @@ export default function Login() {
     try {
       await logInUser({ email, password });
       // Navigate to home after successful login
-      router.replace("/(app)/home");
+      router.replace("/(app)/Home" as any);
     } catch (error) {
       console.error("Error logging in user: ", error);
       setError("Invalid email or password");
@@ -103,7 +103,7 @@ export default function Login() {
           {/* Sign Up Link */}
           <HStack className="mt-6">
             <Text className="text-typography-600">Don't have an account? </Text>
-            <Link href="/signup" asChild>
+            <Link href="/Signup" asChild>
               <Text className="text-primary-600 font-medium">Sign up</Text>
             </Link>
           </HStack>

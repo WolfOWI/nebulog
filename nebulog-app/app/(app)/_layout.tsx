@@ -4,35 +4,35 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="home"
+        name="Home"
         options={{
           title: "Home",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="myprofile"
+        name="MyProfile"
         options={{
           title: "My Profile",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="editprofile"
+        name="EditProfile"
         options={{
           title: "Edit Profile",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="profileiconselect"
+        name="ProfileIconSelect"
         options={{
           title: "Profile Icon Select",
           headerShown: false,
         }}
       />
       <Stack.Screen
-        name="profilecolourpick"
+        name="ProfileColourPick"
         options={{
           title: "Profile Colour Pick",
           headerShown: false,

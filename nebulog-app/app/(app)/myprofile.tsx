@@ -24,7 +24,7 @@ export default function MyProfile() {
 
   const handleEdit = () => {
     try {
-      router.push("/editprofile");
+      router.push("/EditProfile" as any);
     } catch (error) {
       console.error("Error in handleEdit:", error);
     }
@@ -32,7 +32,7 @@ export default function MyProfile() {
 
   const handleLogout = async () => {
     await logOutUser();
-    router.replace("/(auth)/login");
+    router.replace("/(auth)/Login" as any);
   };
 
   if (!user) {

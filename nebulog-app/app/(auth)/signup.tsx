@@ -8,7 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
-import Logo from "@/assets/Icons/Logo";
+import Logo from "@/assets/icons/Logo";
 import { signUpUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 
@@ -43,7 +43,7 @@ export default function Signup() {
     try {
       await signUpUser({ username: name, email, password });
       // Navigate to home after successful signup
-      router.replace("/(app)/home");
+      router.replace("/(app)/Home" as any);
     } catch (error) {
       console.error("Error creating user: ", error);
       setError("Error creating account. Please try again.");

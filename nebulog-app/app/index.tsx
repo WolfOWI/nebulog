@@ -13,10 +13,10 @@ export default function Index() {
 
     if (user) {
       // User is authenticated, redirect to home
-      router.replace("/(app)/home");
+      router.replace("/(app)/Home" as any);
     } else {
       // User is not authenticated, redirect to login
-      router.replace("/(auth)/login");
+      router.replace("/(auth)/Login" as any);
     }
   }, [user, loading]);
 

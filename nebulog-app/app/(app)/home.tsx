@@ -62,7 +62,7 @@ export default function Home() {
         {/* Top overlay */}
         <SafeAreaView>
           <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
-            <AvatarHoldBtn onHoldComplete={() => router.push("/myprofile")} />
+            <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
           </HStack>
         </SafeAreaView>
 
