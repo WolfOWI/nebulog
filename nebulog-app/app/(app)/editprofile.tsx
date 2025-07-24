@@ -18,6 +18,7 @@ import Toast from "react-native-toast-message";
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
   const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
   const [profileColor, setProfileColor] = useState("#4ECDC4");
   const [showErrorTooltip, setShowErrorTooltip] = useState(true); // Temporary for styling
@@ -28,6 +29,7 @@ export default function EditProfile() {
       setUsername(user.username || "");
       setProfileIcon(user.profileIcon || "ufo-outline");
       setProfileColor(user.profileColor || "#3992ba");
+      setBio(user.bio || "");
     }
   }, [user]);
 
@@ -52,17 +54,17 @@ export default function EditProfile() {
         return;
       }
 
-      // If username is changed, update the profile
-      if (username !== user.username) {
+      // If username or bio is changed, update the profile
+      if (username !== user.username || bio !== user.bio) {
         try {
-          updateUserDetails(user.id, { username }); // Update Firestore DB
-          updateUserContext({ username: username }); // Update Global Context
+          updateUserDetails(user.id, { username, bio }); // Update Firestore DB
+          updateUserContext({ username: username, bio: bio }); // Update Global Context
 
           // Show success toast
           Toast.show({
             type: "success",
             text1: "Profile Updated",
-            text2: "Your profile has been saved successfully.",
+            text2: `Your profile has been updated successfully.`,
             position: "top",
             visibilityTime: 3000,
             autoHide: true,
@@ -144,6 +146,14 @@ export default function EditProfile() {
                 placeholder="Enter your username"
                 className="text-typography-900"
               />
+            </Input>
+          </VStack>
+
+          {/* Bio Input */}
+          <VStack className="mb-6">
+            <Text className="text-typography-700 text-sm font-medium mb-2">Bio</Text>
+            <Input className="border border-border-200 rounded-lg">
+              <InputField value={bio} onChangeText={setBio} placeholder="Enter your bio" />
             </Input>
           </VStack>
 
