@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth";
 import Constants from "expo-constants";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,5 +23,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Realtime Database
 const db = getDatabase(app);
 
-export { db };
+// Initialize Firebase Auth
+const auth = getAuth(app);
+
+export { db, auth };
 export default app;

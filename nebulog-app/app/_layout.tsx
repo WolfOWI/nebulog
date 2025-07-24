@@ -5,7 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
-import { Slot } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   Inter_100Thin,
@@ -26,11 +26,6 @@ export {
   ErrorBoundary,
 } from "expo-router";
 
-// export const unstable_settings = {
-//   // Ensure that reloading on `/modal` keeps a back button present.
-//   initialRouteName: "gluestack",
-// };
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -49,7 +44,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  const [styleLoaded, setStyleLoaded] = useState(false);
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -61,13 +55,9 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // useLayoutEffect(() => {
-  //   setStyleLoaded(true);
-  // }, [styleLoaded]);
-
-  // if (!loaded || !styleLoaded) {
-  //   return null;
-  // }
+  if (!loaded) {
+    return null;
+  }
 
   return <RootLayoutNav />;
 }
@@ -79,7 +69,10 @@ function RootLayoutNav() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          <Slot />
+          <Stack>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          </Stack>
         </ThemeProvider>
       </GluestackUIProvider>
     </GestureHandlerRootView>
