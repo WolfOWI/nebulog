@@ -7,14 +7,12 @@ import { CircularProgress } from "react-native-circular-progress";
 interface CircleHoldBtnProps {
   onHoldComplete: () => void;
   iconName: keyof typeof MaterialIcons.glyphMap;
-  className?: string;
   holdDuration?: number;
 }
 
 export default function CircleHoldBtn({
   onHoldComplete,
   iconName,
-  className,
   holdDuration = 1000,
 }: CircleHoldBtnProps) {
   const [isHolding, setIsHolding] = useState(false);
@@ -63,21 +61,11 @@ export default function CircleHoldBtn({
   };
 
   return (
-    <View className={className}>
-      <View style={{ position: "relative" }}>
+    <View>
+      <View className="relative">
         {/* Progress circle */}
         {isHolding && (
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+          <View className="absolute top-0 left-0 right-0 bottom-0 justify-center items-center">
             <CircularProgress
               size={136}
               width={16}
