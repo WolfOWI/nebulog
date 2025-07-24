@@ -37,7 +37,7 @@ export default function Signup() {
     setIsLoading(true);
     try {
       const user = await signUpUser({ username: name, email, password });
-      console.log("User created: ", user);
+      // console.log("User created: ", user);
       router.push("/(app)/home");
       setIsLoading(false);
     } catch (error) {

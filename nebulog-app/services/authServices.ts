@@ -1,6 +1,7 @@
 // Authentication Services
 import { auth } from "@/config/firebaseConfig";
 import { LoginCredentials, SignupCredentials, User } from "@/lib/types";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { createNewUserDoc, getUserById } from "./userServices";
 
@@ -19,8 +20,22 @@ export const isUserLoggedIn = async (): Promise<boolean> => {
  * @returns User object on successful login
  */
 export const logInUser = async (credentials: LoginCredentials): Promise<User> => {
-  // TODO: Implement Firebase log in
-  throw new Error("Not implemented");
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      credentials.email,
+      credentials.password
+    );
+    const user = userCredential.user;
+    if (user) {
+      const userDoc = await getUserById(user.uid);
+      return userDoc;
+    } else {
+      throw new Error("User not found");
+    }
+  } catch (error) {
+    throw new Error("Error logging in user: " + error);
+  }
 };
 
 /**
@@ -35,7 +50,6 @@ export const signUpUser = async (credentials: SignupCredentials): Promise<User> 
       credentials.email,
       credentials.password
     );
-
     const user = userCredential.user;
 
     await createNewUserDoc(user.uid, credentials.username, credentials.email);

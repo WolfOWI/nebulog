@@ -9,23 +9,28 @@ import { FormControl, FormControlLabel, FormControlLabelText } from "@/component
 import { Link, router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
 import Logo from "@/assets/Icons/Logo";
+import { logInUser } from "@/services/authServices";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const handleLogin = async () => {
-    // if (!email || !password) {
-    //   // TODO: Add login error messages
-    //   return;
-    // }
+    if (!email || !password) {
+      console.log("Please fill in all fields");
+      return;
+    }
 
     setIsLoading(true);
-    // TODO: Add auth
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const user = await logInUser({ email, password });
+      console.log("User logged in: ", user);
       router.push("/(app)/home");
-    }, 1000);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error logging in user: ", error);
+      setIsLoading(false);
+    }
   };
 
   return (
