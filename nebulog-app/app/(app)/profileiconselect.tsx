@@ -10,6 +10,7 @@ import { useUser } from "@/contexts/UserContext";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { profileIconNames } from "@/constants/ProfileIconOptions";
 import { updateUserDetails } from "@/services/userServices";
+import Toast from "react-native-toast-message";
 
 export default function ProfileIconSelect() {
   const { user, updateUserContext } = useUser();
@@ -23,9 +24,28 @@ export default function ProfileIconSelect() {
     if (user?.id) {
       updateUserDetails(user.id, { profileIcon: selectedIcon }); // Update Firestore DB
       updateUserContext({ profileIcon: selectedIcon }); // Update Global Context
+
+      Toast.show({
+        type: "success",
+        text1: "Profile Icon Updated",
+        text2: `Your profile icon has been changed to the ${selectedIcon.replace("-", " ")} icon.`,
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
+
       router.back();
     } else {
-      console.error("User ID not found, cannot update user details");
+      Toast.show({
+        type: "error",
+        text1: "Update Failed",
+        text2: "There was an error updating your profile icon. Please try again.",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
     }
   };
 

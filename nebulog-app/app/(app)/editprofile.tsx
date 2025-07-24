@@ -157,12 +157,12 @@ export default function EditProfile() {
               <HStack className="items-center">
                 <View
                   className="w-10 h-10 rounded-full mr-3 items-center justify-center"
-                  style={{ backgroundColor: profileColor }}
+                  style={{ backgroundColor: "#1e293b" }}
                 >
                   <ProfileIcon name={profileIcon} size={24} color="#FFFFFF" />
                 </View>
                 <Text className="text-typography-900">
-                  {profileIcon.charAt(0).toUpperCase() + profileIcon.slice(1)}
+                  {profileIcon.charAt(0).toUpperCase() + profileIcon.replace("-", " ").slice(1)}
                 </Text>
               </HStack>
               <MaterialIcons name="chevron-right" size={24} color="#6B7280" />

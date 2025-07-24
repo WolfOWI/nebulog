@@ -12,6 +12,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getIconColourFromBgColour } from "@/utils/colourUtility";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { updateUserDetails } from "@/services/userServices";
+import Toast from "react-native-toast-message";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
@@ -27,9 +28,28 @@ export default function ProfileColourPick() {
     if (user?.id) {
       updateUserDetails(user.id, { profileColor: selectedColor }); // Update Firestore DB
       updateUserContext({ profileColor: selectedColor }); // Update Context
+
+      Toast.show({
+        type: "success",
+        text1: "Profile Colour Updated",
+        text2: "Your profile colour has been saved successfully.",
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
+
       router.back();
     } else {
-      console.error("User ID not found, cannot update user details");
+      Toast.show({
+        type: "error",
+        text1: "Update Failed",
+        text2: "There was an error updating your profile colour. Please try again.",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
     }
   };
 
