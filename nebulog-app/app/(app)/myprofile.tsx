@@ -59,7 +59,7 @@ export default function MyProfile() {
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
               <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />
             </HStack>
-            {user.bio && <Text className="text-typography-600 text-center">{user.bio}</Text>}
+            {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
             <HStack className="justify-between items-center w-full mt-4 px-4">
               <VStack className="items-center w-1/3">
                 <Text className="text-slate-50 text-center text-2xl ">{user.streakCount}</Text>
