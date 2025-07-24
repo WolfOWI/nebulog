@@ -11,6 +11,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
+import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 
 export default function MyProfile() {
   const { user } = useUser();
@@ -20,8 +21,11 @@ export default function MyProfile() {
   };
 
   const handleEdit = () => {
-    // TODO: Implement edit functionality
-    console.log("Edit profile");
+    try {
+      router.push("/editprofile");
+    } catch (error) {
+      console.error("Error in handleEdit:", error);
+    }
   };
 
   const handleLogout = async () => {
@@ -55,9 +59,10 @@ export default function MyProfile() {
                 }}
               />
             </Avatar>
-            <Heading className="text-typography-900 text-2xl font-bold mb-2">
-              {user.username}
-            </Heading>
+            <HStack className="items-center mb-2 gap-2">
+              <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
+              <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />
+            </HStack>
             {user.bio && <Text className="text-typography-600 text-center">{user.bio}</Text>}
             <HStack className="justify-between items-center w-full mt-4 px-4">
               <VStack className="items-center w-1/3">

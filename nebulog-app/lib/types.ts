@@ -48,5 +48,6 @@ export type RootStackParamList = {
   "/": undefined;
   "/signup": undefined;
   "/home": undefined;
-  "/profile": undefined;
+  "/myprofile": undefined;
+  "/editprofile": undefined;
 };
