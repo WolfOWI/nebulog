@@ -41,7 +41,6 @@ export default function MyProfile() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
-      {/* Double Swipe Button - Centered at top */}
       <View className="m-4">
         <LeftwardSwipeBtn
           onSwipeComplete={handleClose}
@@ -55,7 +54,8 @@ export default function MyProfile() {
           {/* Profile Header */}
           <VStack className="items-center mb-8">
             <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon || "ufo-outline"} />
-            <HStack className="items-center mb-2 gap-2">
+            <HStack className="items-center mt-3 mb-2 gap-3">
+              <View className="w-12 h-12" />
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
               <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />
             </HStack>
