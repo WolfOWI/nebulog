@@ -13,6 +13,8 @@ import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import { getMoodIcon } from "@/constants/moodIcons";
+import ProfileAvatar from "@/components/avatars/ProfileAvatar";
+import { defaultProfileColour } from "@/constants/Colors";
 
 export default function MyProfile() {
   const { user } = useUser();
@@ -53,17 +55,7 @@ export default function MyProfile() {
         <VStack className="flex-1 px-6">
           {/* Profile Header */}
           <VStack className="items-center mb-8">
-            <Avatar className="w-24 h-24 mb-4">
-              <AvatarImage
-                className="w-24 h-24 rounded-full"
-                style={{ backgroundColor: user.profileColor || "#4ECDC4" }}
-              />
-              {getMoodIcon(user.profileIcon || "default", {
-                width: 48,
-                height: 48,
-                fill: "#FFFFFF",
-              })}
-            </Avatar>
+            <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon} />
             <HStack className="items-center mb-2 gap-2">
               <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
               <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="edit" />

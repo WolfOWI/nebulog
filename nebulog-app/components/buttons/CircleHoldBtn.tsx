@@ -3,6 +3,8 @@ import { View, Pressable, Animated } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import CircleBtn from "../building-blocks/CircleBtn";
 import { CircularProgress } from "react-native-circular-progress";
+import { useUser } from "@/contexts/UserContext";
+import { defaultProfileColour } from "@/constants/Colors";
 
 interface CircleHoldBtnProps {
   onHoldComplete: () => void;
@@ -15,6 +17,7 @@ export default function CircleHoldBtn({
   iconName,
   holdDuration = 1000,
 }: CircleHoldBtnProps) {
+  const { user } = useUser();
   const [isHolding, setIsHolding] = useState(false);
   const [progress, setProgress] = useState(0);
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,11 +70,11 @@ export default function CircleHoldBtn({
         {isHolding && (
           <View className="absolute top-0 left-0 right-0 bottom-0 justify-center items-center">
             <CircularProgress
-              size={136}
+              size={104}
               width={16}
               fill={progress}
-              tintColor="#6366f1"
-              backgroundColor="#374151"
+              tintColor={user?.profileColor || defaultProfileColour}
+              backgroundColor="rgba(0, 0, 0, 0.2)"
               rotation={0}
               lineCap="round"
             />

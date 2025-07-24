@@ -5,14 +5,13 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Input, InputField } from "@/components/ui/input";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView, View, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
-
 import { getMoodIcon } from "@/constants/moodIcons";
+import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
@@ -25,7 +24,7 @@ export default function EditProfile() {
     if (user) {
       setUsername(user.username || "");
       setProfileIcon(user.profileIcon || "default");
-      setProfileColor(user.profileColor || "#4ECDC4");
+      setProfileColor(user.profileColor || "#3992ba");
     }
   }, [user]);
 
@@ -73,17 +72,7 @@ export default function EditProfile() {
 
           {/* Profile Avatar Preview */}
           <VStack className="items-center mb-8">
-            <Avatar className="w-24 h-24 mb-4">
-              <AvatarImage
-                className="w-24 h-24 rounded-full"
-                style={{ backgroundColor: profileColor }}
-              />
-              {getMoodIcon(profileIcon, {
-                width: 48,
-                height: 48,
-                fill: "#FFFFFF",
-              })}
-            </Avatar>
+            <ProfileAvatar bgColour={profileColor} icon={profileIcon} />
           </VStack>
 
           {/* Username Input */}

@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import MapComponent from "@/components/map/Map";
 import { Location as LocationType } from "@/lib/types";
+import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
 
 export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks
@@ -61,9 +62,7 @@ export default function Home() {
         {/* Top overlay */}
         <SafeAreaView>
           <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
-            <Button onPress={() => router.push("/myprofile")}>
-              <ButtonText>Profile</ButtonText>
-            </Button>
+            <AvatarHoldBtn onHoldComplete={() => router.push("/myprofile")} />
           </HStack>
         </SafeAreaView>
 

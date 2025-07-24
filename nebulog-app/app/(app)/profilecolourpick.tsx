@@ -11,6 +11,7 @@ import { useUser } from "@/contexts/UserContext";
 import { getMoodIcon } from "@/constants/moodIcons";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getIconColourFromBgColour } from "@/utils/colourUtility";
+import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
@@ -77,16 +78,7 @@ export default function ProfileColourPick() {
 
         {/* Current Avatar Preview */}
         <View className="items-center">
-          <View
-            className="flex items-center justify-center w-24 h-24 rounded-full"
-            style={{ backgroundColor: selectedColor }}
-          >
-            {getMoodIcon(user?.profileIcon || "default", {
-              width: 48,
-              height: 48,
-              fill: getIconColourFromBgColour(selectedColor),
-            })}
-          </View>
+          <ProfileAvatar bgColour={selectedColor} icon={user?.profileIcon || "default"} />
         </View>
 
         {/* Color Picker Component */}
