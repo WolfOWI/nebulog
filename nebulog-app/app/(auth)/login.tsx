@@ -7,7 +7,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { Link, router } from "expo-router";
-import { SafeAreaView, ScrollView } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import Logo from "@/assets/icons/Logo";
 import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
@@ -80,7 +80,7 @@ export default function Login() {
           {error ? <Text className="text-red-400 text-center mb-4">{error}</Text> : null}
 
           {/* Login Form */}
-          <VStack className="w-full max-w-sm space-y-4">
+          <VStack className="w-full max-w-sm gap-4">
             <FormControl>
               <FormControlLabel>
                 <FormControlLabelText className="text-typography-700 font-medium mb-1">
@@ -118,11 +118,12 @@ export default function Login() {
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
             </Button> */}
             <LaunchButton
-              onLaunch={() => console.log("Launched!")}
-              iconName="rocket-launch"
+              onLaunch={handleLogin}
+              label="Hold to Log In"
               holdDuration={2000} // 2 seconds
-              size={100}
+              size={88}
             />
+
             {/* TODO: Remove this later */}
             <Button className="mt-4" onPress={tempQuickLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Quick Login" : "Quick Login"}</ButtonText>

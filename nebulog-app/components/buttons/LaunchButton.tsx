@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, Pressable, Animated } from "react-native";
+import { View, Pressable, Animated, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import { defaultProfileColour } from "@/constants/Colors";
@@ -9,13 +9,15 @@ interface LaunchButtonProps {
   iconName?: keyof typeof MaterialIcons.glyphMap;
   holdDuration?: number;
   size?: number;
+  label?: string;
 }
 
 export default function LaunchButton({
   onLaunch,
-  iconName = "rocket-launch",
+  iconName,
   holdDuration = 2000,
   size = 80,
+  label,
 }: LaunchButtonProps) {
   const { user } = useUser();
   const [isHolding, setIsHolding] = useState(false);
@@ -33,7 +35,7 @@ export default function LaunchButton({
       return;
     }
 
-    console.log("Starting hold animation");
+    // console.log("Starting hold animation");
     setIsHolding(true);
     setIsFull(false);
     setProgress(0);
@@ -51,7 +53,7 @@ export default function LaunchButton({
       // Update fill height directly for smoother animation
       fillHeight.setValue(newProgress / 100);
 
-      console.log(`Fill progress: ${newProgress}%`);
+      //   console.log(`Fill progress: ${newProgress}%`);
 
       if (currentStep >= steps) {
         setIsFull(true);
@@ -90,7 +92,7 @@ export default function LaunchButton({
   };
 
   const completeLaunch = () => {
-    console.log("Completing launch");
+    // console.log("Completing launch");
     if (isFull) {
       stopShake();
       onLaunch();
@@ -99,13 +101,18 @@ export default function LaunchButton({
         setIsHolding(false);
         setIsFull(false);
         setProgress(0);
-        fillHeight.setValue(0);
+        // Reset fill animation
+        Animated.timing(fillHeight, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }).start();
       }, 100);
     }
   };
 
   const cancelHold = () => {
-    console.log("Canceling hold animation");
+    // console.log("Canceling hold animation");
     setIsHolding(false);
     setIsFull(false);
     setProgress(0);
@@ -127,11 +134,8 @@ export default function LaunchButton({
   // Interpolate shake values
   const shakeTranslateX = shakeAnimation.interpolate({
     inputRange: [-1, 1],
-    outputRange: [-8, 8],
+    outputRange: [-1, 1],
   });
-
-  const buttonColor = user?.profileColor || defaultProfileColour;
-  const fillColor = "#ff6b6b"; // Bright red for testing visibility
 
   return (
     <View style={{ width: "100%", height: size }}>
@@ -145,17 +149,9 @@ export default function LaunchButton({
         <Pressable
           onPressIn={startHold}
           onPressOut={isFull ? completeLaunch : cancelHold}
+          className="w-full border-2 bg-slate-800 rounded-2xl border-[#f8fafc] justify-center items-center overflow-hidden relative gap-2"
           style={{
-            width: "100%",
             height: size,
-            borderRadius: 12,
-            borderWidth: 2,
-            borderColor: "#f8fafc",
-            overflow: "hidden",
-            backgroundColor: "#374151", // Dark background to see fill
-            justifyContent: "center",
-            alignItems: "center",
-            position: "relative",
           }}
         >
           {/* Fill background */}
@@ -177,7 +173,16 @@ export default function LaunchButton({
           />
 
           {/* Icon */}
-          <MaterialIcons name={iconName} size={size * 0.4} color="#f8fafc" style={{ zIndex: 2 }} />
+          {iconName && (
+            <MaterialIcons
+              name={iconName}
+              size={size * 0.3}
+              color="#f8fafc"
+              style={{ zIndex: 2 }}
+            />
+          )}
+
+          {label && <Text className="text-slate-50 text-[16px] z-10">{label}</Text>}
         </Pressable>
       </Animated.View>
     </View>
