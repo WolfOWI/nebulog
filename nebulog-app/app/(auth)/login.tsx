@@ -7,11 +7,11 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { Link, router } from "expo-router";
-import { SafeAreaView, ScrollView, View } from "react-native";
-import Logo from "@/assets/icons/Logo";
+import { SafeAreaView, ScrollView, View, Image } from "react-native";
 import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
+import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -62,25 +62,31 @@ export default function Login() {
   return (
     <SafeAreaView className="flex-1 bg-background-0">
       <ScrollView>
+        {/* TODO: Remove this later */}
+        <Button className="mt-4" onPress={tempQuickLogin} disabled={isLoading}>
+          <ButtonText>{isLoading ? "Quick Login" : "Quick Login"}</ButtonText>
+        </Button>
+        {/* ---------------------------- */}
         <VStack className="flex-1 justify-center items-center px-6 py-8">
           {/* Logo */}
-          <VStack className="items-center mb-8">
-            <Logo />
-          </VStack>
+          <Image source={nebulogText} className="w-[150px] h-6 object-cover mb-12" />
 
           {/* Welcome Text */}
           <VStack className="items-center mb-8">
             <Heading className="text-typography-900 text-2xl font-bold mb-2">Welcome Back</Heading>
-            <Text className="text-typography-600 text-center">
-              Sign in to your account to continue
-            </Text>
+            <HStack className="">
+              <Text className="text-typography-600">Don't have an account? </Text>
+              <Link href="/Signup" asChild>
+                <Text className="text-primary-600 font-bold">Join us</Text>
+              </Link>
+            </HStack>
           </VStack>
 
           {/* Error Message */}
           {error ? <Text className="text-red-400 text-center mb-4">{error}</Text> : null}
 
           {/* Login Form */}
-          <VStack className="w-full max-w-sm gap-4">
+          <VStack className="w-full gap-4 mb-24">
             <FormControl>
               <FormControlLabel>
                 <FormControlLabelText className="text-typography-700 font-medium mb-1">
@@ -117,26 +123,14 @@ export default function Login() {
             {/* <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
             </Button> */}
-            <LaunchButton
-              onLaunch={handleLogin}
-              label="Hold to Log In"
-              holdDuration={2000} // 2 seconds
-              size={88}
-            />
-
-            {/* TODO: Remove this later */}
-            <Button className="mt-4" onPress={tempQuickLogin} disabled={isLoading}>
-              <ButtonText>{isLoading ? "Quick Login" : "Quick Login"}</ButtonText>
-            </Button>
           </VStack>
-
-          {/* Sign Up Link */}
-          <HStack className="mt-6">
-            <Text className="text-typography-600">Don't have an account? </Text>
-            <Link href="/Signup" asChild>
-              <Text className="text-primary-600 font-medium">Sign up</Text>
-            </Link>
-          </HStack>
+          <LaunchButton
+            iconName="login"
+            onLaunch={handleLogin}
+            label="Hold to Log In"
+            holdDuration={500}
+            size={88}
+          />
         </VStack>
       </ScrollView>
     </SafeAreaView>

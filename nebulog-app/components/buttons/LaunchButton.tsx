@@ -10,6 +10,7 @@ interface LaunchButtonProps {
   holdDuration?: number;
   size?: number;
   label?: string;
+  fillColor?: string;
 }
 
 export default function LaunchButton({
@@ -18,6 +19,7 @@ export default function LaunchButton({
   holdDuration = 2000,
   size = 80,
   label,
+  fillColor = "#3730a3",
 }: LaunchButtonProps) {
   const { user } = useUser();
   const [isHolding, setIsHolding] = useState(false);
@@ -149,7 +151,8 @@ export default function LaunchButton({
         <Pressable
           onPressIn={startHold}
           onPressOut={isFull ? completeLaunch : cancelHold}
-          className="w-full border-2 bg-slate-800 rounded-2xl border-[#f8fafc] justify-center items-center overflow-hidden relative gap-2"
+          //   className="w-full border-2 bg-slate-800 rounded-2xl border-[#f8fafc] justify-center items-center overflow-hidden relative gap-2"
+          className="w-full rounded-2xl justify-center items-center overflow-hidden relative gap-2"
           style={{
             height: size,
           }}
@@ -161,7 +164,7 @@ export default function LaunchButton({
               bottom: 0,
               left: 0,
               right: 0,
-              backgroundColor: "green",
+              backgroundColor: fillColor,
               height: fillHeight.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, size],
@@ -182,7 +185,7 @@ export default function LaunchButton({
             />
           )}
 
-          {label && <Text className="text-slate-50 text-[16px] z-10">{label}</Text>}
+          {label && <Text className="text-slate-400 text-[16px] z-10">{label}</Text>}
         </Pressable>
       </Animated.View>
     </View>
