@@ -20,7 +20,7 @@ export default function LeftwardSwipeBtn({
   onSwipeComplete,
   iconName,
   threshold = 0.3,
-  touchMessage = "Swipe Left to Close",
+  touchMessage = "Swipe Left",
 }: LeftwardSwipeBtnProps) {
   // Track the button's position
   const translateX = useSharedValue(0);
