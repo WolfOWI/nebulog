@@ -7,6 +7,7 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Slot, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { UserProvider } from "@/contexts/UserContext";
 import {
   Inter_100Thin,
   Inter_200ExtraLight,
@@ -67,14 +68,17 @@ function RootLayoutNav() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          </Stack>
-        </ThemeProvider>
-      </GluestackUIProvider>
+      <UserProvider>
+        <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+          <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(app)" options={{ headerShown: false }} />
+            </Stack>
+          </ThemeProvider>
+        </GluestackUIProvider>
+      </UserProvider>
     </GestureHandlerRootView>
   );
 }

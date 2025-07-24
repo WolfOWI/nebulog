@@ -10,25 +10,32 @@ import { Link, router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
 import Logo from "@/assets/Icons/Logo";
 import { logInUser } from "@/services/authServices";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { user } = useUser();
+
   const handleLogin = async () => {
     if (!email || !password) {
-      console.log("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
+    setError("");
+
     try {
-      const user = await logInUser({ email, password });
-      console.log("User logged in: ", user);
-      router.push("/(app)/home");
-      setIsLoading(false);
+      await logInUser({ email, password });
+      // Navigate to home after successful login
+      router.replace("/(app)/home");
     } catch (error) {
       console.error("Error logging in user: ", error);
+      setError("Invalid email or password");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -49,6 +56,9 @@ export default function Login() {
               Sign in to your account to continue
             </Text>
           </VStack>
+
+          {/* Error Message */}
+          {error ? <Text className="text-red-500 text-center mb-4">{error}</Text> : null}
 
           {/* Login Form */}
           <VStack className="w-full max-w-sm space-y-4">

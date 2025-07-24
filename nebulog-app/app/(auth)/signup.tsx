@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import { SafeAreaView, ScrollView } from "react-native";
 import Logo from "@/assets/Icons/Logo";
 import { signUpUser } from "@/services/authServices";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -17,31 +18,36 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { user } = useUser();
 
   const handleSignup = async () => {
     if (password.length < 6) {
-      console.log("Password must be at least 6 characters long");
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     if (password !== confirmPassword) {
-      console.log("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
     if (!name || !email || !password || !confirmPassword) {
-      console.log("Please fill in all fields");
+      setError("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
+    setError("");
+
     try {
-      const user = await signUpUser({ username: name, email, password });
-      // console.log("User created: ", user);
-      router.push("/(app)/home");
-      setIsLoading(false);
+      await signUpUser({ username: name, email, password });
+      // Navigate to home after successful signup
+      router.replace("/(app)/home");
     } catch (error) {
       console.error("Error creating user: ", error);
+      setError("Error creating account. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -64,6 +70,9 @@ export default function Signup() {
               Sign up to get started with your account
             </Text>
           </VStack>
+
+          {/* Error Message */}
+          {error ? <Text className="text-red-500 text-center mb-4">{error}</Text> : null}
 
           {/* Signup Form */}
           <VStack className="w-full max-w-sm space-y-4">

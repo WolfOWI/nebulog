@@ -1,7 +1,11 @@
 // Authentication Services
 import { auth } from "@/config/firebaseConfig";
 import { LoginCredentials, SignupCredentials, User } from "@/lib/types";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged as firebaseOnAuthStateChanged,
+} from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { createNewUserDoc, getUserById } from "./userServices";
 
@@ -10,8 +14,7 @@ import { createNewUserDoc, getUserById } from "./userServices";
  * @returns Boolean - True if user is logged in, false otherwise
  */
 export const isUserLoggedIn = async (): Promise<boolean> => {
-  // TODO: Implement authentication status check
-  return false;
+  return auth.currentUser !== null;
 };
 
 /**
@@ -65,8 +68,11 @@ export const signUpUser = async (credentials: SignupCredentials): Promise<User> 
  * @returns Nothing
  */
 export const logOutUser = async (): Promise<void> => {
-  // TODO: Implement Firebase sign out
-  throw new Error("Not implemented");
+  try {
+    await signOut(auth);
+  } catch (error) {
+    throw new Error("Error signing out: " + error);
+  }
 };
 
 /**
@@ -74,8 +80,16 @@ export const logOutUser = async (): Promise<void> => {
  * @returns Current user object or null if not authenticated
  */
 export const getCurrentUser = async (): Promise<User | null> => {
-  // TODO: Implement get current user
-  return null;
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      return await getUserById(currentUser.uid);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting current user:", error);
+    return null;
+  }
 };
 
 /**
@@ -94,8 +108,17 @@ export const updateUserProfile = async (userData: Partial<User>): Promise<User> 
  * @returns Unsubscribe function
  */
 export const onAuthStateChanged = (callback: (user: User | null) => void) => {
-  // TODO: Implement auth state listener
-  return () => {
-    // Return unsubscribe function
-  };
+  return firebaseOnAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      try {
+        const userDoc = await getUserById(firebaseUser.uid);
+        callback(userDoc);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        callback(null);
+      }
+    } else {
+      callback(null);
+    }
+  });
 };
