@@ -11,6 +11,7 @@ import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/botto
 import MapComponent from "@/components/map/Map";
 import { Location as LocationType } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
+import Toast from "react-native-toast-message";
 
 export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks

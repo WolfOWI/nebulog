@@ -8,6 +8,9 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { Slot, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UserProvider } from "@/contexts/UserContext";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "@/styles/toastStyles";
+
 import {
   Inter_100Thin,
   Inter_200ExtraLight,
@@ -76,6 +79,7 @@ function RootLayoutNav() {
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(app)" options={{ headerShown: false }} />
             </Stack>
+            <Toast config={toastConfig} />
           </ThemeProvider>
         </GluestackUIProvider>
       </UserProvider>

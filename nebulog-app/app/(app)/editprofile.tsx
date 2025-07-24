@@ -13,12 +13,14 @@ import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { isUsernameTaken, updateUserDetails } from "@/services/userServices";
+import Toast from "react-native-toast-message";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
   const [username, setUsername] = useState("");
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
   const [profileColor, setProfileColor] = useState("#4ECDC4");
+  const [showErrorTooltip, setShowErrorTooltip] = useState(true); // Temporary for styling
 
   // Load user data when component mounts
   useEffect(() => {
@@ -35,22 +37,66 @@ export default function EditProfile() {
 
   const handleSave = async () => {
     if (user?.id) {
-      // Check if username is already taken
+      // Check if username is already taken (and not the same as the current username)
       const isTaken = await isUsernameTaken(username);
-      if (isTaken) {
-        console.error("Username already taken");
+      if (isTaken && username !== user.username) {
+        Toast.show({
+          type: "error",
+          text1: `"${username}" is already taken`,
+          text2: `Please choose a different username.`,
+          position: "top",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
+        });
         return;
       }
 
-      try {
-        updateUserDetails(user.id, { username }); // Update Firestore DB
-        updateUserContext({ username: username }); // Update Global Context
+      // If username is changed, update the profile
+      if (username !== user.username) {
+        try {
+          updateUserDetails(user.id, { username }); // Update Firestore DB
+          updateUserContext({ username: username }); // Update Global Context
+
+          // Show success toast
+          Toast.show({
+            type: "success",
+            text1: "Profile Updated",
+            text2: "Your profile has been saved successfully.",
+            position: "top",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 50,
+          });
+
+          router.back();
+        } catch (error) {
+          // Show error toast
+          Toast.show({
+            type: "error",
+            text1: "Update Failed",
+            text2: "There was an error updating your profile. Please try again.",
+            position: "top",
+            visibilityTime: 4000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        }
+      } else {
+        // If nothing is changed, just go back
         router.back();
-      } catch (error) {
-        console.error("Error updating user username: ", error);
       }
     } else {
-      console.error("User ID not found, cannot update user details");
+      // Show error toast for missing user ID
+      Toast.show({
+        type: "error",
+        text1: "User Not Found",
+        text2: "Unable to update profile. Please try logging in again.",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
     }
   };
 
