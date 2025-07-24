@@ -8,6 +8,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { MaterialIcons } from "@expo/vector-icons";
+import CircleBtn from "../building-blocks/CircleBtn";
 
 interface LeftwardSwipeBtnProps {
   onSwipeComplete: () => void;
@@ -46,7 +47,7 @@ export default function LeftwardSwipeBtn({
         translateX.value = Math.max(event.translationX, -maxSwipeDistance);
       }
     })
-    .onEnd((event) => {
+    .onFinalize((event) => {
       // Calculate how far user needs to swipe to trigger the action
       const maxSwipeDistance = componentWidth - 48;
       const swipeThreshold = -maxSwipeDistance * threshold;
@@ -71,7 +72,7 @@ export default function LeftwardSwipeBtn({
         });
       }
 
-      // Hide the message
+      // Hide the message when finger is lifted
       runOnJS(setShowMessage)(false);
     });
 
@@ -101,9 +102,7 @@ export default function LeftwardSwipeBtn({
 
         {/* The animated button */}
         <Animated.View style={[animatedStyle]}>
-          <View className="flex justify-center items-center self-end bg-transparent border border-slate-50 w-12 h-12 rounded-full">
-            <MaterialIcons name={iconName} size={24} color="#f8fafc" />
-          </View>
+          <CircleBtn iconName={iconName} className="self-end" />
         </Animated.View>
       </View>
     </GestureDetector>

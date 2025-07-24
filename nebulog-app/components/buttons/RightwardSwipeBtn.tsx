@@ -8,6 +8,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { MaterialIcons } from "@expo/vector-icons";
+import CircleBtn from "../building-blocks/CircleBtn";
 
 interface RightwardSwipeBtnProps {
   onSwipeComplete: () => void;
@@ -46,7 +47,7 @@ export default function RightwardSwipeBtn({
         translateX.value = Math.min(event.translationX, maxSwipeDistance);
       }
     })
-    .onEnd((event) => {
+    .onFinalize((event) => {
       // Calculate how far user needs to swipe to trigger the action
       const maxSwipeDistance = componentWidth - 48;
       const swipeThreshold = maxSwipeDistance * threshold;
@@ -71,7 +72,7 @@ export default function RightwardSwipeBtn({
         });
       }
 
-      // Hide the message
+      // Hide the message when finger is lifted
       runOnJS(setShowMessage)(false);
     });
 
@@ -101,9 +102,7 @@ export default function RightwardSwipeBtn({
 
         {/* The animated button */}
         <Animated.View style={[animatedStyle]}>
-          <View className="flex justify-center items-center self-start bg-transparent border border-slate-50 w-12 h-12 rounded-full">
-            <MaterialIcons name={iconName} size={24} color="#f8fafc" />
-          </View>
+          <CircleBtn iconName={iconName} className="self-start" />
         </Animated.View>
       </View>
     </GestureDetector>

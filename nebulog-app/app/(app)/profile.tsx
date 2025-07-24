@@ -8,16 +8,20 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
-import RightwardSwipeBtn from "@/components/buttons/RightwardSwipeBtn";
+import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 
 export default function Profile() {
   const { user } = useUser();
 
   const handleClose = () => {
     router.back();
+  };
+
+  const handleEdit = () => {
+    // TODO: Implement edit functionality
+    console.log("Edit profile");
   };
 
   const handleLogout = async () => {
@@ -31,20 +35,17 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
+      {/* Double Swipe Button - Centered at top */}
+      <View className="m-4">
+        <LeftwardSwipeBtn
+          onSwipeComplete={handleClose}
+          iconName="close"
+          touchMessage="Swipe to Close"
+        />
+      </View>
+
       <ScrollView>
         <VStack className="flex-1 px-6">
-          {/* Header */}
-          <LeftwardSwipeBtn
-            onSwipeComplete={handleClose}
-            iconName="close"
-            touchMessage="Swipe to Close"
-          />
-          <RightwardSwipeBtn
-            onSwipeComplete={handleClose}
-            iconName="edit"
-            touchMessage="Swipe to Edit"
-          />
-
           {/* Profile Header */}
           <VStack className="items-center mb-8">
             <Avatar className="w-24 h-24 mb-4">
