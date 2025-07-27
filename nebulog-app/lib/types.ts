@@ -27,8 +27,15 @@ export interface Reflection {
 }
 
 export interface Location {
+  // Coordinates
   lat: number;
   long: number;
+
+  // Human-readable address
+  formattedAddress?: string;
+
+  // Google Maps ID
+  placeId?: string;
 }
 
 // Auth related types
