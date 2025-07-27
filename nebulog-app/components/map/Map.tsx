@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import * as Location from "expo-location";
@@ -24,6 +24,7 @@ interface MapComponentProps {
   onRegionChange?: (region: Region) => void;
   onReflectionPanelChange?: (isOpen: boolean) => void;
   className?: string;
+  ref?: React.Ref<any>;
 }
 
 // Fake reflection data near your location - one for each mood
@@ -253,127 +254,128 @@ const defaultRegion = {
   longitudeDelta: 0.01,
 };
 
-const MapComponent = forwardRef<any, MapComponentProps>(
-  (
-    {
-      initialRegion = defaultRegion,
-      showUserLocation = true,
-      markers = [],
-      onMarkerPress,
-      onRegionChange,
-      onReflectionPanelChange,
-      className,
-    },
-    ref
-  ) => {
-    const mapRef = useRef<MapView>(null);
-    const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
-    const [selectedReflection, setSelectedReflection] = useState<any>(null);
+const MapComponent = ({
+  initialRegion = defaultRegion,
+  showUserLocation = true,
+  markers = [],
+  onMarkerPress,
+  onRegionChange,
+  onReflectionPanelChange,
+  className,
+  ref,
+}: MapComponentProps) => {
+  const mapRef = useRef<MapView>(null); // Controls the actual map
+  const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+  const [selectedReflection, setSelectedReflection] = useState<any>(null);
 
-    const handleGetCurrentLocation = async () => {
-      const location = await getCurrentLocation();
-      if (location) {
-        setUserLocation(location);
+  const handleGetCurrentLocation = async () => {
+    const location = await getCurrentLocation();
+    if (location) {
+      setUserLocation(location);
 
-        // Animate to user location
-        if (mapRef.current) {
-          mapRef.current.animateToRegion({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        }
-      }
-    };
-
-    const handleReflectionPress = (reflection: any) => {
-      setSelectedReflection(reflection);
-      onReflectionPanelChange?.(true);
-
-      // Animate map to center on the reflection
+      // Animate to user location
       if (mapRef.current) {
         mapRef.current.animateToRegion({
-          latitude: reflection.coordinate.latitude,
-          longitude: reflection.coordinate.longitude,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         });
       }
-    };
+    }
+  };
 
-    const closeReflection = () => {
-      setSelectedReflection(null);
-      onReflectionPanelChange?.(false);
-    };
+  const handleReflectionPress = (reflection: any) => {
+    setSelectedReflection(reflection);
+    onReflectionPanelChange?.(true);
 
-    useEffect(() => {
-      if (showUserLocation) {
-        handleGetCurrentLocation();
-      }
-    }, [showUserLocation]);
+    // Animate map to center on the reflection
+    if (mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: reflection.coordinate.latitude,
+        longitude: reflection.coordinate.longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    }
+  };
 
-    useImperativeHandle(ref, () => ({
-      getCurrentLocation: handleGetCurrentLocation,
-      userLocation,
-    }));
+  const closeReflection = () => {
+    setSelectedReflection(null);
+    onReflectionPanelChange?.(false);
+  };
 
-    return (
-      <VStack className={className}>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          initialRegion={initialRegion}
-          showsUserLocation={showUserLocation}
-          showsCompass={true}
-          showsScale={true}
-          onRegionChangeComplete={onRegionChange}
-          customMapStyle={customMapStyle}
-        >
-          {/* User location marker */}
-          {userLocation && showUserLocation && (
-            <Marker
-              coordinate={{
-                latitude: userLocation.coords.latitude,
-                longitude: userLocation.coords.longitude,
-              }}
-              title="Your Location"
-              description="You are here"
-              pinColor="blue"
-            />
-          )}
+  useEffect(() => {
+    if (showUserLocation) {
+      handleGetCurrentLocation();
+    }
+  }, [showUserLocation]);
 
-          {/* Custom markers */}
-          {markers.map((marker) => (
-            <Marker
-              key={marker.id}
-              coordinate={marker.coordinate}
-              title={marker.title}
-              description={marker.description}
-              onPress={() => onMarkerPress?.(marker)}
-            />
-          ))}
+  // Expose methods & data through the ref
+  useEffect(() => {
+    if (ref && "current" in ref) {
+      ref.current = {
+        getCurrentLocation: handleGetCurrentLocation,
+        userLocation,
+      };
+    }
+  }, [ref, userLocation]);
 
-          {/* Reflection markers */}
-          {fakeReflections.map((reflection) => (
-            <Marker
-              key={reflection.id}
-              coordinate={reflection.coordinate}
-              title={reflection.locationLabel || "Reflection"}
-              description={reflection.text.substring(0, 50) + "..."}
-              onPress={() => handleReflectionPress(reflection)}
-              pinColor="purple"
-            />
-          ))}
-        </MapView>
+  return (
+    <VStack className={className}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        initialRegion={initialRegion}
+        showsUserLocation={showUserLocation}
+        showsCompass={true}
+        showsScale={true}
+        onRegionChangeComplete={onRegionChange}
+        customMapStyle={customMapStyle}
+      >
+        {/* User location marker */}
+        {userLocation && showUserLocation && (
+          <Marker
+            coordinate={{
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
+            }}
+            title="Your Location"
+            description="You are here"
+            pinColor="blue"
+          />
+        )}
 
-        {/* Reflection Detail Panel */}
-        <ReflectionDetailPanel reflection={selectedReflection} onClose={closeReflection} />
-      </VStack>
-    );
-  }
-);
+        {/* Custom markers */}
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            coordinate={marker.coordinate}
+            title={marker.title}
+            description={marker.description}
+            onPress={() => onMarkerPress?.(marker)}
+          />
+        ))}
+
+        {/* Reflection markers */}
+        {fakeReflections.map((reflection) => (
+          <Marker
+            key={reflection.id}
+            coordinate={reflection.coordinate}
+            title={reflection.locationLabel || "Reflection"}
+            description={reflection.text.substring(0, 50) + "..."}
+            onPress={() => handleReflectionPress(reflection)}
+            pinColor="purple"
+          />
+        ))}
+      </MapView>
+
+      {/* Reflection Detail Panel */}
+      <ReflectionDetailPanel reflection={selectedReflection} onClose={closeReflection} />
+    </VStack>
+  );
+};
 
 export default MapComponent;
 

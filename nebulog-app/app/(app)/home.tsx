@@ -32,21 +32,20 @@ export default function Home() {
     []
   );
 
-  const [location, setLocation] = useState<LocationType | null>(null);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
+  // Map Ref
   const mapRef = useRef<any>(null);
 
+  // Reflection Panel State
+  const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
+
+  // Get Location
   const handleGetLocation = async () => {
-    setIsLoadingLocation(true);
     try {
-      if (mapRef.current && mapRef.current.getCurrentLocation) {
+      if (mapRef.current.getCurrentLocation) {
         await mapRef.current.getCurrentLocation();
       }
     } catch (error) {
       console.error("Error getting location:", error);
-    } finally {
-      setIsLoadingLocation(false);
     }
   };
 
@@ -60,20 +59,20 @@ export default function Home() {
           onReflectionPanelChange={setIsReflectionPanelOpen}
         />
 
-        {/* Top overlay */}
+        {/* Top Screen overlay */}
         <SafeAreaView>
           <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
             <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
           </HStack>
         </SafeAreaView>
 
-        {/* Bottom overlay*/}
+        {/* Bottom Screen overlay*/}
         <SafeAreaView className="absolute bottom-0 left-0 right-0 ">
           <VStack
             className="items-start pb-8 px-4"
             style={{ opacity: isReflectionPanelOpen ? 0 : 1 }}
           >
-            <Button onPress={handleGetLocation} disabled={isLoadingLocation}>
+            <Button onPress={handleGetLocation}>
               <ButtonText>{"My Location"}</ButtonText>
             </Button>
 
