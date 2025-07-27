@@ -269,15 +269,15 @@ const MapComponent = ({
   const [selectedReflection, setSelectedReflection] = useState<any>(null);
 
   const handleGetCurrentLocation = async () => {
-    const location = await getCurrentLocation();
-    if (location) {
-      setUserLocation(location);
+    const loc = await getCurrentLocation();
+    if (loc) {
+      setUserLocation(loc);
 
       // Animate to user location
       if (mapRef.current) {
         mapRef.current.animateToRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
@@ -329,8 +329,8 @@ const MapComponent = ({
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         showsUserLocation={showUserLocation}
-        showsCompass={true}
-        showsScale={true}
+        showsCompass={false}
+        showsScale={false}
         onRegionChangeComplete={onRegionChange}
         customMapStyle={customMapStyle}
       >
