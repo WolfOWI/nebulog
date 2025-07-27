@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UserProvider } from "@/contexts/UserContext";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "@/styles/toastStyles";
+import { StatusBar } from "react-native";
 
 import {
   Inter_100Thin,
@@ -71,6 +72,7 @@ function RootLayoutNav() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
       <UserProvider>
         <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
           <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
