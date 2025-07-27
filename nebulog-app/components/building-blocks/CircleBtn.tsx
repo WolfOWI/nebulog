@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 
 interface CircleBtnProps {
   iconName: keyof typeof MaterialIcons.glyphMap;
@@ -35,9 +36,22 @@ const CircleBtn = ({ iconName, className, size, primary = false }: CircleBtnProp
 
   return (
     <View
-      className={`flex justify-center items-center ${containerHierarchyClasses}  w-${containerSize} h-${containerSize} rounded-full ${className}`}
+      className={`flex justify-center items-center ${containerHierarchyClasses}  w-${containerSize} h-${containerSize} rounded-full ${className} `}
     >
-      <MaterialIcons name={iconName} size={iconSize} color={iconHierarchyColor} />
+      <BlurView
+        intensity={20}
+        style={{
+          borderRadius: 999,
+          overflow: "hidden",
+          width: "100%",
+          height: "100%",
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <MaterialIcons name={iconName} size={iconSize} color={iconHierarchyColor} />
+      </BlurView>
     </View>
   );
 };

@@ -10,12 +10,18 @@ interface CircleHoldBtnProps {
   onHoldComplete: () => void;
   iconName: keyof typeof MaterialIcons.glyphMap;
   holdDuration?: number;
+  className?: string;
+  size?: string;
+  primary?: boolean;
 }
 
 export default function CircleHoldBtn({
   onHoldComplete,
   iconName,
   holdDuration = 1000,
+  className,
+  size,
+  primary = false,
 }: CircleHoldBtnProps) {
   const { user } = useUser();
   const [isHolding, setIsHolding] = useState(false);
@@ -86,7 +92,7 @@ export default function CircleHoldBtn({
           onPressOut={cancelHold}
           style={{ minWidth: 48, minHeight: 48 }}
         >
-          <CircleBtn iconName={iconName} />
+          <CircleBtn iconName={iconName} className={className} size={size} primary={primary} />
         </Pressable>
       </View>
     </View>

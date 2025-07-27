@@ -13,9 +13,13 @@ import { Location as LocationType } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
 import Toast from "react-native-toast-message";
 import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useUser } from "@/contexts/UserContext";
+import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 
 export default function Home() {
+  const { user } = useUser();
+
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleSheetChanges = useCallback((index: number) => {
@@ -63,6 +67,13 @@ export default function Home() {
         {/* Top Screen overlay */}
         <SafeAreaView>
           <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
+            <CircleHoldBtn
+              onHoldComplete={handleGetLocation}
+              holdDuration={300}
+              iconName="location-pin"
+              size="large"
+            />
+
             <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
           </HStack>
         </SafeAreaView>
@@ -70,16 +81,15 @@ export default function Home() {
         {/* Bottom Screen overlay*/}
         <SafeAreaView className="absolute bottom-0 left-0 right-0 ">
           <VStack
-            className="items-start pb-8 px-4"
+            className="items-end pb-8 px-4 gap-8"
             style={{ opacity: isReflectionPanelOpen ? 0 : 1 }}
           >
-            <Button onPress={handleGetLocation}>
-              <ButtonText>{"My Location"}</ButtonText>
-            </Button>
-
-            <Button onPress={handlePresentModalPress} className="mt-4">
-              <ButtonText>Bottom Sheet</ButtonText>
-            </Button>
+            <CircleHoldBtn
+              onHoldComplete={handlePresentModalPress}
+              holdDuration={300}
+              iconName="arrow-upward"
+              size="large"
+            />
           </VStack>
         </SafeAreaView>
 
@@ -97,7 +107,7 @@ export default function Home() {
           }}
           style={{ zIndex: 999 }}
         >
-          <BottomSheetView className="flex-1 px-6 py-4">
+          <BottomSheetView className="flex-1 px-6 pt-4 pb-8">
             <VStack className="items-center mb-6 gap-6">
               <LaunchThoughtSwipeBtn
                 onSwipeComplete={() => console.log("swipe complete")}
@@ -114,19 +124,19 @@ export default function Home() {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    123 days
+                    {user?.streakCount} days
                   </Text>
                 </HStack>
                 <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
                   <View className="bg-slate-500 w-10 h-10 rounded-full flex justify-center items-center">
-                    <MaterialIcons name="sunny" size={24} color="#f8fafc" />
+                    <MaterialCommunityIcons name="thought-bubble" size={24} color="#f8fafc" />
                   </View>
                   <Text
                     className="text-slate-50 text-[16px]"
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    123 thoughts
+                    {user?.totalReflections} thoughts
                   </Text>
                 </HStack>
               </HStack>
