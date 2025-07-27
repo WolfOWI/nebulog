@@ -329,8 +329,10 @@ const MapComponent = ({
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
         showsUserLocation={showUserLocation}
+        showsMyLocationButton={false}
         showsCompass={false}
         showsScale={false}
+        toolbarEnabled={false}
         onRegionChangeComplete={onRegionChange}
         customMapStyle={customMapStyle}
       >
