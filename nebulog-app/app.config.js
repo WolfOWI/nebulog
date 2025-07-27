@@ -33,6 +33,8 @@ export default {
         resizeMode: "contain",
         backgroundColor: "#0F172B",
       },
+      navigationBarColor: "transparent",
+      navigationBarStyle: "dark",
       config: {
         googleMaps: {
           apiKey: process.env.GOOGLE_MAPS_API_KEY,

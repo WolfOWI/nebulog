@@ -5,7 +5,7 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -20,6 +20,7 @@ import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 
 export default function Home() {
   const { user } = useUser();
+  const insets = useSafeAreaInsets();
 
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -66,33 +67,35 @@ export default function Home() {
         />
 
         {/* Top Screen overlay */}
-        <SafeAreaView>
-          <HStack className="absolute top-0 left-0 right-0 z-20 justify-end items-center mb-8 gap-4 px-4">
-            <CircleHoldBtn
-              onHoldComplete={handleGetLocation}
-              holdDuration={300}
-              iconName="location-pin"
-              size="large"
-            />
+        <HStack
+          className="absolute top-0 left-0 right-0 z-20 justify-end items-center gap-4 px-4"
+          style={{ paddingTop: insets.top }}
+        >
+          <CircleHoldBtn
+            onHoldComplete={handleGetLocation}
+            holdDuration={300}
+            iconName="location-pin"
+            size="large"
+          />
 
-            <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
-          </HStack>
-        </SafeAreaView>
+          <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
+        </HStack>
 
         {/* Bottom Screen overlay*/}
-        <SafeAreaView className="absolute bottom-0 left-0 right-0 ">
-          <VStack
-            className="items-end pb-8 px-4 gap-8"
-            style={{ opacity: isReflectionPanelOpen ? 0 : 1 }}
-          >
-            <CircleHoldBtn
-              onHoldComplete={handlePresentModalPress}
-              holdDuration={300}
-              iconName="arrow-upward"
-              size="large"
-            />
-          </VStack>
-        </SafeAreaView>
+        <VStack
+          className="absolute bottom-0 left-0 right-0 items-end px-4 gap-8"
+          style={{
+            paddingBottom: insets.bottom,
+            opacity: isReflectionPanelOpen ? 0 : 1,
+          }}
+        >
+          <CircleHoldBtn
+            onHoldComplete={handlePresentModalPress}
+            holdDuration={300}
+            iconName="arrow-upward"
+            size="large"
+          />
+        </VStack>
 
         {/* Bottom Sheet */}
         <BottomSheet
