@@ -15,6 +15,7 @@ interface RightwardSwipeBtnProps {
   iconName: keyof typeof MaterialIcons.glyphMap;
   threshold?: number; // How much to swipe before triggering (0-1)
   touchMessage?: string;
+  className?: string;
 }
 
 export default function RightwardSwipeBtn({
@@ -22,6 +23,7 @@ export default function RightwardSwipeBtn({
   iconName,
   threshold = 0.3,
   touchMessage = "Swipe Right",
+  className,
 }: RightwardSwipeBtnProps) {
   // Track the button's position
   const translateX = useSharedValue(0);
@@ -91,7 +93,11 @@ export default function RightwardSwipeBtn({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View style={{ width: "100%", position: "relative" }} onLayout={handleLayout}>
+      <View
+        style={{ width: "100%", position: "relative" }}
+        onLayout={handleLayout}
+        className={className}
+      >
         {/* Show swipe instruction when touched */}
         {showMessage && (
           <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000">

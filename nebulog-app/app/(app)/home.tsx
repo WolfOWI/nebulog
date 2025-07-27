@@ -12,13 +12,14 @@ import MapComponent from "@/components/map/Map";
 import { Location as LocationType } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
 import Toast from "react-native-toast-message";
+import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
   const handleSheetChanges = useCallback((index: number) => {
-    // console.log("handleSheetChanges", index);
+    console.log("handleSheetChanges", index);
   }, []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.expand();
@@ -85,60 +86,49 @@ export default function Home() {
         {/* Bottom Sheet */}
         <BottomSheet
           ref={bottomSheetRef}
-          index={1} // Default start at 50%
-          snapPoints={snapPoints}
           onChange={handleSheetChanges}
           enablePanDownToClose={true}
           backdropComponent={renderBackdrop}
           backgroundStyle={{
-            backgroundColor: "gray",
+            backgroundColor: "#1e293b",
           }}
           handleIndicatorStyle={{
-            backgroundColor: "#d1d5db",
+            backgroundColor: "#475569",
           }}
           style={{ zIndex: 999 }}
         >
           <BottomSheetView className="flex-1 px-6 py-4">
-            <VStack className="items-center mb-6">
-              <Heading className="text-typography-900 text-2xl font-bold mb-2">
-                Bottom Sheet
-              </Heading>
-              <Text className="text-typography-600 text-center mb-6">
-                This is a beautiful bottom sheet that slides up from the bottom of the screen. You
-                can drag it up and down, and tap outside to dismiss it.
-              </Text>
-            </VStack>
-
-            <VStack className="gap-4">
-              <Button onPress={handleDismiss} variant="outline">
-                <ButtonText>Close Sheet</ButtonText>
-              </Button>
-
-              <HStack className="gap-3">
-                <Button
-                  onPress={() => bottomSheetRef.current?.snapToIndex(0)}
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <ButtonText>25%</ButtonText>
-                </Button>
-                <Button
-                  onPress={() => bottomSheetRef.current?.snapToIndex(1)}
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <ButtonText>50%</ButtonText>
-                </Button>
-                <Button
-                  onPress={() => bottomSheetRef.current?.snapToIndex(2)}
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <ButtonText>90%</ButtonText>
-                </Button>
+            <VStack className="items-center mb-6 gap-6">
+              <LaunchThoughtSwipeBtn
+                onSwipeComplete={() => console.log("swipe complete")}
+                iconName="rocket-launch"
+                displayMessage="What's on your mind?"
+              />
+              <HStack className="w-full gap-2">
+                <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
+                  <View className="bg-slate-500 w-10 h-10 rounded-full flex justify-center items-center">
+                    <MaterialIcons name="sunny" size={24} color="#f8fafc" />
+                  </View>
+                  <Text
+                    className="text-slate-50 text-[16px]"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    123 days
+                  </Text>
+                </HStack>
+                <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
+                  <View className="bg-slate-500 w-10 h-10 rounded-full flex justify-center items-center">
+                    <MaterialIcons name="sunny" size={24} color="#f8fafc" />
+                  </View>
+                  <Text
+                    className="text-slate-50 text-[16px]"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    123 thoughts
+                  </Text>
+                </HStack>
               </HStack>
             </VStack>
           </BottomSheetView>
