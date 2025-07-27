@@ -6,6 +6,7 @@ import { VStack } from "@/components/ui/vstack";
 import { customMapStyle } from "@/styles/mapStyles";
 import ReflectionDetailPanel from "./ReflectionDetailPanel";
 import { Reflection } from "@/lib/types";
+import { getCurrentLocation } from "@/services/locationServices";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -269,31 +270,9 @@ const MapComponent = forwardRef<any, MapComponentProps>(
     const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
     const [selectedReflection, setSelectedReflection] = useState<any>(null);
 
-    const requestLocationPermission = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        return status === "granted";
-      } catch (err) {
-        console.error("Location permission error:", err);
-        return false;
-      }
-    };
-
-    const getCurrentLocation = async () => {
-      try {
-        const hasPermission = await requestLocationPermission();
-        if (!hasPermission) {
-          console.log("Location permission denied");
-          return;
-        }
-
-        // Use faster location options for better responsiveness
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-          timeInterval: 1000,
-          distanceInterval: 10,
-        });
-
+    const handleGetCurrentLocation = async () => {
+      const location = await getCurrentLocation();
+      if (location) {
         setUserLocation(location);
 
         // Animate to user location
@@ -305,8 +284,6 @@ const MapComponent = forwardRef<any, MapComponentProps>(
             longitudeDelta: 0.01,
           });
         }
-      } catch (err) {
-        console.error("Location error:", err);
       }
     };
 
@@ -332,12 +309,12 @@ const MapComponent = forwardRef<any, MapComponentProps>(
 
     useEffect(() => {
       if (showUserLocation) {
-        getCurrentLocation();
+        handleGetCurrentLocation();
       }
     }, [showUserLocation]);
 
     useImperativeHandle(ref, () => ({
-      getCurrentLocation,
+      getCurrentLocation: handleGetCurrentLocation,
       userLocation,
     }));
 
