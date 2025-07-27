@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
+import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
-import { SafeAreaView, ScrollView, View, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, View, Pressable } from "react-native";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import { useUser } from "@/contexts/UserContext";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
