@@ -38,6 +38,13 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="ThoughtLaunch"
+        options={{
+          title: "Thought Launch",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

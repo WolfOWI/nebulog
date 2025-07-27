@@ -110,7 +110,7 @@ export default function Home() {
           <BottomSheetView className="flex-1 px-6 pt-4 pb-8">
             <VStack className="items-center mb-6 gap-6">
               <LaunchThoughtSwipeBtn
-                onSwipeComplete={() => console.log("swipe complete")}
+                onSwipeComplete={() => router.push("/ThoughtLaunch" as any)}
                 iconName="rocket-launch"
                 displayMessage="What's on your mind?"
               />
