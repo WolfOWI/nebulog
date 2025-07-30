@@ -167,7 +167,7 @@ export default function EditProfile() {
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Icon</Text>
             <Pressable
               onPress={handleIconSelect}
-              className="flex-row items-center justify-between p-4 border border-border-200 rounded-2xl bg-background-50"
+              className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl"
             >
               <HStack className="items-center">
                 <View
@@ -176,7 +176,7 @@ export default function EditProfile() {
                 >
                   <ProfileIcon name={profileIcon} size={24} color="#FFFFFF" />
                 </View>
-                <Text className="text-typography-900">
+                <Text className="text-typography-900" size="xl">
                   {profileIcon.charAt(0).toUpperCase() + profileIcon.replace("-", " ").slice(1)}
                 </Text>
               </HStack>
@@ -189,23 +189,20 @@ export default function EditProfile() {
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Color</Text>
             <Pressable
               onPress={handleColorSelect}
-              className="flex-row items-center justify-between p-4 border border-border-200 rounded-2xl bg-background-50"
+              className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl"
             >
               <HStack className="items-center">
                 <View
                   className="w-10 h-10 rounded-full mr-3 border-2 border-border-200"
                   style={{ backgroundColor: profileColor }}
                 />
-                <Text className="text-typography-900">{profileColor}</Text>
+                <Text className="text-typography-900" size="xl">
+                  {profileColor}
+                </Text>
               </HStack>
               <MaterialIcons name="chevron-right" size={24} color="#6B7280" />
             </Pressable>
           </VStack>
-
-          {/* Save Button */}
-          {/* <Button onPress={handleSave} className="mb-6">
-            <ButtonText>Save Changes</ButtonText>
-          </Button> */}
         </VStack>
         <VStack className="mt-12 mb-12">
           <LaunchButton

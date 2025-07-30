@@ -24,7 +24,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     return (
       <Pressable
         onPress={handleLocationPress}
-        className="border border-border-200 rounded-lg p-4 bg-background-50 active:bg-background-100"
+        className="border border-background-100 rounded-2xl p-4"
       >
         <HStack className="items-center gap-3">
           <View className="w-10 h-10 bg-indigo-100 rounded-full items-center justify-center">
@@ -47,7 +47,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   return (
     <Pressable
       onPress={handleLocationPress}
-      className="border-2 border-dashed border-border-300 rounded-lg p-6 bg-background-50 active:bg-background-100"
+      className="border border-background-100 rounded-2xl p-6"
     >
       <VStack className="items-center gap-3">
         <View className="w-12 h-12 bg-gray-100 rounded-full items-center justify-center">

@@ -13,7 +13,7 @@ const UITextarea = createTextarea({
 });
 
 const textareaStyle = tva({
-  base: "w-full h-[100px] border border-background-300 rounded-2xl data-[hover=true]:border-outline-400 data-[focus=true]:border-primary-700 data-[focus=true]:data-[hover=true]:border-primary-700 data-[disabled=true]:opacity-40 data-[disabled=true]:bg-background-50 data-[disabled=true]:data-[hover=true]:border-background-300",
+  base: "w-full h-[100px] border border-background-100 rounded-2xl data-[hover=true]:border-outline-400 data-[focus=true]:border-primary-700 data-[focus=true]:data-[hover=true]:border-primary-700 data-[disabled=true]:opacity-40 data-[disabled=true]:bg-background-50 data-[disabled=true]:data-[hover=true]:border-background-100",
 
   variants: {
     variant: {
@@ -44,7 +44,7 @@ const textareaInputStyle = tva({
 type ITextareaProps = React.ComponentProps<typeof UITextarea> & VariantProps<typeof textareaStyle>;
 
 const Textarea = React.forwardRef<React.ElementRef<typeof UITextarea>, ITextareaProps>(
-  ({ className, variant = "outline", size = "xl", ...props }, ref) => {
+  ({ className, variant = "default", size = "xl", ...props }, ref) => {
     return (
       <UITextarea
         ref={ref}

@@ -68,7 +68,7 @@ const ThoughtLaunch = () => {
             <Text className="text-typography-700 font-medium">How are you feeling?</Text>
 
             <Select selectedValue={selectedMood} onValueChange={setSelectedMood}>
-              <SelectTrigger>
+              <SelectTrigger className="p-4 h-fit">
                 <HStack className="items-center gap-3">
                   {selectedMoodData ? (
                     <>
@@ -141,11 +141,7 @@ const ThoughtLaunch = () => {
             </Textarea>
           </VStack>
 
-          {/* Location Selector */}
-          <VStack className="gap-3">
-            <Text className="text-typography-700 font-medium">Location</Text>
-            <LocationPicker />
-          </VStack>
+          <LocationPicker />
 
           {/* Launch Button */}
           <VStack className="mt-8 mb-8">
