@@ -4,10 +4,11 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
+import { Pressable } from "@/components/ui/pressable";
 import { Input, InputField } from "@/components/ui/input";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View, Pressable } from "react-native";
+import { ScrollView, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
@@ -143,7 +144,7 @@ export default function EditProfile() {
           {/* Username Input */}
           <VStack className="mb-6">
             <Text className="text-typography-700 text-sm font-medium mb-2">Username</Text>
-            <Input className="border border-border-200 rounded-lg">
+            <Input>
               <InputField
                 value={username}
                 onChangeText={setUsername}
@@ -156,7 +157,7 @@ export default function EditProfile() {
           {/* Bio Input */}
           <VStack className="mb-6">
             <Text className="text-typography-700 text-sm font-medium mb-2">Bio</Text>
-            <Input className="border border-border-200 rounded-lg">
+            <Input>
               <InputField value={bio} onChangeText={setBio} placeholder="Enter your bio" />
             </Input>
           </VStack>
@@ -166,7 +167,7 @@ export default function EditProfile() {
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Icon</Text>
             <Pressable
               onPress={handleIconSelect}
-              className="flex-row items-center justify-between p-4 border border-border-200 rounded-lg bg-background-50"
+              className="flex-row items-center justify-between p-4 border border-border-200 rounded-2xl bg-background-50"
             >
               <HStack className="items-center">
                 <View
@@ -188,7 +189,7 @@ export default function EditProfile() {
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Color</Text>
             <Pressable
               onPress={handleColorSelect}
-              className="flex-row items-center justify-between p-4 border border-border-200 rounded-lg bg-background-50"
+              className="flex-row items-center justify-between p-4 border border-border-200 rounded-2xl bg-background-50"
             >
               <HStack className="items-center">
                 <View

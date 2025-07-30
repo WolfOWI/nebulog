@@ -60,7 +60,7 @@ const LocationSearch = () => {
         {/* Search Input */}
         <VStack className="gap-3">
           <HStack className="gap-3">
-            <Input className="flex-1 border border-border-200 rounded-lg p-4 bg-background-50 h-fit">
+            <Input className="flex-1">
               <InputField
                 placeholder="Search for a location..."
                 value={searchQuery}

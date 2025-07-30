@@ -94,7 +94,7 @@ export default function Login() {
                   Email
                 </FormControlLabelText>
               </FormControlLabel>
-              <Input>
+              <Input variant="outline">
                 <InputField
                   placeholder="Enter your email"
                   value={email}

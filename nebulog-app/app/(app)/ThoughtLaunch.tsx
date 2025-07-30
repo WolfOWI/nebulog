@@ -68,7 +68,7 @@ const ThoughtLaunch = () => {
             <Text className="text-typography-700 font-medium">How are you feeling?</Text>
 
             <Select selectedValue={selectedMood} onValueChange={setSelectedMood}>
-              <SelectTrigger className="border border-border-200 rounded-lg p-4 bg-background-50 h-fit">
+              <SelectTrigger>
                 <HStack className="items-center gap-3">
                   {selectedMoodData ? (
                     <>
@@ -128,7 +128,7 @@ const ThoughtLaunch = () => {
 
           {/* Comment Text Field */}
           <VStack className="gap-3">
-            <Textarea className="border border-border-200 rounded-lg h-[200px]">
+            <Textarea className="h-[200px]">
               <TextareaInput
                 placeholder="What is on your mind?"
                 value={comment}
