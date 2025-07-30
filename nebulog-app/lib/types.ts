@@ -20,7 +20,6 @@ export interface Reflection {
   text: string;
   visibility: "public" | "private";
   location?: Location;
-  locationLabel?: string;
   mood?: string;
   createdAt: string;
   echoCount: number;
@@ -32,8 +31,8 @@ export interface Location {
   long: number;
 
   // Human-readable address
-  mainAddressText?: string;
-  secondaryAddressText?: string;
+  placeName?: string;
+  formattedAddress?: string;
 
   // Google Maps ID
   placeId?: string;

@@ -9,10 +9,12 @@ import { useLocation } from "@/contexts/LocationContext";
 
 interface LocationPickerProps {
   placeholder?: string;
+  className?: string;
 }
 
 const LocationPicker: React.FC<LocationPickerProps> = ({
   placeholder = "Where are you thinking from?",
+  className,
 }) => {
   const { selectedLocation } = useLocation();
 
@@ -24,7 +26,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     return (
       <Pressable
         onPress={handleLocationPress}
-        className="border border-background-100 rounded-2xl p-4"
+        className={`border border-background-100 rounded-2xl p-4 ${className}`}
       >
         <HStack className="items-center gap-3">
           <View className="w-10 h-10 bg-indigo-100 rounded-full items-center justify-center">
@@ -47,7 +49,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   return (
     <Pressable
       onPress={handleLocationPress}
-      className="border border-background-100 rounded-2xl p-6"
+      className={`border border-background-100 rounded-2xl p-6 ${className}`}
     >
       <VStack className="items-center gap-3">
         <View className="w-12 h-12 bg-gray-100 rounded-full items-center justify-center">

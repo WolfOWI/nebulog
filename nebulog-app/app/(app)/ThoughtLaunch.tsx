@@ -1,6 +1,6 @@
 import { View, ScrollView, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -21,22 +21,62 @@ import { FormControl, FormControlLabel, FormControlLabelText } from "@/component
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import LaunchButton from "@/components/buttons/LaunchButton";
+import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { mood } from "@/constants/moods";
 import { getMoodIcon } from "@/constants/moodIcons";
 import LocationPicker from "@/components/LocationPicker";
 import { useLocation } from "@/contexts/LocationContext";
+import { createReflection } from "@/services/reflectionServices";
+import { useUser } from "@/contexts/UserContext";
 
 const ThoughtLaunch = () => {
+  const { user } = useUser();
   const [selectedMood, setSelectedMood] = useState<string>("unselected");
   const [comment, setComment] = useState("");
   const { selectedLocation } = useLocation();
+  const [isPublic, setIsPublic] = useState(true);
+  const [isLocationOn, setIsLocationOn] = useState(true);
 
-  const handleLaunch = () => {
-    // TODO: Implement launch logic
-    console.log("Launching thought:", { selectedMood, comment, location: selectedLocation });
-    router.push("/(app)/Home" as any);
+  // If location is off, set public to off (location is required for public reflections)
+  useEffect(() => {
+    if (!isLocationOn) {
+      setIsPublic(false);
+    }
+  }, [isLocationOn]);
+
+  const handleLaunch = async () => {
+    if (!user?.id) {
+      throw new Error("Logged in user's ID not found");
+    }
+
+    if (!selectedLocation) {
+      throw new Error("No location selected");
+    }
+
+    const reflection = {
+      authorId: user.id,
+      text: comment,
+      visibility: (isPublic ? "public" : "private") as "public" | "private",
+      location: {
+        lat: selectedLocation.geometry.location.lat,
+        long: selectedLocation.geometry.location.lng,
+        placeName: selectedLocation.name,
+        formattedAddress: selectedLocation.formatted_address,
+        placeId: selectedLocation.place_id,
+      },
+      mood: selectedMood,
+      createdAt: new Date().toISOString(),
+      echoCount: 0,
+    };
+
+    try {
+      await createReflection(reflection);
+      router.push("/(app)/Home" as any);
+    } catch (error) {
+      console.error("Error creating reflection:", error);
+    }
   };
 
   const selectedMoodData = selectedMood ? mood[selectedMood as keyof typeof mood] : null;
@@ -141,21 +181,44 @@ const ThoughtLaunch = () => {
             </Textarea>
           </VStack>
 
-          <LocationPicker />
+          {isLocationOn ? (
+            <LocationPicker />
+          ) : (
+            <View className="h-16 items-center justify-center">
+              <Text className="text-typography-500">No Location</Text>
+            </View>
+          )}
+
+          {/* Circular Switch Buttons */}
+          <HStack className="justify-center gap-6">
+            <CircularSwitchBtn
+              isOn={isPublic}
+              onToggle={setIsPublic}
+              onText="Public"
+              offText="Private"
+              size={104}
+            />
+            <CircularSwitchBtn
+              isOn={isLocationOn}
+              onToggle={setIsLocationOn}
+              onText="Location"
+              offText="Hidden"
+              size={104}
+            />
+          </HStack>
+
+          <View className="h-16" />
 
           {/* Launch Button */}
-          <VStack className="mt-8 mb-8">
-            <LaunchButton
-              iconName="rocket-launch"
-              onLaunch={handleLaunch}
-              label="Hold to Launch Thought"
-              holdDuration={2000}
-              size={88}
-              fillColor="#3730a3"
-            />
-          </VStack>
+          <LaunchButton
+            iconName="rocket-launch"
+            onLaunch={handleLaunch}
+            label="Hold to Launch Thought"
+            holdDuration={2000}
+            size={88}
+            fillColor="#3730a3"
+          />
         </VStack>
-        <VStack className="h-64" />
       </ScrollView>
     </SafeAreaView>
   );
