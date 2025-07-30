@@ -15,6 +15,7 @@ import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { updateUserDetails } from "@/services/userServices";
 import Toast from "react-native-toast-message";
 import { GetColorName } from "hex-color-to-color-name";
+import LaunchButton from "@/components/buttons/LaunchButton";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
@@ -121,12 +122,17 @@ export default function ProfileColourPick() {
             swatches={false}
           />
         </View>
-
-        {/* Save Button */}
-        <Button onPress={handleSave} className="mb-6">
-          <ButtonText>Save Colour</ButtonText>
-        </Button>
       </ScrollView>
+      <View className="m-4">
+        <LaunchButton
+          iconName="check"
+          onLaunch={handleSave}
+          label="Hold to Save"
+          holdDuration={500}
+          size={88}
+          fillColor={selectedColor}
+        />
+      </View>
     </SafeAreaView>
   );
 }
