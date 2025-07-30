@@ -83,6 +83,7 @@ const ThoughtLaunch = () => {
       // Update local user context
       updateUserContext({
         totalReflections: user.totalReflections + 1,
+        lastReflectDate: new Date().toISOString(),
       });
 
       // TODO: Add toast notification for success

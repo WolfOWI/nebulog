@@ -1,9 +1,8 @@
 // Reflection Services
 
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, increment, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Reflection } from "@/lib/types";
-import { plusOneReflectionCount } from "./userServices";
 
 // Create a new reflection
 export const createReflection = async (reflection: Reflection, userId: string) => {
@@ -12,7 +11,11 @@ export const createReflection = async (reflection: Reflection, userId: string) =
     await addDoc(reflectionsCollection, reflection);
 
     try {
-      await plusOneReflectionCount(userId);
+      const userDoc = doc(db, "users", userId);
+      await updateDoc(userDoc, {
+        totalReflections: increment(1),
+        lastReflectDate: new Date().toISOString(),
+      });
     } catch (error) {
       console.error("Error incrementing reflection count:", error);
     }
