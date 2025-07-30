@@ -19,7 +19,7 @@ export default {
         backgroundColor: "#0F172B",
       },
       config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+        googleMapsApiKey: process.env.GOOGLE_PLATFORM_API_KEY,
       },
     },
     android: {
@@ -37,7 +37,7 @@ export default {
       navigationBarStyle: "dark",
       config: {
         googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_API_KEY,
+          apiKey: process.env.GOOGLE_PLATFORM_API_KEY,
         },
       },
     },
@@ -78,7 +78,7 @@ export default {
       FIREBASE_STORAGE_BUCKET: process.env.FIREBASE_STORAGE_BUCKET,
       FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
       FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
-      GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+      GOOGLE_PLATFORM_API_KEY: process.env.GOOGLE_PLATFORM_API_KEY,
     },
   },
 };
