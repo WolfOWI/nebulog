@@ -45,6 +45,13 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="LocationSearch"
+        options={{
+          title: "Location Search",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

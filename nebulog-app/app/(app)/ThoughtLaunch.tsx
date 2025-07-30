@@ -24,14 +24,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { mood } from "@/constants/moods";
 import { getMoodIcon } from "@/constants/moodIcons";
+import LocationPicker from "@/components/LocationPicker";
+import { useLocation } from "@/contexts/LocationContext";
 
 const ThoughtLaunch = () => {
   const [selectedMood, setSelectedMood] = useState<string>("unselected");
   const [comment, setComment] = useState("");
+  const { selectedLocation } = useLocation();
 
   const handleLaunch = () => {
     // TODO: Implement launch logic
-    console.log("Launching thought:", { selectedMood, comment });
+    console.log("Launching thought:", { selectedMood, comment, location: selectedLocation });
     router.push("/(app)/Home" as any);
   };
 
@@ -138,13 +141,7 @@ const ThoughtLaunch = () => {
           {/* Location Selector */}
           <VStack className="gap-3">
             <Text className="text-typography-700 font-medium">Location</Text>
-            <HStack className="items-center gap-3 p-4 border border-border-200 rounded-lg bg-background-50">
-              <MaterialIcons name="location-on" size={24} color="#6B7280" />
-              <VStack className="flex-1">
-                <Text className="text-typography-900 font-medium">Southdowns, Centurion</Text>
-                <Text className="text-typography-600 text-sm">123 Open Window Street</Text>
-              </VStack>
-            </HStack>
+            <LocationPicker />
           </VStack>
 
           {/* Launch Button */}
@@ -159,6 +156,7 @@ const ThoughtLaunch = () => {
             />
           </VStack>
         </VStack>
+        <VStack className="h-64" />
       </ScrollView>
     </SafeAreaView>
   );
