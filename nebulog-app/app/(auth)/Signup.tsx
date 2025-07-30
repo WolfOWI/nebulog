@@ -8,7 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Image } from "react-native";
+import { ScrollView, Image, View } from "react-native";
 import { signUpUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
@@ -144,16 +144,18 @@ export default function Signup() {
               </Input>
             </FormControl>
           </VStack>
-          <LaunchButton
-            iconName="person-add"
-            onLaunch={handleSignup}
-            label="Hold to Sign Up"
-            holdDuration={500}
-            size={88}
-            fillColor="#34d399"
-          />
         </VStack>
       </ScrollView>
+      <View className="m-4">
+        <LaunchButton
+          iconName="person-add"
+          onLaunch={handleSignup}
+          label="Hold to Sign Up"
+          holdDuration={500}
+          size={88}
+          fillColor="#34d399"
+        />
+      </View>
     </SafeAreaView>
   );
 }

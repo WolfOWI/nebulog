@@ -125,15 +125,17 @@ export default function Login() {
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
             </Button> */}
           </VStack>
-          <LaunchButton
-            iconName="login"
-            onLaunch={handleLogin}
-            label="Hold to Log In"
-            holdDuration={500}
-            size={88}
-          />
         </VStack>
       </ScrollView>
+      <View className="m-4">
+        <LaunchButton
+          iconName="login"
+          onLaunch={handleLogin}
+          label="Hold to Log In"
+          holdDuration={500}
+          size={88}
+        />
+      </View>
     </SafeAreaView>
   );
 }

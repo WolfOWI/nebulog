@@ -204,17 +204,17 @@ export default function EditProfile() {
             </Pressable>
           </VStack>
         </VStack>
-        <VStack className="mt-12 mb-12">
-          <LaunchButton
-            iconName="logout"
-            onLaunch={handleLogout}
-            label="Hold to Log Out"
-            holdDuration={2000}
-            size={88}
-            fillColor="#991b1b"
-          />
-        </VStack>
       </ScrollView>
+      <View className="m-4">
+        <LaunchButton
+          iconName="logout"
+          onLaunch={handleLogout}
+          label="Hold to Log Out"
+          holdDuration={2000}
+          size={88}
+          fillColor="#991b1b"
+        />
+      </View>
     </SafeAreaView>
   );
 }
