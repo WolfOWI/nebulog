@@ -29,6 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     if (user) {
       setUser({ ...user, ...updates });
     }
+    console.log("User context updated:", user);
   };
 
   return (

@@ -9,6 +9,7 @@ import {
   getDocs,
   where,
   query,
+  increment,
 } from "firebase/firestore";
 import { User } from "@/lib/types";
 
@@ -91,4 +92,24 @@ export const isUsernameTaken = async (username: string) => {
   } else {
     return true;
   }
+};
+
+/**
+ * Plus 1 to user's reflection count
+ * @param userId - User's id
+ * @returns Nothing
+ */
+export const plusOneReflectionCount = async (userId: string) => {
+  const userDoc = doc(db, "users", userId);
+  await updateDoc(userDoc, { totalReflections: increment(1) });
+};
+
+/**
+ * Minus 1 from user's reflection count
+ * @param userId - User's id
+ * @returns Nothing
+ */
+export const minusOneReflectionCount = async (userId: string) => {
+  const userDoc = doc(db, "users", userId);
+  await updateDoc(userDoc, { totalReflections: increment(-1) });
 };

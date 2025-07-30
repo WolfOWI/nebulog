@@ -32,7 +32,7 @@ import { createReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 
 const ThoughtLaunch = () => {
-  const { user } = useUser();
+  const { user, updateUserContext } = useUser();
   const [selectedMood, setSelectedMood] = useState<string>("unselected");
   const [comment, setComment] = useState("");
   const { selectedLocation } = useLocation();
@@ -77,10 +77,18 @@ const ThoughtLaunch = () => {
     console.log("Reflection:", reflection);
 
     try {
-      await createReflection(reflection);
+      await createReflection(reflection, user.id);
       router.push("/(app)/Home" as any);
+
+      // Update local user context
+      updateUserContext({
+        totalReflections: user.totalReflections + 1,
+      });
+
+      // TODO: Add toast notification for success
     } catch (error) {
       console.error("Error creating reflection:", error);
+      // TODO: Add toast notification for error
     }
   };
 

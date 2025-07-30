@@ -25,7 +25,7 @@ export default function Home() {
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
+    // console.log("handleSheetChanges", index);
   }, []);
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.expand();
