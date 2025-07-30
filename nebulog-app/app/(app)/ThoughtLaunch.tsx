@@ -51,6 +51,7 @@ const ThoughtLaunch = () => {
       throw new Error("Logged in user's ID not found");
     }
 
+    // TODO: Add functionality for no location (private)
     if (!selectedLocation) {
       throw new Error("No location selected");
     }
@@ -59,17 +60,21 @@ const ThoughtLaunch = () => {
       authorId: user.id,
       text: comment,
       visibility: (isPublic ? "public" : "private") as "public" | "private",
-      location: {
-        lat: selectedLocation.geometry.location.lat,
-        long: selectedLocation.geometry.location.lng,
-        placeName: selectedLocation.name,
-        formattedAddress: selectedLocation.formatted_address,
-        placeId: selectedLocation.place_id,
-      },
+      ...(isLocationOn && {
+        location: {
+          lat: selectedLocation.geometry.location.lat,
+          long: selectedLocation.geometry.location.lng,
+          placeName: selectedLocation.name,
+          formattedAddress: selectedLocation.formatted_address,
+          placeId: selectedLocation.place_id,
+        },
+      }),
       mood: selectedMood,
       createdAt: new Date().toISOString(),
       echoCount: 0,
     };
+
+    console.log("Reflection:", reflection);
 
     try {
       await createReflection(reflection);
