@@ -213,18 +213,19 @@ const ThoughtLaunch = () => {
           </HStack>
 
           <View className="h-16" />
-
-          {/* Launch Button */}
-          <LaunchButton
-            iconName="rocket-launch"
-            onLaunch={handleLaunch}
-            label="Hold to Launch Thought"
-            holdDuration={2000}
-            size={88}
-            fillColor="#3730a3"
-          />
         </VStack>
       </ScrollView>
+      <View className="m-4">
+        {/* Launch Button */}
+        <LaunchButton
+          iconName={isPublic ? "rocket-launch" : "save"}
+          onLaunch={handleLaunch}
+          label={isPublic ? "Hold to Launch" : "Hold to Save"}
+          holdDuration={2000}
+          size={88}
+          fillColor="#3730a3"
+        />
+      </View>
     </SafeAreaView>
   );
 };
