@@ -18,6 +18,7 @@ import { isUsernameTaken, updateUserDetails } from "@/services/userServices";
 import Toast from "react-native-toast-message";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import { logOutUser } from "@/services/authServices";
+import { GetColorName } from "hex-color-to-color-name";
 
 export default function EditProfile() {
   const { user, updateUserContext } = useUser();
@@ -197,7 +198,7 @@ export default function EditProfile() {
                   style={{ backgroundColor: profileColor }}
                 />
                 <Text className="text-typography-900" size="xl">
-                  {profileColor}
+                  {GetColorName(profileColor)}
                 </Text>
               </HStack>
               <MaterialIcons name="chevron-right" size={24} color="#6B7280" />

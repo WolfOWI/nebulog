@@ -14,6 +14,7 @@ import { getIconColourFromBgColour } from "@/utils/colourUtility";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { updateUserDetails } from "@/services/userServices";
 import Toast from "react-native-toast-message";
+import { GetColorName } from "hex-color-to-color-name";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
@@ -33,7 +34,7 @@ export default function ProfileColourPick() {
       Toast.show({
         type: "success",
         text1: "Profile Colour Updated",
-        text2: "Your profile colour has been saved successfully.",
+        text2: `Your profile colour has been set to ${GetColorName(selectedColor)}.`,
         position: "top",
         visibilityTime: 3000,
         autoHide: true,
@@ -99,7 +100,9 @@ export default function ProfileColourPick() {
         {/* Title */}
         <VStack className="items-center mb-4">
           <Heading className="text-typography-900 text-2xl font-bold mb-2">Choose Colour</Heading>
-          <Text className="text-typography-600 text-center">Select a colour for your profile</Text>
+          <Text className="text-typography-600 text-center" size="xl">
+            {GetColorName(selectedColor)}
+          </Text>
         </VStack>
 
         {/* Current Avatar Preview */}
