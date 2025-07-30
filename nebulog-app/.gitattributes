@@ -1,0 +1,11 @@
+# Enforce case sensitivity for TypeScript and JavaScript files
+*.tsx binary
+*.ts binary
+*.js binary
+*.jsx binary
+
+# Ensure line endings are consistent
+*.tsx text eol=lf
+*.ts text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf 
