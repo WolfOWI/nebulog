@@ -30,8 +30,8 @@ const CircleBtn = ({ iconName, className, size, primary = false }: CircleBtnProp
   }
 
   let containerHierarchyClasses = primary
-    ? "bg-slate-50"
-    : "bg-transparent border border-slate-500";
+    ? "bg-typography-900"
+    : "bg-transparent border border-typography-600";
   let iconHierarchyColor = primary ? "#0f172a" : "#f8fafc";
 
   return (

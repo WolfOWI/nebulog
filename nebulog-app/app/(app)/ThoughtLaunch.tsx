@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, ScrollView, Pressable } from "react-native";
+import { Text } from "@/components/ui/text";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VStack } from "@/components/ui/vstack";
@@ -77,10 +78,10 @@ const ThoughtLaunch = () => {
                         height: 48,
                       })}
                       <VStack className="flex-1">
-                        <Text className={`text-lg font-medium ${selectedMoodData.textColor}`}>
+                        <Text className={`font-medium ${selectedMoodData.textColor}`} size="lg">
                           {selectedMoodData.spaceObject}
                         </Text>
-                        <Text className="text-typography-600 text-sm">
+                        <Text className="text-typography-600" size="sm">
                           {selectedMoodData.subemotions}
                         </Text>
                       </VStack>
@@ -93,8 +94,10 @@ const ThoughtLaunch = () => {
                         height: 48,
                       })}
                       <VStack className="flex-1">
-                        <Text className="text-typography-400 text-lg">Select your mood</Text>
-                        <Text className="text-typography-500 text-sm">
+                        <Text className="text-typography-400" size="lg">
+                          Select your mood
+                        </Text>
+                        <Text className="text-typography-500" size="sm">
                           Choose how you're feeling
                         </Text>
                       </VStack>

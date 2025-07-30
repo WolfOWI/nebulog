@@ -32,13 +32,14 @@ export interface Location {
   long: number;
 
   // Human-readable address
-  formattedAddress?: string;
+  mainAddressText?: string;
+  secondaryAddressText?: string;
 
   // Google Maps ID
   placeId?: string;
 }
 
-// Google Places API
+// (Google Places API)
 export interface Place {
   place_id: string;
   description: string;
@@ -52,6 +53,7 @@ export interface Place {
   }>;
 }
 
+// (Google Places API)
 export interface PlaceDetails {
   place_id: string;
   name: string;

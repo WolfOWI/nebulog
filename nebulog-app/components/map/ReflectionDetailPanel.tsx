@@ -52,24 +52,28 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
             <Text>✕</Text>
           </Button>
         </HStack>
-        <Text className="text-body text-slate-50">
+        <Text className="text-typography-900" size="md">
           {moodData?.subemotions || "Unselected Mood"}
         </Text>
-        <Text className="text-[16px] text-slate-400">{reflection.text}</Text>
-        <Text className="text-small text-slate-400">
+        <Text className="text-typography-400" size="md">
+          {reflection.text}
+        </Text>
+        <Text className="text-typography-400" size="sm">
           {reflection.locationLabel || "Unknown Location"}
         </Text>
         <Divider className="my-2" />
-        <Text className="text-small text-slate-400">
+        <Text className="text-typography-400" size="sm">
           {reflection.authorId || "Someone"}
           {/* TODO: Add author name */}
         </Text>
         <HStack className="flex-row justify-between items-center">
-          <Text className="text-small text-slate-400">
+          <Text className="text-typography-400" size="sm">
             {reflection.createdAt ? dayjs(reflection.createdAt).fromNow() : "Some time ago"}
           </Text>
           <HStack className="flex-row items-center gap-2">
-            <Text className="text-[16px] text-slate-50">{reflection.echoCount || "0"}</Text>
+            <Text className="text-typography-900" size="md">
+              {reflection.echoCount || "0"}
+            </Text>
             {getIcon("echo", { fill: "#F8FAFC", width: 24, height: 24 })}
           </HStack>
         </HStack>

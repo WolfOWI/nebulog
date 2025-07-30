@@ -75,7 +75,7 @@ export default function Signup() {
           </VStack>
 
           {/* Error Message */}
-          {error ? <Text className="text-red-400 text-center mb-4">{error}</Text> : null}
+          {error ? <Text className="text-error-400 text-center mb-4">{error}</Text> : null}
 
           {/* Signup Form */}
           <VStack className="w-full gap-4 mb-24">

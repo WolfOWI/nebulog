@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
@@ -89,7 +90,9 @@ export default function LaunchThoughtSwipeBtn({
       >
         <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-start items-center z-1000 gap-4">
           <View className="w-16 h-16" />
-          <Text className="text-slate-50 text-center text-lg">{displayMessage}</Text>
+          <Text className="text-typography-900 text-center" size="lg">
+            {displayMessage}
+          </Text>
         </View>
 
         {/* The animated button */}

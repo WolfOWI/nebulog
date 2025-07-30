@@ -58,16 +58,28 @@ export default function MyProfile() {
             {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
             <HStack className="justify-between items-center w-full mt-4 px-4">
               <VStack className="items-center w-1/3">
-                <Text className="text-slate-50 text-center text-2xl ">{user.streakCount}</Text>
-                <Text className="text-slate-400 text-center">day streak</Text>
+                <Text className="text-typography-900 text-center" size="2xl">
+                  {user.streakCount}
+                </Text>
+                <Text className="text-typography-400 text-center" size="md">
+                  day streak
+                </Text>
               </VStack>
               <VStack className="items-center w-1/3">
-                <Text className="text-slate-50 text-center text-2xl ">{user.totalReflections}</Text>
-                <Text className="text-slate-400 text-center">reflections</Text>
+                <Text className="text-typography-900 text-center" size="2xl">
+                  {user.totalReflections}
+                </Text>
+                <Text className="text-typography-400 text-center" size="md">
+                  reflections
+                </Text>
               </VStack>
               <VStack className="items-center w-1/3">
-                <Text className="text-slate-50 text-center text-2xl ">{user.totalEchoes}</Text>
-                <Text className="text-slate-400 text-center">echoes</Text>
+                <Text className="text-typography-900 text-center" size="2xl">
+                  {user.totalEchoes}
+                </Text>
+                <Text className="text-typography-400 text-center" size="md">
+                  echoes
+                </Text>
               </VStack>
             </HStack>
           </VStack>

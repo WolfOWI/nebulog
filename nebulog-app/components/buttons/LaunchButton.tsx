@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
-import { View, Pressable, Animated, Text } from "react-native";
+import { View, Pressable, Animated } from "react-native";
+import { Text } from "@/components/ui/text";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import { defaultProfileColour } from "@/constants/Colors";
@@ -185,7 +186,11 @@ export default function LaunchButton({
             />
           )}
 
-          {label && <Text className="text-slate-400 text-[16px] z-10">{label}</Text>}
+          {label && (
+            <Text className="text-typography-400 z-10" size="md">
+              {label}
+            </Text>
+          )}
         </Pressable>
       </Animated.View>
     </View>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, FlatList } from "react-native";
+import { View, Pressable, FlatList } from "react-native";
+import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -108,7 +109,7 @@ const LocationSearch = () => {
                     <Text className="text-typography-900 font-medium">
                       {item.structured_formatting.main_text}
                     </Text>
-                    <Text className="text-typography-600 text-sm">
+                    <Text className="text-typography-600" size="sm">
                       {item.structured_formatting.secondary_text}
                     </Text>
                   </VStack>
@@ -122,7 +123,7 @@ const LocationSearch = () => {
         {!isSearching && searchQuery.trim().length >= 3 && searchResults.length === 0 && (
           <VStack className="items-center py-8">
             <Text className="text-typography-600">No locations found</Text>
-            <Text className="text-typography-500 text-sm text-center mt-2">
+            <Text className="text-typography-500 text-center mt-2" size="sm">
               Try a different search term or check your spelling
             </Text>
           </VStack>

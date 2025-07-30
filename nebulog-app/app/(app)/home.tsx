@@ -124,7 +124,8 @@ export default function Home() {
                     <MaterialIcons name="sunny" size={24} color="#f8fafc" />
                   </View>
                   <Text
-                    className="text-slate-50 text-[16px]"
+                    className="text-typography-900"
+                    size="md"
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
@@ -136,7 +137,8 @@ export default function Home() {
                     <MaterialCommunityIcons name="thought-bubble" size={24} color="#f8fafc" />
                   </View>
                   <Text
-                    className="text-slate-50 text-[16px]"
+                    className="text-typography-900"
+                    size="md"
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >

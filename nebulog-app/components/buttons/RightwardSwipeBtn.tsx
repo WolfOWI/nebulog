@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
@@ -101,7 +102,9 @@ export default function RightwardSwipeBtn({
         {/* Show swipe instruction when touched */}
         {showMessage && (
           <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000">
-            <Text className="text-white text-center text-lg">{touchMessage}</Text>
+            <Text className="text-typography-900 text-center" size="lg">
+              {touchMessage}
+            </Text>
             <MaterialIcons name="arrow-forward" size={24} color="#f8fafc" />
           </View>
         )}

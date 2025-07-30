@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -30,10 +31,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             <MaterialIcons name="location-on" size={20} color="#6366f1" />
           </View>
           <VStack className="flex-1">
-            <Text className="text-typography-900 font-medium text-base">
+            <Text className="text-typography-900 font-medium" size="md">
               {selectedLocation.name}
             </Text>
-            <Text className="text-typography-600 text-sm">
+            <Text className="text-typography-600" size="sm">
               {selectedLocation.formatted_address}
             </Text>
           </VStack>
@@ -53,8 +54,12 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           <MaterialIcons name="add-location" size={24} color="#6B7280" />
         </View>
         <VStack className="items-center">
-          <Text className="text-typography-700 font-medium text-base">Add Location</Text>
-          <Text className="text-typography-500 text-sm text-center">{placeholder}</Text>
+          <Text className="text-typography-700 font-medium" size="md">
+            Add Location
+          </Text>
+          <Text className="text-typography-500 text-center" size="sm">
+            {placeholder}
+          </Text>
         </VStack>
       </VStack>
     </Pressable>
