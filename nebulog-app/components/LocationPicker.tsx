@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -6,17 +6,47 @@ import { HStack } from "@/components/ui/hstack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useLocation } from "@/contexts/LocationContext";
+import { PlaceDetails } from "@/lib/types";
 
 interface LocationPickerProps {
   placeholder?: string;
   className?: string;
+  initialLocation?: {
+    lat: number;
+    long: number;
+    placeName?: string;
+    formattedAddress?: string;
+    placeId?: string;
+  } | null;
+  isEditing?: boolean;
 }
 
 const LocationPicker: React.FC<LocationPickerProps> = ({
   placeholder = "Where are you thinking from?",
   className,
+  initialLocation,
+  isEditing = false,
 }) => {
-  const { selectedLocation } = useLocation();
+  const { selectedLocation, setSelectedLocation } = useLocation();
+
+  // Set initial location if passed through
+  useEffect(() => {
+    if (initialLocation) {
+      const placeDetails: PlaceDetails = {
+        place_id: initialLocation.placeId || "",
+        name: initialLocation.placeName || "Unknown Location",
+        formatted_address: initialLocation.formattedAddress || "",
+        geometry: {
+          location: {
+            lat: initialLocation.lat,
+            lng: initialLocation.long,
+          },
+        },
+        address_components: [],
+      };
+      setSelectedLocation(placeDetails);
+    }
+  }, [initialLocation, isEditing]); // Re-run when editing mode changes
 
   const handleLocationPress = () => {
     router.push("/(app)/LocationSearch" as any);

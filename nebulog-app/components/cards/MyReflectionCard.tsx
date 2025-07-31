@@ -1,5 +1,5 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { BlurView } from "expo-blur";
@@ -12,8 +12,15 @@ import { Divider } from "../ui/divider";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getIcon } from "@/constants/customIcons";
-import { Pressable } from "../ui/pressable";
 import { MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import {
+  Actionsheet,
+  ActionsheetContent,
+  ActionsheetItem,
+  ActionsheetItemText,
+  ActionsheetBackdrop,
+} from "../ui/actionsheet";
 
 // Extend dayjs with relative time plugin
 dayjs.extend(relativeTime);
@@ -23,6 +30,8 @@ interface MyReflectionCardProps {
 }
 
 const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
+  const [isActionsheetOpen, setIsActionsheetOpen] = useState(false);
+
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
@@ -43,11 +52,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
               {moodData?.spaceObject || "Unknown Planet"}
             </Text>
           </HStack>
-          <Pressable
-            onPress={() => {
-              console.log("pressed");
-            }}
-          >
+          <Pressable onPress={() => setIsActionsheetOpen(true)}>
             <MaterialIcons name="more-vert" size={24} color="#F8FAFC" />
           </Pressable>
         </HStack>
@@ -77,6 +82,34 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
           )}
         </HStack>
       </VStack>
+
+      <Actionsheet isOpen={isActionsheetOpen} onClose={() => setIsActionsheetOpen(false)}>
+        <ActionsheetBackdrop />
+        <ActionsheetContent>
+          <ActionsheetItem
+            onPress={() => {
+              // Navigate to edit page with reflection data
+              router.push({
+                pathname: "/(app)/EditReflection",
+                params: { reflection: JSON.stringify(reflection) },
+              } as any);
+              setIsActionsheetOpen(false);
+            }}
+          >
+            <MaterialIcons name="edit" size={24} color="#F8FAFC" />
+            <ActionsheetItemText>Edit</ActionsheetItemText>
+          </ActionsheetItem>
+          <ActionsheetItem
+            onPress={() => {
+              // Handle delete action
+              setIsActionsheetOpen(false);
+            }}
+          >
+            <MaterialIcons name="delete" size={24} color="#F8FAFC" />
+            <ActionsheetItemText>Delete</ActionsheetItemText>
+          </ActionsheetItem>
+        </ActionsheetContent>
+      </Actionsheet>
     </View>
   );
 };

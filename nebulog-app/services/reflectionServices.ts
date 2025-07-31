@@ -9,6 +9,7 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Reflection } from "@/lib/types";
@@ -49,5 +50,32 @@ export const getReflectionsForUser = async (userId: string) => {
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Reflection));
   } catch (error) {
     throw new Error("Failed to get reflections for user: " + error);
+  }
+};
+
+/**
+ * Update an existing reflection
+ * @param reflectionId - The ID of the reflection to update
+ * @param updates - The updates to apply to the reflection
+ */
+export const updateReflection = async (reflectionId: string, updates: Partial<Reflection>) => {
+  try {
+    const reflectionDoc = doc(db, "reflections", reflectionId);
+    await updateDoc(reflectionDoc, updates);
+  } catch (error) {
+    throw new Error("Failed to update reflection: " + error);
+  }
+};
+
+/**
+ * Delete a reflection
+ * @param reflectionId - The ID of the reflection to delete
+ */
+export const deleteReflection = async (reflectionId: string) => {
+  try {
+    const reflectionDoc = doc(db, "reflections", reflectionId);
+    await deleteDoc(reflectionDoc);
+  } catch (error) {
+    throw new Error("Failed to delete reflection: " + error);
   }
 };

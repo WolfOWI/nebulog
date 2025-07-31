@@ -1,13 +1,23 @@
 import React, { useState, useRef } from "react";
 import { View, Pressable, Animated } from "react-native";
 import { Text } from "@/components/ui/text";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import { defaultProfileColour } from "@/constants/Colors";
 
+const getIconComponent = (iconName: string) => {
+  if (iconName in MaterialCommunityIcons.glyphMap) {
+    return MaterialCommunityIcons;
+  }
+  if (iconName in MaterialIcons.glyphMap) {
+    return MaterialIcons;
+  }
+  return MaterialIcons;
+};
+
 interface LaunchButtonProps {
   onLaunch: () => void;
-  iconName?: keyof typeof MaterialIcons.glyphMap;
+  iconName?: string;
   holdDuration?: number;
   size?: number;
   label?: string;
@@ -177,14 +187,18 @@ export default function LaunchButton({
           />
 
           {/* Icon */}
-          {iconName && (
-            <MaterialIcons
-              name={iconName}
-              size={size * 0.3}
-              color="#f8fafc"
-              style={{ zIndex: 2 }}
-            />
-          )}
+          {iconName &&
+            (() => {
+              const IconComponent = getIconComponent(iconName);
+              return (
+                <IconComponent
+                  name={iconName as any}
+                  size={size * 0.3}
+                  color="#f8fafc"
+                  style={{ zIndex: 2 }}
+                />
+              );
+            })()}
 
           {label && (
             <Text className="text-typography-400 z-10" size="md">

@@ -52,6 +52,13 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="EditReflection"
+        options={{
+          title: "Edit Reflection",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }
