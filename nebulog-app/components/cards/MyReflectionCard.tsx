@@ -21,22 +21,44 @@ import {
   ActionsheetItemText,
   ActionsheetBackdrop,
 } from "../ui/actionsheet";
+import { Alert } from "react-native";
+import { deleteReflection } from "@/services/reflectionServices";
 
 // Extend dayjs with relative time plugin
 dayjs.extend(relativeTime);
 
 interface MyReflectionCardProps {
   reflection: Reflection;
+  onDelete: (reflectionId: string) => void;
 }
 
-const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
+const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection, onDelete }) => {
   const [isActionsheetOpen, setIsActionsheetOpen] = useState(false);
-
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
-  console.log(moodData);
+
+  const handleDeletePress = () => {
+    Alert.alert(
+      "Delete Reflection",
+      "Are you sure you want to delete this reflection? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            onDelete(reflection.id || "");
+            setIsActionsheetOpen(false);
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View className="p-6 rounded-3xl overflow-hidden bg-background-100">
@@ -99,12 +121,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
             <MaterialIcons name="edit" size={24} color="#F8FAFC" />
             <ActionsheetItemText>Edit</ActionsheetItemText>
           </ActionsheetItem>
-          <ActionsheetItem
-            onPress={() => {
-              // Handle delete action
-              setIsActionsheetOpen(false);
-            }}
-          >
+          <ActionsheetItem onPress={handleDeletePress}>
             <MaterialIcons name="delete" size={24} color="#F8FAFC" />
             <ActionsheetItemText>Delete</ActionsheetItemText>
           </ActionsheetItem>

@@ -71,10 +71,19 @@ export const updateReflection = async (reflectionId: string, updates: Partial<Re
  * Delete a reflection
  * @param reflectionId - The ID of the reflection to delete
  */
-export const deleteReflection = async (reflectionId: string) => {
+export const deleteReflection = async (reflectionId: string, userId: string) => {
   try {
     const reflectionDoc = doc(db, "reflections", reflectionId);
     await deleteDoc(reflectionDoc);
+
+    try {
+      const userDoc = doc(db, "users", userId);
+      await updateDoc(userDoc, {
+        totalReflections: increment(-1),
+      });
+    } catch (error) {
+      console.error("Error decreasing reflection count:", error);
+    }
   } catch (error) {
     throw new Error("Failed to delete reflection: " + error);
   }

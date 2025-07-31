@@ -26,7 +26,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
-  console.log(moodData);
 
   return (
     <BlurView

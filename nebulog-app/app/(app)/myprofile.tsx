@@ -18,7 +18,7 @@ import { defaultProfileColour } from "@/constants/Colors";
 import MyReflectionCard from "@/components/cards/MyReflectionCard";
 import { Reflection } from "@/lib/types";
 import { FlatList } from "react-native-gesture-handler";
-import { getReflectionsForUser } from "@/services/reflectionServices";
+import { deleteReflection, getReflectionsForUser } from "@/services/reflectionServices";
 
 export default function MyProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
@@ -77,9 +77,32 @@ export default function MyProfile() {
     }
   };
 
+  // TODO: Store reflections in context
   useEffect(() => {
     handleGetReflections();
   }, []);
+
+  const handleDelete = async (reflectionId: string) => {
+    if (!reflectionId) {
+      throw new Error("Reflection ID not found");
+    }
+
+    try {
+      if (!user.id) {
+        throw new Error("User ID not found");
+      }
+
+      await deleteReflection(reflectionId, user.id);
+
+      // Refresh the reflections list after successful deletion
+      await handleGetReflections();
+
+      // TODO: Add toast notification for success
+    } catch (error) {
+      console.error("Error deleting reflection:", error);
+      // TODO: Add toast notification for error
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
@@ -129,7 +152,7 @@ export default function MyProfile() {
       </VStack>
       <FlatList
         data={reflections}
-        renderItem={({ item }) => <MyReflectionCard reflection={item} />}
+        renderItem={({ item }) => <MyReflectionCard reflection={item} onDelete={handleDelete} />}
         keyExtractor={(item) => item.id!}
         contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
         showsVerticalScrollIndicator={false}

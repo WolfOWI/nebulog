@@ -44,7 +44,6 @@ const ThoughtLaunch = () => {
     if (!isLocationOn && isPublic) {
       setIsPublic(false);
     }
-    console.log("isLocationOn", isLocationOn);
   }, [isLocationOn]);
 
   // Location must be on for public reflections
@@ -52,7 +51,6 @@ const ThoughtLaunch = () => {
     if (!isLocationOn && isPublic) {
       setIsLocationOn(true);
     }
-    console.log("isPublic", isPublic);
   }, [isPublic]);
 
   const handleLaunch = async () => {

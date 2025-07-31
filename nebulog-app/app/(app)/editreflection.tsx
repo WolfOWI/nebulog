@@ -54,7 +54,6 @@ const EditReflection = () => {
     if (!isLocationOn && isPublic) {
       setIsPublic(false);
     }
-    console.log("isLocationOn", isLocationOn);
   }, [isLocationOn]);
 
   // Location must be on for public reflections
@@ -62,7 +61,6 @@ const EditReflection = () => {
     if (!isLocationOn && isPublic) {
       setIsLocationOn(true);
     }
-    console.log("isPublic", isPublic);
   }, [isPublic]);
 
   // Clear location context when leaving the page
