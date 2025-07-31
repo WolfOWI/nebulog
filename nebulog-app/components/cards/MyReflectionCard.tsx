@@ -58,7 +58,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
           {reflection.text}
         </Text>
         <Text className="text-typography-600" size="sm">
-          {reflection.location?.placeName || "Unknown Location"}
+          {reflection.location?.placeName || "No location"}
         </Text>
         <Divider className="my-2" />
         <HStack className="flex-row justify-between items-center">

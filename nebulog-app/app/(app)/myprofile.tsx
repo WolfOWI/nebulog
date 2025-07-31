@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
@@ -18,8 +18,11 @@ import { defaultProfileColour } from "@/constants/Colors";
 import MyReflectionCard from "@/components/cards/MyReflectionCard";
 import { Reflection } from "@/lib/types";
 import { FlatList } from "react-native-gesture-handler";
+import { getReflectionsForUser } from "@/services/reflectionServices";
 
 export default function MyProfile() {
+  const [reflections, setReflections] = useState<Reflection[]>([]);
+
   const fakeReflection = {
     authorId: "KPH6Xrv2rvViazAD4ttushuGHRq1",
     createdAt: "2025-07-30T18:24:59.817Z",
@@ -54,6 +57,29 @@ export default function MyProfile() {
   if (!user) {
     return null;
   }
+
+  const handleGetReflections = async () => {
+    if (!user.id) {
+      console.log("No logged inuser found");
+      return;
+    }
+    try {
+      const userReflections = await getReflectionsForUser(user.id);
+
+      // Sort reflections by createdAt in descending order
+      const sortedReflections = userReflections.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setReflections(sortedReflections);
+    } catch (error) {
+      console.error("Error in handleGetReflections:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetReflections();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
@@ -102,9 +128,9 @@ export default function MyProfile() {
         </HStack>
       </VStack>
       <FlatList
-        data={[fakeReflection, fakeReflection, fakeReflection, fakeReflection]}
-        renderItem={({ item }) => <MyReflectionCard reflection={item as Reflection} />}
-        keyExtractor={(item) => item.authorId}
+        data={reflections}
+        renderItem={({ item }) => <MyReflectionCard reflection={item} />}
+        keyExtractor={(item) => item.id!}
         contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
         showsVerticalScrollIndicator={false}
       />

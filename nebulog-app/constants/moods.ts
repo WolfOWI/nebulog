@@ -50,9 +50,9 @@ export const mood = {
     subemotions: "Peace, Calm, Serenity",
     spaceObject: "Crystal Moon",
     colorHex: "#A2F4FD",
-    colorName: "purple-300",
-    textColor: "text-purple-300",
-    borderColor: "border-purple-300",
+    colorName: "cyan-300",
+    textColor: "text-cyan-200",
+    borderColor: "border-cyan-200",
     icon: getMoodIcon("stillness"),
   },
   wonder: {

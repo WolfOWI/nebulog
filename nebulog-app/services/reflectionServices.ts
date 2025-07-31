@@ -1,10 +1,23 @@
 // Reflection Services
 
-import { collection, addDoc, increment, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  increment,
+  doc,
+  updateDoc,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Reflection } from "@/lib/types";
 
-// Create a new reflection
+/**
+ * Create a new reflection
+ * @param reflection - The reflection to create
+ * @param userId - The user ID of the reflection's author
+ */
 export const createReflection = async (reflection: Reflection, userId: string) => {
   try {
     const reflectionsCollection = collection(db, "reflections");
@@ -21,5 +34,20 @@ export const createReflection = async (reflection: Reflection, userId: string) =
     }
   } catch (error) {
     throw new Error("Failed to create reflection: " + error);
+  }
+};
+
+/**
+ * Get all reflections created by a user
+ * @param userId - The user ID to get reflections for
+ */
+export const getReflectionsForUser = async (userId: string) => {
+  try {
+    const reflectionsCollection = collection(db, "reflections");
+    const q = query(reflectionsCollection, where("authorId", "==", userId));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Reflection));
+  } catch (error) {
+    throw new Error("Failed to get reflections for user: " + error);
   }
 };
