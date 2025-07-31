@@ -22,6 +22,7 @@ import { deleteReflection, getReflectionsForUser } from "@/services/reflectionSe
 
 export default function MyProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
+  const { user } = useUser();
 
   const fakeReflection = {
     authorId: "KPH6Xrv2rvViazAD4ttushuGHRq1",
@@ -40,8 +41,6 @@ export default function MyProfile() {
     visibility: "public",
   };
 
-  const { user } = useUser();
-
   const handleClose = () => {
     router.back();
   };
@@ -54,13 +53,9 @@ export default function MyProfile() {
     }
   };
 
-  if (!user) {
-    return null;
-  }
-
   const handleGetReflections = async () => {
-    if (!user.id) {
-      console.log("No logged inuser found");
+    if (!user?.id) {
+      console.log("No logged in user found");
       return;
     }
     try {
@@ -79,8 +74,10 @@ export default function MyProfile() {
 
   // TODO: Store reflections in context
   useEffect(() => {
-    handleGetReflections();
-  }, []);
+    if (user) {
+      handleGetReflections();
+    }
+  }, [user]);
 
   const handleDelete = async (reflectionId: string) => {
     if (!reflectionId) {
@@ -88,7 +85,7 @@ export default function MyProfile() {
     }
 
     try {
-      if (!user.id) {
+      if (!user?.id) {
         throw new Error("User ID not found");
       }
 
@@ -103,6 +100,10 @@ export default function MyProfile() {
       // TODO: Add toast notification for error
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">

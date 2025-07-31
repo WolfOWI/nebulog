@@ -5,7 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UserProvider } from "@/contexts/UserContext";
 import { LocationProvider } from "@/contexts/LocationContext";

@@ -21,7 +21,7 @@ import { logOutUser } from "@/services/authServices";
 import { GetColorName } from "hex-color-to-color-name";
 
 export default function EditProfile() {
-  const { user, updateUserContext } = useUser();
+  const { user, loading, updateUserContext } = useUser();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
@@ -113,10 +113,20 @@ export default function EditProfile() {
 
   const handleLogout = async () => {
     await logOutUser();
-    router.replace("/(auth)/login" as any);
+    setTimeout(() => {
+      router.replace("/(auth)/login" as any);
+    }, 100);
   };
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <SafeAreaView className="flex-1 bg-background-0">
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-typography-600">Redirecting...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
