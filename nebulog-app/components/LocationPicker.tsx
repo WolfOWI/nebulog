@@ -49,7 +49,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   }, [initialLocation, isEditing]); // Re-run when editing mode changes
 
   const handleLocationPress = () => {
-    router.push("/(app)/LocationSearch" as any);
+    router.push("/(app)/locationsearch" as any);
   };
 
   if (selectedLocation) {
