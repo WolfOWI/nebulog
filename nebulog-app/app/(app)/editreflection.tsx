@@ -49,12 +49,21 @@ const EditReflection = () => {
   const [originalLocation, setOriginalLocation] = useState(reflectionData?.location || null);
   const { setSelectedLocation } = useLocation();
 
-  // If location is off, set public to off (location is required for public reflections)
+  // If location is off, set public to off
   useEffect(() => {
-    if (!isLocationOn) {
+    if (!isLocationOn && isPublic) {
       setIsPublic(false);
     }
+    console.log("isLocationOn", isLocationOn);
   }, [isLocationOn]);
+
+  // Location must be on for public reflections
+  useEffect(() => {
+    if (!isLocationOn && isPublic) {
+      setIsLocationOn(true);
+    }
+    console.log("isPublic", isPublic);
+  }, [isPublic]);
 
   // Clear location context when leaving the page
   useEffect(() => {

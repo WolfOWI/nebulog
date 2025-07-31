@@ -39,12 +39,21 @@ const ThoughtLaunch = () => {
   const [isPublic, setIsPublic] = useState(true);
   const [isLocationOn, setIsLocationOn] = useState(true);
 
-  // If location is off, set public to off (location is required for public reflections)
+  // If location is off, set public to off
   useEffect(() => {
-    if (!isLocationOn) {
+    if (!isLocationOn && isPublic) {
       setIsPublic(false);
     }
+    console.log("isLocationOn", isLocationOn);
   }, [isLocationOn]);
+
+  // Location must be on for public reflections
+  useEffect(() => {
+    if (!isLocationOn && isPublic) {
+      setIsLocationOn(true);
+    }
+    console.log("isPublic", isPublic);
+  }, [isPublic]);
 
   const handleLaunch = async () => {
     if (!user?.id) {
