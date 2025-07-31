@@ -22,7 +22,7 @@ import { deleteReflection, getReflectionsForUser } from "@/services/reflectionSe
 
 export default function MyProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
-  const { user } = useUser();
+  const { user, updateUserContext } = useUser();
 
   const fakeReflection = {
     authorId: "KPH6Xrv2rvViazAD4ttushuGHRq1",
@@ -93,6 +93,11 @@ export default function MyProfile() {
 
       // Refresh the reflections list after successful deletion
       await handleGetReflections();
+
+      // Update user context
+      updateUserContext({
+        totalReflections: user.totalReflections - 1,
+      });
 
       // TODO: Add toast notification for success
     } catch (error) {
