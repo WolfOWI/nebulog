@@ -104,16 +104,16 @@ export default function EditProfile() {
   };
 
   const handleIconSelect = () => {
-    router.push("/(app)/ProfileIconSelect" as any);
+    router.push("/(app)/profileiconselect" as any);
   };
 
   const handleColorSelect = () => {
-    router.push("/ProfileColourPick" as any);
+    router.push("/profilecolourpick" as any);
   };
 
   const handleLogout = async () => {
     await logOutUser();
-    router.replace("/(auth)/Login" as any);
+    router.replace("/(auth)/login" as any);
   };
 
   if (!user) return null;

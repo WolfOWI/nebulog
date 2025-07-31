@@ -33,7 +33,7 @@ export default function Login() {
     try {
       await logInUser({ email, password });
       // Navigate to home after successful login
-      router.replace("/(app)/Home" as any);
+      router.replace("/(app)/home" as any);
     } catch (error) {
       console.error("Error logging in user: ", error);
       setError("Invalid email or password");
@@ -51,7 +51,7 @@ export default function Login() {
     try {
       await logInUser({ email: "wolf@gmail.com", password: "123456" });
       // Navigate to home after successful login
-      router.replace("/(app)/Home" as any);
+      router.replace("/(app)/home" as any);
     } catch (error) {
       console.error("Error logging in user: ", error);
       setError("Invalid email or password");
@@ -77,7 +77,7 @@ export default function Login() {
             <Heading className="text-typography-900 text-2xl font-bold mb-2">Welcome Back</Heading>
             <HStack className="">
               <Text className="text-typography-600">Don't have an account? </Text>
-              <Link href="/Signup" asChild>
+              <Link href="/signup" asChild>
                 <Text className="text-primary-600 font-bold">Join us</Text>
               </Link>
             </HStack>

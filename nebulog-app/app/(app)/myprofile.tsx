@@ -48,7 +48,7 @@ export default function MyProfile() {
 
   const handleEdit = () => {
     try {
-      router.push("/EditProfile" as any);
+      router.push("/editprofile" as any);
     } catch (error) {
       console.error("Error in handleEdit:", error);
     }

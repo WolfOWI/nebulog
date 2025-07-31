@@ -78,7 +78,7 @@ export default function Home() {
             size="large"
           />
 
-          <AvatarHoldBtn onHoldComplete={() => router.push("/MyProfile" as any)} />
+          <AvatarHoldBtn onHoldComplete={() => router.push("/myprofile" as any)} />
         </HStack>
 
         {/* Bottom Screen overlay*/}
@@ -114,7 +114,7 @@ export default function Home() {
           <BottomSheetView className="flex-1 px-6 pt-4 pb-8">
             <VStack className="items-center mb-6 gap-6">
               <LaunchThoughtSwipeBtn
-                onSwipeComplete={() => router.push("/ThoughtLaunch" as any)}
+                onSwipeComplete={() => router.push("/thoughtlaunch" as any)}
                 iconName="rocket-launch"
                 displayMessage="What's on your mind?"
               />

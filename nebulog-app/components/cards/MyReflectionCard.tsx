@@ -90,7 +90,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection }) => {
             onPress={() => {
               // Navigate to edit page with reflection data
               router.push({
-                pathname: "/(app)/EditReflection",
+                pathname: "/(app)/editreflection",
                 params: { reflection: JSON.stringify(reflection) },
               } as any);
               setIsActionsheetOpen(false);

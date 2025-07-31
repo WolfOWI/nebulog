@@ -1,5 +1,6 @@
 import { Place, PlaceDetails } from "@/lib/types";
 import { getCurrentLocation } from "./locationServices";
+import Constants from "expo-constants";
 
 export const searchPlaces = async (query: string): Promise<Place[]> => {
   // Only start searching after 3 characters
@@ -21,7 +22,7 @@ export const searchPlaces = async (query: string): Promise<Place[]> => {
       fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           query
-        )}&key=${process.env.GOOGLE_PLATFORM_API_KEY}&types=geocode${
+        )}&key=${Constants.expoConfig?.extra?.GOOGLE_PLATFORM_API_KEY}&types=geocode${
           deviceLocation
             ? `&location=${deviceLocation.coords.latitude},${deviceLocation.coords.longitude}&radius=10000`
             : ""
@@ -32,7 +33,7 @@ export const searchPlaces = async (query: string): Promise<Place[]> => {
       fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           query
-        )}&key=${process.env.GOOGLE_PLATFORM_API_KEY}&types=establishment${
+        )}&key=${Constants.expoConfig?.extra?.GOOGLE_PLATFORM_API_KEY}&types=establishment${
           deviceLocation
             ? `&location=${deviceLocation.coords.latitude},${deviceLocation.coords.longitude}&radius=10000`
             : ""
@@ -77,7 +78,7 @@ export const searchPlaces = async (query: string): Promise<Place[]> => {
 export const getPlaceDetails = async (placeId: string): Promise<PlaceDetails | null> => {
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,name,formatted_address,geometry&key=${process.env.GOOGLE_PLATFORM_API_KEY}`
+      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,name,formatted_address,geometry&key=${Constants.expoConfig?.extra?.GOOGLE_PLATFORM_API_KEY}`
     );
 
     const data = await response.json();

@@ -87,6 +87,11 @@ export type RootStackParamList = {
   "/": undefined;
   "/signup": undefined;
   "/home": undefined;
-  "/myProfile": undefined;
-  "/editProfile": undefined;
+  "/myprofile": undefined;
+  "/editprofile": undefined;
+  "/profileiconselect": undefined;
+  "/profilecolourpick": undefined;
+  "/locationsearch": undefined;
+  "/thoughtlaunch": undefined;
+  "/editreflection": undefined;
 };

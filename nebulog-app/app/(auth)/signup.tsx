@@ -45,7 +45,7 @@ export default function Signup() {
     try {
       await signUpUser({ username: name, email, password });
       // Navigate to home after successful signup
-      router.replace("/(app)/Home" as any);
+      router.replace("/(app)/home" as any);
     } catch (error) {
       console.error("Error creating user: ", error);
       setError("Error creating account. Please try again.");
@@ -68,7 +68,7 @@ export default function Signup() {
             </Heading>
             <HStack className="">
               <Text className="text-typography-600">Already have an account? </Text>
-              <Link href="/Login" asChild>
+              <Link href="/login" asChild>
                 <Text className="text-primary-600 font-bold">Log in</Text>
               </Link>
             </HStack>

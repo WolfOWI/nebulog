@@ -78,7 +78,7 @@ const ThoughtLaunch = () => {
 
     try {
       await createReflection(reflection, user.id);
-      router.push("/(app)/Home" as any);
+      router.push("/(app)/home" as any);
 
       // Update local user context
       updateUserContext({
