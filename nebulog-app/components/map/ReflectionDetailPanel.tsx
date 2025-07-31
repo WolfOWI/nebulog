@@ -59,7 +59,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
           {reflection.text}
         </Text>
         <Text className="text-typography-400" size="sm">
-          {reflection.locationLabel || "Unknown Location"}
+          {reflection.location?.placeName || "Unknown Location"}
         </Text>
         <Divider className="my-2" />
         <Text className="text-typography-400" size="sm">

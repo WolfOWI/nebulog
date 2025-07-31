@@ -15,8 +15,28 @@ import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { defaultProfileColour } from "@/constants/Colors";
+import MyReflectionCard from "@/components/cards/MyReflectionCard";
+import { Reflection } from "@/lib/types";
+import { FlatList } from "react-native-gesture-handler";
 
 export default function MyProfile() {
+  const fakeReflection = {
+    authorId: "KPH6Xrv2rvViazAD4ttushuGHRq1",
+    createdAt: "2025-07-30T18:24:59.817Z",
+    echoCount: 0,
+    location: {
+      formattedAddress: "15 Royal Chalice Cres, Mooikloof, Pretoria, 0081, South Africa",
+      lat: -25.8429741,
+      long: 28.342731,
+      placeId:
+        "Ej4xNSBSb3lhbCBDaGFsaWNlIENyZXMsIE1vb2lrbG9vZiwgUHJldG9yaWEsIDAwODEsIFNvdXRoIEFmcmljYSIwEi4KFAoSCUFM-LccXZUeEV_SrfYGX50CEA8qFAoSCTXfcO0CXZUeEQ1R-2YuzlI4",
+      placeName: "15 Royal Chalice Cres",
+    },
+    mood: "grief",
+    text: "What is life's meaning?",
+    visibility: "public",
+  };
+
   const { user } = useUser();
 
   const handleClose = () => {
@@ -45,46 +65,49 @@ export default function MyProfile() {
         />
       </View>
 
-      <ScrollView>
-        <VStack className="flex-1 px-6">
-          {/* Profile Header */}
-          <VStack className="items-center mb-8">
-            <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon || "ufo-outline"} />
-            <HStack className="items-center mt-3 mb-2 gap-3">
-              <View className="w-12 h-12" />
-              <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
-              <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="more-horiz" />
-            </HStack>
-            {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
-            <HStack className="justify-between items-center w-full mt-4 px-4">
-              <VStack className="items-center w-1/3">
-                <Text className="text-typography-900 text-center" size="2xl">
-                  {user.streakCount}
-                </Text>
-                <Text className="text-typography-400 text-center" size="md">
-                  day streak
-                </Text>
-              </VStack>
-              <VStack className="items-center w-1/3">
-                <Text className="text-typography-900 text-center" size="2xl">
-                  {user.totalReflections}
-                </Text>
-                <Text className="text-typography-400 text-center" size="md">
-                  reflections
-                </Text>
-              </VStack>
-              <VStack className="items-center w-1/3">
-                <Text className="text-typography-900 text-center" size="2xl">
-                  {user.totalEchoes}
-                </Text>
-                <Text className="text-typography-400 text-center" size="md">
-                  echoes
-                </Text>
-              </VStack>
-            </HStack>
+      {/* Profile Header */}
+      <VStack className="items-center mb-8">
+        <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon || "ufo-outline"} />
+        <HStack className="items-center mt-3 mb-2 gap-3">
+          <View className="w-12 h-12" />
+          <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
+          <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="more-horiz" />
+        </HStack>
+        {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
+        <HStack className="justify-between items-center w-full mt-4 px-4">
+          <VStack className="items-center w-1/3">
+            <Text className="text-typography-900 text-center" size="2xl">
+              {user.streakCount}
+            </Text>
+            <Text className="text-typography-400 text-center" size="md">
+              day streak
+            </Text>
           </VStack>
-        </VStack>
-      </ScrollView>
+          <VStack className="items-center w-1/3">
+            <Text className="text-typography-900 text-center" size="2xl">
+              {user.totalReflections}
+            </Text>
+            <Text className="text-typography-400 text-center" size="md">
+              reflections
+            </Text>
+          </VStack>
+          <VStack className="items-center w-1/3">
+            <Text className="text-typography-900 text-center" size="2xl">
+              {user.totalEchoes}
+            </Text>
+            <Text className="text-typography-400 text-center" size="md">
+              echoes
+            </Text>
+          </VStack>
+        </HStack>
+      </VStack>
+      <FlatList
+        data={[fakeReflection, fakeReflection, fakeReflection, fakeReflection]}
+        renderItem={({ item }) => <MyReflectionCard reflection={item as Reflection} />}
+        keyExtractor={(item) => item.authorId}
+        contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 }
