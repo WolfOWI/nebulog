@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Pressable, Text } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 
 interface CircularSwitchBtnProps {
   isOn?: boolean;
@@ -49,7 +49,7 @@ const CircularSwitchBtn = ({
           width: size,
           height: size,
           borderRadius: size / 2,
-          borderWidth: isActive ? 4 : 2,
+          borderWidth: isActive ? 4 : 1,
           borderColor: borderColor,
           backgroundColor: "transparent",
           justifyContent: "center",
@@ -60,16 +60,29 @@ const CircularSwitchBtn = ({
           shadowRadius: isActive ? 8 : 0,
         }}
       >
-        <Text
+        <BlurView
+          intensity={20}
           style={{
-            color: textColor,
-            fontSize: 16,
-            fontWeight: "600",
-            textAlign: "center",
+            borderRadius: size / 2,
+            overflow: "hidden",
+            width: "100%",
+            height: "100%",
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          {isActive ? onText : offText}
-        </Text>
+          <Text
+            style={{
+              color: textColor,
+              fontSize: 16,
+              fontWeight: "600",
+              textAlign: "center",
+            }}
+          >
+            {isActive ? onText : offText}
+          </Text>
+        </BlurView>
       </View>
     </Pressable>
   );
