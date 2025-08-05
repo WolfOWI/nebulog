@@ -36,6 +36,9 @@ export interface Location {
 
   // Google Maps ID
   placeId?: string;
+
+  // Geofire geohash (for location searches)
+  geohash?: string;
 }
 
 // (Google Places API)
