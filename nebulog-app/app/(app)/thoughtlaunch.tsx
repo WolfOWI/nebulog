@@ -30,6 +30,7 @@ import LocationPicker from "@/components/LocationPicker";
 import { useLocation } from "@/contexts/LocationContext";
 import { createReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
+import { geohashForLocation } from "geofire-common";
 
 const ThoughtLaunch = () => {
   const { user, updateUserContext } = useUser();
@@ -74,14 +75,16 @@ const ThoughtLaunch = () => {
           placeName: selectedLocation.name,
           formattedAddress: selectedLocation.formatted_address,
           placeId: selectedLocation.place_id,
+          geohash: geohashForLocation([
+            selectedLocation.geometry.location.lat,
+            selectedLocation.geometry.location.lng,
+          ]),
         },
       }),
       mood: selectedMood,
       createdAt: new Date().toISOString(),
       echoCount: 0,
     };
-
-    console.log("Reflection:", reflection);
 
     try {
       await createReflection(reflection, user.id);
