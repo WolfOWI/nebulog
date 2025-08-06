@@ -41,7 +41,6 @@ const defaultRegion = {
 const MapComponent = ({
   initialRegion = defaultRegion,
   showUserLocation = true,
-  markers = [],
   onMarkerPress,
   onRegionChange,
   onReflectionPanelChange,
@@ -226,26 +225,6 @@ const MapComponent = ({
             pinColor="blue"
           />
         )}
-
-        {/* Custom markers */}
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            coordinate={marker.coordinate}
-            title={marker.title || marker.reflection?.location?.placeName || "Reflection"}
-            description={
-              marker.description || marker.reflection?.text?.substring(0, 50) + "..." || ""
-            }
-            onPress={() => {
-              if (marker.reflection) {
-                handleReflectionPress(marker.reflection);
-              } else {
-                onMarkerPress?.(marker);
-              }
-            }}
-            pinColor={marker.reflection ? "purple" : undefined}
-          />
-        ))}
 
         {/* Reflection markers from Firestore */}
         {mapReflections.map((reflection) => {
