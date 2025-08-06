@@ -12,10 +12,10 @@ import { useUser } from "@/contexts/UserContext";
 import Toast from "react-native-toast-message";
 import { getMoodIcon, MoodIcons } from "@/constants/moodIcons";
 import { mood } from "@/constants/moods";
+import { ProfileIcon } from "../building-blocks/ProfileIcon";
 
 interface MapComponentProps {
   initialRegion?: Region;
-  showUserLocation?: boolean;
   markers?: Array<{
     id: string;
     coordinate: {
@@ -35,7 +35,6 @@ interface MapComponentProps {
 
 const MapComponent = ({
   initialRegion,
-  showUserLocation = true,
   onMarkerPress,
   onRegionChange,
   onReflectionPanelChange,
@@ -181,7 +180,7 @@ const MapComponent = ({
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={initialRegion}
-        showsUserLocation={showUserLocation}
+        showsUserLocation={false} // Showing user location with own customing marker
         showsMyLocationButton={false}
         showsCompass={false}
         showsScale={false}
@@ -191,7 +190,7 @@ const MapComponent = ({
         scrollEnabled={!selectedReflection} // Prevent map from scrolling when reflection is open (android fix)
       >
         {/* User location marker */}
-        {userLocation && showUserLocation && (
+        {userLocation && (
           <Marker
             coordinate={{
               latitude: userLocation.coords.latitude,
@@ -199,8 +198,11 @@ const MapComponent = ({
             }}
             title="Your Location"
             description="You are here"
-            pinColor="blue"
-          />
+          >
+            <View className="rounded-full items-center justify-center bg-slate-500/20 p-2">
+              <ProfileIcon name={user?.profileIcon || "default"} size={32} color="white" />
+            </View>
+          </Marker>
         )}
 
         {/* Reflection markers from Firestore */}

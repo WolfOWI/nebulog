@@ -91,7 +91,6 @@ export default function Home() {
       <SafeAreaView className="flex-1 bg-background-0 relative h-full w-full">
         <MapComponent
           ref={mapRef}
-          showUserLocation={true}
           className="absolute inset-0 z-0"
           onReflectionPanelChange={handleReflectionPanelChange}
         />

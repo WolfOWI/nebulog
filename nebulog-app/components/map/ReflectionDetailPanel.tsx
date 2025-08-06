@@ -77,7 +77,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
       if (event.translationY > 50) {
         runOnJS(handleClose)();
       } else {
-        // Snap back to original position if not swiped enough
         translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
       }
     });
@@ -89,6 +88,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const shadowColor = moodData?.shadowColor || "shadow-slate-200/50";
 
   return (
+    // TODO: Shadow not working properly - get an alternative solution?
     <GestureDetector gesture={swipeDownGesture}>
       <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor} `}>
         <BlurView
