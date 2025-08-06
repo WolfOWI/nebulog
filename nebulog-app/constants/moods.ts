@@ -9,6 +9,7 @@ export const mood = {
     textColor: "text-slate-200",
     borderColor: "border-slate-200",
     icon: getMoodIcon("unselected"),
+    shadowColor: "shadow-slate-200/50",
   },
   joy: {
     subemotions: "Happiness, Hope, Excitement",
@@ -18,6 +19,7 @@ export const mood = {
     textColor: "text-amber-300",
     borderColor: "border-amber-300",
     icon: getMoodIcon("joy"),
+    shadowColor: "shadow-amber-300/50",
   },
   gratitude: {
     subemotions: "Thankfulness, Appreciation, Nostalgia",
@@ -27,6 +29,7 @@ export const mood = {
     textColor: "text-orange-400",
     borderColor: "border-orange-400",
     icon: getMoodIcon("gratitude"),
+    shadowColor: "shadow-orange-400/50",
   },
   growth: {
     subemotions: "Change, Restarting, Evolving",
@@ -36,6 +39,7 @@ export const mood = {
     textColor: "text-emerald-300",
     borderColor: "border-emerald-300",
     icon: getMoodIcon("growth"),
+    shadowColor: "shadow-emerald-300/50",
   },
   connection: {
     subemotions: "Belonging, Empathy, Love",
@@ -45,6 +49,7 @@ export const mood = {
     textColor: "text-pink-400",
     borderColor: "border-pink-400",
     icon: getMoodIcon("connection"),
+    shadowColor: "shadow-pink-400/50",
   },
   stillness: {
     subemotions: "Peace, Calm, Serenity",
@@ -54,6 +59,7 @@ export const mood = {
     textColor: "text-cyan-200",
     borderColor: "border-cyan-200",
     icon: getMoodIcon("stillness"),
+    shadowColor: "shadow-cyan-200/50",
   },
   wonder: {
     subemotions: "Curiosity, Awe, Amazement",
@@ -63,6 +69,7 @@ export const mood = {
     textColor: "text-violet-400",
     borderColor: "border-violet-400",
     icon: getMoodIcon("wonder"),
+    shadowColor: "shadow-violet-400/50",
   },
   anger: {
     subemotions: "Frustration, Rage, Irritation",
@@ -72,6 +79,7 @@ export const mood = {
     textColor: "text-red-500",
     borderColor: "border-red-500",
     icon: getMoodIcon("anger"),
+    shadowColor: "shadow-red-500/50",
   },
   turbulence: {
     subemotions: "Anxiety, Shame, Confusion",
@@ -81,6 +89,7 @@ export const mood = {
     textColor: "text-orange-600",
     borderColor: "border-orange-600",
     icon: getMoodIcon("turbulence"),
+    shadowColor: "shadow-orange-600/50",
   },
   sadness: {
     subemotions: "Shame, Disappointment, Melancholy",
@@ -90,6 +99,7 @@ export const mood = {
     textColor: "text-sky-500",
     borderColor: "border-sky-500",
     icon: getMoodIcon("sadness"),
+    shadowColor: "shadow-sky-500/50",
   },
   grief: {
     subemotions: "Emptiness, Loss, Despair",
@@ -99,6 +109,7 @@ export const mood = {
     textColor: "text-grief-500",
     borderColor: "border-grief-500",
     icon: getMoodIcon("grief"),
+    shadowColor: "shadow-grief-500/50",
   },
   lost: {
     subemotions: "Lonely, Stuck, Directionless",
@@ -108,5 +119,6 @@ export const mood = {
     textColor: "text-gray-400",
     borderColor: "border-gray-400",
     icon: getMoodIcon("lost"),
+    shadowColor: "shadow-gray-400/50",
   },
 };
