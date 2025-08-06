@@ -30,9 +30,14 @@ dayjs.extend(relativeTime);
 interface ReflectionDetailPanelProps {
   reflection: Reflection | null;
   onClose: () => void;
+  className?: string;
 }
 
-const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflection, onClose }) => {
+const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
+  reflection,
+  onClose,
+  className,
+}) => {
   // Animation values - these must be called before any conditional returns
   const translateY = useSharedValue(300); // Start off-screen
   const opacity = useSharedValue(0);
@@ -64,12 +69,16 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
     .onUpdate((event) => {
       // Only trigger if swiping down
       if (event.translationY > 0) {
+        translateY.value = event.translationY;
       }
     })
     .onEnd((event) => {
       // Close panel (if swiped down more than 50 pixels)
       if (event.translationY > 50) {
         runOnJS(handleClose)();
+      } else {
+        // Snap back to original position if not swiped enough
+        translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
       }
     });
 
@@ -81,10 +90,10 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
 
   return (
     <GestureDetector gesture={swipeDownGesture}>
-      <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor}`}>
+      <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor} `}>
         <BlurView
           intensity={20}
-          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border ${moodData?.borderColor}`}
+          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border ${moodData?.borderColor} ${className}`}
         >
           <VStack className="gap-2 ">
             <HStack className="flex-row justify-between items-center">

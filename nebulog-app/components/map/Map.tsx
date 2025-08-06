@@ -188,6 +188,7 @@ const MapComponent = ({
         toolbarEnabled={false}
         onRegionChangeComplete={handleRegionChange}
         customMapStyle={customMapStyle}
+        scrollEnabled={!selectedReflection} // Prevent map from scrolling when reflection is open (android fix)
       >
         {/* User location marker */}
         {userLocation && showUserLocation && (
@@ -235,7 +236,11 @@ const MapComponent = ({
       </MapView>
 
       {/* Reflection Detail Panel */}
-      <ReflectionDetailPanel reflection={selectedReflection} onClose={closeReflection} />
+      <ReflectionDetailPanel
+        reflection={selectedReflection}
+        onClose={closeReflection}
+        className="z-999"
+      />
     </VStack>
   );
 };
