@@ -10,6 +10,8 @@ import { getCurrentLocation } from "@/services/locationServices";
 import { getPublicReflectionsInRadius } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 import Toast from "react-native-toast-message";
+import { getMoodIcon, MoodIcons } from "@/constants/moodIcons";
+import { mood } from "@/constants/moods";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -242,10 +244,18 @@ const MapComponent = ({
                 longitude: reflection.location.long,
               }}
               title={reflection.location?.placeName || "Reflection"}
-              description={reflection.text.substring(0, 50) + "..."}
               onPress={() => handleReflectionPress(reflection)}
-              pinColor="purple"
-            />
+            >
+              <View className=" rounded-full items-center justify-center">
+                {getMoodIcon(reflection.mood || "default", {
+                  width: 32,
+                  height: 32,
+                  fill:
+                    mood[reflection.mood?.toLowerCase() as keyof typeof mood]?.colorHex ||
+                    mood.unselected.colorHex,
+                })}
+              </View>
+            </Marker>
           );
         })}
       </MapView>
