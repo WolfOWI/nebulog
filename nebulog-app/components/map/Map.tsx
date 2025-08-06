@@ -33,13 +33,6 @@ interface MapComponentProps {
   ref?: React.Ref<any>;
 }
 
-// const defaultRegion = {
-//   latitude: -25.838338242913675,
-//   longitude: 28.342688891941343,
-//   latitudeDelta: 0.01,
-//   longitudeDelta: 0.01,
-// };
-
 const MapComponent = ({
   initialRegion,
   showUserLocation = true,
