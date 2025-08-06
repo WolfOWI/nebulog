@@ -24,7 +24,7 @@ interface MapComponentProps {
     };
     title?: string;
     description?: string;
-    reflection?: Reflection; // Add reflection data to marker
+    reflection?: Reflection;
   }>;
   onMarkerPress?: (marker: any) => void;
   onRegionChange?: (region: Region) => void;
@@ -33,15 +33,15 @@ interface MapComponentProps {
   ref?: React.Ref<any>;
 }
 
-const defaultRegion = {
-  latitude: -25.838338242913675,
-  longitude: 28.342688891941343,
-  latitudeDelta: 0.01,
-  longitudeDelta: 0.01,
-};
+// const defaultRegion = {
+//   latitude: -25.838338242913675,
+//   longitude: 28.342688891941343,
+//   latitudeDelta: 0.01,
+//   longitudeDelta: 0.01,
+// };
 
 const MapComponent = ({
-  initialRegion = defaultRegion,
+  initialRegion,
   showUserLocation = true,
   onMarkerPress,
   onRegionChange,
@@ -50,78 +50,78 @@ const MapComponent = ({
   ref,
 }: MapComponentProps) => {
   const { user } = useUser();
-  const mapRef = useRef<MapView>(null); // Controls the actual map
+  const mapRef = useRef<MapView>(null);
+  const currentRegionRef = useRef<Region | null>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+  const [maySearchForReflections, setMaySearchForReflections] = useState(true);
+  const [mayAnimateToUserLocation, setMayAnimateToUserLocation] = useState(true);
   const [selectedReflection, setSelectedReflection] = useState<any>(null);
   const [mapReflections, setMapReflections] = useState<Reflection[]>([]);
-  const [currentRegion, setCurrentRegion] = useState<Region>(initialRegion);
-  const [isFirstTimeLoad, setIsFirstTimeLoad] = useState(true);
-  const [forceRender, setForceRender] = useState(0); // Force re-render
 
-  // Get user location on mount
+  // On mount
   useEffect(() => {
-    console.log("first time load", isFirstTimeLoad);
-    handleGetCurrentLocation();
+    getSetUserLocation();
   }, []);
 
-  // Fetch reflections when user location is available
-  useEffect(() => {
-    if (userLocation && isFirstTimeLoad) {
-      console.log("Fetching reflections for user location");
-      getReflectionsOfUserLocation();
-      setIsFirstTimeLoad(false);
-    }
-  }, [userLocation, isFirstTimeLoad]);
-
-  // Fetch reflections near the user's location
-  const getReflectionsOfUserLocation = async () => {
-    try {
-      if (!userLocation) {
-        console.log("No user location available, skipping this fetch");
-        return;
-      }
-
-      const reflections = await getPublicReflectionsInRadius(
-        userLocation.coords.latitude,
-        userLocation.coords.longitude,
-        5
-      );
-
-      setMapReflections(reflections);
-      setForceRender((prev) => prev + 1); // Force map re-render
-
-      // Show toast if no reflections found
-      if (reflections.length === 0) {
-        Toast.show({
-          type: "info",
-          text1: "No reflections found",
-          text2: "Be the first to share a reflection in this area!",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching initial reflections:", error);
+  // Get & set location of user
+  const getSetUserLocation = async () => {
+    console.log("Getting user location");
+    const loc = await getCurrentLocation();
+    if (loc) {
+      setUserLocation(loc);
     }
   };
 
-  // Fetch reflections near the current region
-  const getReflectionsOfCurrentArea = async () => {
-    if (!currentRegion) {
-      console.log("No current region available to getReflectionsOfCurrentArea");
-      return;
+  // Animate to user location (only on first time load)
+  useEffect(() => {
+    if (userLocation && mayAnimateToUserLocation) {
+      animateToLocation(userLocation);
+      setMayAnimateToUserLocation(false);
     }
+  }, [userLocation, mayAnimateToUserLocation]);
 
+  // Animate to location
+  const animateToLocation = (location: Location.LocationObject) => {
+    console.log("Animating to location");
+    mapRef.current?.animateToRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+  };
+
+  // Handle map region changes
+  const handleRegionChange = (region: Region) => {
+    onRegionChange?.(region);
+    currentRegionRef.current = region;
+  };
+
+  // On startup, when user location is available, get reflections of user location
+  useEffect(() => {
+    if (userLocation && maySearchForReflections) {
+      console.log("Getting reflections of user location", userLocation);
+      getReflectionsByLocation({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+      setMaySearchForReflections(false);
+    }
+  }, [userLocation]);
+
+  // Handle get reflections by location (given)
+  const getReflectionsByLocation = async (location: Region) => {
     try {
-      console.log(
-        `Searching for reflections near: ${currentRegion.latitude}, ${currentRegion.longitude}`
-      );
+      console.log(`Searching for reflections near: ${location.latitude}, ${location.longitude}`);
       const reflections = await getPublicReflectionsInRadius(
-        currentRegion.latitude,
-        currentRegion.longitude,
+        location.latitude,
+        location.longitude,
         5
       );
-      console.log(`Found ${reflections.length} reflections in current area`);
+      console.log(`Found ${reflections.length} reflections.`);
       setMapReflections(reflections);
-      setForceRender((prev) => prev + 1); // Force map re-render
 
       // Show toast if no reflections found in search
       if (reflections.length === 0) {
@@ -136,34 +136,16 @@ const MapComponent = ({
     }
   };
 
+  const handleGoToUserLocation = () => {
+    getSetUserLocation();
+    setMayAnimateToUserLocation(true);
+    setMaySearchForReflections(true);
+  };
+
+  // Refresh reflections in current region
   const refreshReflections = async () => {
-    await getReflectionsOfCurrentArea();
-    setForceRender((prev) => prev + 1); // Force map re-render
-  };
-
-  // Handle map region changes
-  const handleRegionChange = (region: Region) => {
-    setCurrentRegion(region);
-    onRegionChange?.(region);
-  };
-
-  const handleGetCurrentLocation = async () => {
-    const loc = await getCurrentLocation();
-    if (loc) {
-      setUserLocation(loc);
-
-      // Animate to user location
-      if (mapRef.current) {
-        const newRegion = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        };
-
-        mapRef.current.animateToRegion(newRegion);
-        setCurrentRegion(newRegion);
-      }
+    if (currentRegionRef.current) {
+      await getReflectionsByLocation(currentRegionRef.current);
     }
   };
 
@@ -191,9 +173,9 @@ const MapComponent = ({
   useEffect(() => {
     if (ref && "current" in ref) {
       ref.current = {
-        getCurrentLocation: handleGetCurrentLocation,
+        getCurrentLocation: handleGoToUserLocation,
         userLocation,
-        getReflectionsOfCurrentArea,
+        getReflectionsByLocation,
         refreshReflections,
       };
     }
@@ -213,7 +195,6 @@ const MapComponent = ({
         toolbarEnabled={false}
         onRegionChangeComplete={handleRegionChange}
         customMapStyle={customMapStyle}
-        key={`map-${forceRender}`}
       >
         {/* User location marker */}
         {userLocation && showUserLocation && (
@@ -238,7 +219,7 @@ const MapComponent = ({
 
           return (
             <Marker
-              key={`${reflection.id}-${forceRender}`}
+              key={`${reflection.id}`}
               coordinate={{
                 latitude: reflection.location.lat,
                 longitude: reflection.location.long,

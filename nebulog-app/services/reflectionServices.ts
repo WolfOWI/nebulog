@@ -114,7 +114,7 @@ export const getPublicReflectionsInRadius = async (lat: number, long: number, ra
       }
     }
 
-    console.log(`Found ${matchingDocs.length} reflections within ${radius}km of [${lat}, ${long}]`);
+    // console.log(`Found ${matchingDocs.length} reflections within ${radius}km of [${lat}, ${long}]`);
     return matchingDocs;
   } catch (error) {
     console.error("Error fetching reflections in radius:", error);

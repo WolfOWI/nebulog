@@ -62,11 +62,11 @@ export default function Home() {
     try {
       if (mapRef.current.refreshReflections) {
         await mapRef.current.refreshReflections();
-        Toast.show({
-          type: "success",
-          text1: "Map Refreshed",
-          text2: "Reflections updated successfully",
-        });
+        // Toast.show({
+        //   type: "success",
+        //   text1: "Map Refreshed",
+        //   text2: "Reflections updated successfully",
+        // });
       }
     } catch (error) {
       console.error("Error refreshing map:", error);
