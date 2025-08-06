@@ -54,7 +54,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
   }, [reflection]);
 
   const handleClose = () => {
-    // Animate out before calling onClose
     translateY.value = withSpring(300, { damping: 20, stiffness: 100 });
     opacity.value = withTiming(0, { duration: 200 }, () => {
       runOnJS(onClose)();
@@ -63,13 +62,12 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({ reflectio
 
   const swipeDownGesture = Gesture.Pan()
     .onUpdate((event) => {
-      // Only trigger if swiping down (positive translationY)
+      // Only trigger if swiping down
       if (event.translationY > 0) {
-        // You can add visual feedback here if needed
       }
     })
     .onEnd((event) => {
-      // Close the panel if swiped down more than 50 pixels
+      // Close panel (if swiped down more than 50 pixels)
       if (event.translationY > 50) {
         runOnJS(handleClose)();
       }

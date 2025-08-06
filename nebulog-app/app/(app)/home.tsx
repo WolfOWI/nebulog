@@ -46,7 +46,7 @@ export default function Home() {
   // Reflection Panel State
   const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
 
-  // Get Location
+  // Get Location of User
   const handleGetLocation = async () => {
     try {
       if (mapRef.current.getCurrentLocation) {
@@ -57,7 +57,7 @@ export default function Home() {
     }
   };
 
-  // Refresh map data
+  // Refresh map
   const handleRefreshMap = async () => {
     try {
       if (mapRef.current.refreshReflections) {
@@ -78,6 +78,14 @@ export default function Home() {
     }
   };
 
+  // Handle Reflection Panel Change (close bottom sheet if open)
+  const handleReflectionPanelChange = (isOpen: boolean) => {
+    setIsReflectionPanelOpen(isOpen);
+    if (isOpen) {
+      bottomSheetRef.current?.close();
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 bg-background-0 relative h-full w-full">
@@ -85,7 +93,7 @@ export default function Home() {
           ref={mapRef}
           showUserLocation={true}
           className="absolute inset-0 z-0"
-          onReflectionPanelChange={setIsReflectionPanelOpen}
+          onReflectionPanelChange={handleReflectionPanelChange}
         />
 
         {/* Top Screen overlay */}
