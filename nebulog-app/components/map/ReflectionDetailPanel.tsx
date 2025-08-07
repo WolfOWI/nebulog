@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, Platform } from "react-native";
 import { Text } from "@/components/ui/text";
 import { BlurView } from "expo-blur";
 import { HStack } from "../ui/hstack";
@@ -61,6 +61,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
 
   const [isHolding, setIsHolding] = useState(false);
   const [isFull, setIsFull] = useState(false);
+  const [isAuthor, setIsAuthor] = useState(true);
   const [holdProgress, setHoldProgress] = useState(0);
   const [blurViewHeight, setBlurViewHeight] = useState(0);
   const holdInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -252,120 +253,178 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
     }
   };
 
+  // Check if user is the author of the reflection
+  useEffect(() => {
+    if (reflection?.authorId === user?.id) {
+      setIsAuthor(true);
+    } else {
+      setIsAuthor(false);
+    }
+  }, [reflection?.authorId, user?.id]);
+
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
-  const shadowColor = moodData?.shadowColor || "shadow-slate-200/50";
 
   return (
-    // TODO: Shadow not working properly - get an alternative solution?
-    <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor} `}>
+    // TODO: Setup stylisation between true and false isLiked states
+    <Animated.View style={animatedStyle}>
       <GestureDetector gesture={swipeDownGesture}>
-        <BlurView
-          intensity={20}
-          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border border-slate-800/50 ${className}`}
-          onLayout={(event) => {
-            const { height } = event.nativeEvent.layout;
-            setBlurViewHeight(height);
+        <View
+          style={{
+            ...Platform.select({
+              ios: {
+                shadowColor: moodData?.colorHex,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.5,
+                shadowRadius: 24,
+              },
+            }),
           }}
         >
-          {/* Hold gesture container #1 - top area */}
-          <Pressable
-            onPressIn={startHold}
-            onPressOut={isFull ? completeHold : cancelHold}
+          <BlurView
+            intensity={Platform.OS === "android" ? 0 : 20}
+            className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl border border-slate-800/50 overflow-hidden ${className}`}
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 80,
-              zIndex: 10,
+              borderWidth: 1,
+              borderColor: moodData?.colorHex,
+              borderRadius: 24,
+
+              ...Platform.select({
+                android: {
+                  backgroundColor: "rgba(15, 23, 42, 1)",
+                  shadowColor: moodData?.colorHex,
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.5,
+                  shadowRadius: 24,
+                  elevation: 24,
+                },
+              }),
             }}
-          />
-          {/* Hold gesture container #2 - bottom (echo) area */}
-          <Pressable
-            onPressIn={startHold}
-            onPressOut={isFull ? completeHold : cancelHold}
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: "80%",
-              right: 0,
-              height: 80,
-              zIndex: 10,
+            onLayout={(event) => {
+              const { height } = event.nativeEvent.layout;
+              setBlurViewHeight(height);
             }}
-          />
-          {/* Animated fill overlay */}
-          {isHolding && (
-            <Animated.View
-              style={[
-                {
+          >
+            {/* Hold gesture container #1 - top area */}
+            {!isAuthor && (
+              <Pressable
+                onPressIn={startHold}
+                onPressOut={isFull ? completeHold : cancelHold}
+                style={{
                   position: "absolute",
-                  bottom: 0,
+                  top: 0,
                   left: 0,
                   right: 0,
-                  backgroundColor: moodData?.colorHex
-                    ? `${moodData.colorHex}80`
-                    : "rgba(0, 0, 0, 0.5)",
-                  borderRadius: 16,
-                  zIndex: 1,
-                },
-                animatedFillStyle,
-              ]}
-            />
-          )}
-          <VStack className="gap-2" style={{ zIndex: 2 }}>
-            <HStack className="flex-row justify-between items-center">
-              <HStack className="gap-2 items-center">
-                {getMoodIcon(reflectionMood, {
-                  fill: moodData?.colorHex,
-                  width: 32,
-                  height: 32,
-                })}
-                <Text className={`text-2xl ${moodData?.textColor}`}>
-                  {moodData?.spaceObject || "Unknown Planet"}
-                </Text>
-              </HStack>
-            </HStack>
-            <Text className="text-typography-900" size="md">
-              {moodData?.subemotions || "Unselected Mood"}
-            </Text>
-            <Text className="text-typography-600" size="lg">
-              {reflection.text}
-            </Text>
-            <Text className="text-typography-600" size="sm">
-              {reflection.location?.placeName || "Unknown Location"}
-            </Text>
-            <Divider className="my-2" />
-
-            <HStack className="flex-row justify-between items-end">
-              <Pressable className="flex-row items-center gap-3" onPress={handleUserProfilePress}>
-                <ProfileAvatar
-                  bgColour={reflection.authorProfileColor || "#4ECDC4"}
-                  icon={reflection.authorProfileIcon || "ufo-outline"}
-                  iconSize={24}
-                  size={48}
-                />
-                <VStack className="gap-1">
-                  <Text className="text-typography-900" size="md">
-                    {reflection.authorUsername || "Someone"}
-                  </Text>
-                  <Text className="text-typography-600" size="sm">
-                    {reflection.createdAt ? dayjs(reflection.createdAt).fromNow() : "Some time ago"}
-                  </Text>
-                </VStack>
-              </Pressable>
-
-              <EchoCounter
-                echoCount={echoCount}
-                isLiked={isLiked}
-                onToggleLike={handleToggleEcho}
-                disabled={isEchoing}
+                  bottom: 80,
+                  zIndex: 10,
+                }}
               />
-            </HStack>
-          </VStack>
-        </BlurView>
+            )}
+            {/* Hold gesture container #2 - bottom (echo) area */}
+            {!isAuthor && (
+              <Pressable
+                onPressIn={startHold}
+                onPressOut={isFull ? completeHold : cancelHold}
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: "80%",
+                  right: 0,
+                  height: 80,
+                  zIndex: 10,
+                }}
+              />
+            )}
+            {/* Animated fill overlay */}
+            {isHolding && !isAuthor && (
+              <Animated.View
+                style={[
+                  {
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: moodData?.colorHex
+                      ? `${moodData.colorHex}80`
+                      : "rgba(0, 0, 0, 0.5)",
+                    borderRadius: 16,
+                    zIndex: 1,
+                  },
+                  animatedFillStyle,
+                ]}
+              />
+            )}
+            <VStack className="gap-2" style={{ zIndex: 2 }}>
+              {/* TODO: Temporary - remove this later */}
+              {isLiked && (
+                <Text className="text-typography-900" size="md">
+                  IsLiked
+                </Text>
+              )}
+              <HStack className="flex-row justify-between items-center">
+                <HStack className="gap-2 items-center">
+                  {getMoodIcon(reflectionMood, {
+                    fill: moodData?.colorHex,
+                    width: 32,
+                    height: 32,
+                  })}
+                  <Text className={`text-2xl ${moodData?.textColor}`}>
+                    {moodData?.spaceObject || "Unknown Planet"}
+                  </Text>
+                </HStack>
+              </HStack>
+              <Text className="text-typography-900" size="md">
+                {moodData?.subemotions || "Unselected Mood"}
+              </Text>
+              <Text className="text-typography-600" size="lg">
+                {reflection.text}
+              </Text>
+              <Text className="text-typography-600" size="sm">
+                {reflection.location?.placeName || "Unknown Location"}
+              </Text>
+              <Divider className="my-2" />
+
+              <HStack className="flex-row justify-between items-end">
+                <Pressable className="flex-row items-center gap-3" onPress={handleUserProfilePress}>
+                  <ProfileAvatar
+                    bgColour={reflection.authorProfileColor || "#4ECDC4"}
+                    icon={reflection.authorProfileIcon || "ufo-outline"}
+                    iconSize={24}
+                    size={48}
+                  />
+                  <VStack className="gap-1">
+                    <Text className="text-typography-900" size="md">
+                      {reflection.authorUsername || "Someone"}
+                    </Text>
+                    <Text className="text-typography-600" size="sm">
+                      {reflection.createdAt
+                        ? dayjs(reflection.createdAt).fromNow()
+                        : "Some time ago"}
+                    </Text>
+                  </VStack>
+                </Pressable>
+
+                {!isAuthor ? (
+                  <EchoCounter
+                    echoCount={echoCount}
+                    isLiked={isLiked}
+                    onToggleLike={handleToggleEcho}
+                    disabled={isEchoing}
+                  />
+                ) : (
+                  <EchoCounter
+                    echoCount={echoCount}
+                    isLiked={isLiked}
+                    onToggleLike={handleToggleEcho}
+                    disabled={true}
+                  />
+                )}
+              </HStack>
+            </VStack>
+          </BlurView>
+        </View>
       </GestureDetector>
     </Animated.View>
   );
