@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { BlurView } from "expo-blur";
 import { HStack } from "../ui/hstack";
@@ -21,6 +21,7 @@ import Animated, {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
+import EchoCounter from "../information/EchoCounter";
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
@@ -41,12 +42,30 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   // Animation values - these must be called before any conditional returns
   const translateY = useSharedValue(300); // Start off-screen
   const opacity = useSharedValue(0);
+  const fillHeight = useSharedValue(0); // Animated fill height
+  const fillOpacity = useSharedValue(0); // Animated fill opacity
+
+  // Hold gesture state
+  const [isHolding, setIsHolding] = useState(false);
+  const [isFull, setIsFull] = useState(false);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [blurViewHeight, setBlurViewHeight] = useState(0);
+  const holdInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const holdDuration = 1000;
 
   // Animated styles
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateY: translateY.value }],
       opacity: opacity.value,
+    };
+  });
+
+  // Animated fill style
+  const animatedFillStyle = useAnimatedStyle(() => {
+    return {
+      height: fillHeight.value,
+      opacity: fillOpacity.value,
     };
   });
 
@@ -65,6 +84,80 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
     });
   };
 
+  // Hold gesture functions
+  const startHold = () => {
+    // Prevent multiple starts
+    if (isHolding || holdInterval.current) {
+      return;
+    }
+
+    setIsHolding(true);
+    setIsFull(false);
+    setHoldProgress(0);
+    fillHeight.value = 0;
+    fillOpacity.value = withTiming(1, { duration: 200 });
+
+    const interval = 16;
+    const steps = holdDuration / interval;
+    let currentStep = 0;
+
+    holdInterval.current = setInterval(() => {
+      currentStep++;
+      const newProgress = Math.min((currentStep / steps) * 100, 100);
+      setHoldProgress(newProgress);
+      fillHeight.value = (newProgress / 100) * blurViewHeight;
+
+      if (currentStep >= steps) {
+        setIsFull(true);
+        // Clear interval when complete
+        if (holdInterval.current) {
+          clearInterval(holdInterval.current);
+          holdInterval.current = null;
+        }
+      }
+    }, interval);
+  };
+
+  const completeHold = () => {
+    if (isFull) {
+      // TODO: Add echo (like) reflection functionality
+      console.log("Echo (like) reflection:", reflection?.id);
+
+      // Reset after completion
+      setTimeout(() => {
+        setIsFull(false);
+        setHoldProgress(0);
+        fillHeight.value = withTiming(0, { duration: 300 });
+        fillOpacity.value = withTiming(0, { duration: 300 });
+
+        // Hide the fill after animation completes
+        setTimeout(() => {
+          setIsHolding(false);
+        }, 300);
+      }, 100);
+    }
+  };
+
+  const cancelHold = () => {
+    setIsFull(false);
+    setHoldProgress(0);
+
+    // Animate the fill dropping down and fading out
+    fillHeight.value = withTiming(0, { duration: 300 });
+    fillOpacity.value = withTiming(0, { duration: 300 });
+
+    // Hide the fill after animation completes
+    setTimeout(() => {
+      setIsHolding(false);
+    }, 300);
+
+    if (holdInterval.current) {
+      clearInterval(holdInterval.current);
+      holdInterval.current = null;
+    }
+  };
+
+  // Closing the panel swipe gesture
   const swipeDownGesture = Gesture.Pan()
     .onUpdate((event) => {
       // Only trigger if swiping down
@@ -89,13 +182,49 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
 
   return (
     // TODO: Shadow not working properly - get an alternative solution?
-    <GestureDetector gesture={swipeDownGesture}>
-      <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor} `}>
+    <Animated.View style={animatedStyle} className={`shadow-lg ${shadowColor} `}>
+      <GestureDetector gesture={swipeDownGesture}>
         <BlurView
           intensity={20}
-          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border ${moodData?.borderColor} ${className}`}
+          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border border-transparent ${className}`}
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setBlurViewHeight(height);
+          }}
         >
-          <VStack className="gap-2 ">
+          {/* Hold gesture container */}
+          <Pressable
+            onPressIn={startHold}
+            onPressOut={isFull ? completeHold : cancelHold}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10,
+            }}
+          />
+          {/* Animated fill overlay */}
+          {isHolding && (
+            <Animated.View
+              style={[
+                {
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: moodData?.colorHex
+                    ? `${moodData.colorHex}80`
+                    : "rgba(0, 0, 0, 0.5)",
+                  borderRadius: 16,
+                  zIndex: 1,
+                },
+                animatedFillStyle,
+              ]}
+            />
+          )}
+          <VStack className="gap-2" style={{ zIndex: 2 }}>
             <HStack className="flex-row justify-between items-center">
               <HStack className="gap-2 items-center">
                 {getMoodIcon(reflectionMood, {
@@ -126,17 +255,13 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               <Text className="text-typography-600" size="sm">
                 {reflection.createdAt ? dayjs(reflection.createdAt).fromNow() : "Some time ago"}
               </Text>
-              <HStack className="flex-row items-center gap-2">
-                <Text className="text-typography-900" size="md">
-                  {reflection.echoCount || "0"}
-                </Text>
-                {getIcon("echo", { fill: "#F8FAFC", width: 24, height: 24 })}
-              </HStack>
+              {/* TODO: Add isLiked state */}
+              <EchoCounter echoCount={reflection.echoCount} isLiked={false} />
             </HStack>
           </VStack>
         </BlurView>
-      </Animated.View>
-    </GestureDetector>
+      </GestureDetector>
+    </Animated.View>
   );
 };
 
