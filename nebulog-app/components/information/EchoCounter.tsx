@@ -15,7 +15,7 @@ const EchoCounter = ({ echoCount, isLiked, onToggleLike, disabled = false }: Ech
   return (
     <HStack
       className={`flex-row items-center py-2 ps-4 pe-2 gap-2 rounded-full ${
-        isLiked && "bg-slate-50"
+        isLiked && "bg-slate-200"
       } ${onToggleLike && !disabled ? "active:opacity-70" : ""}`}
       onTouchEnd={onToggleLike && !disabled ? onToggleLike : undefined}
     >

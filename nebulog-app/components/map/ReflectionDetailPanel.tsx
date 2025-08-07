@@ -65,7 +65,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const [holdProgress, setHoldProgress] = useState(0);
   const [blurViewHeight, setBlurViewHeight] = useState(0);
   const holdInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  const holdDuration = 1000;
+  const holdDuration = 500;
 
   // Animated styles
   const animatedStyle = useAnimatedStyle(() => {
@@ -277,7 +277,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               ios: {
                 shadowColor: moodData?.colorHex,
                 shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.5,
+                shadowOpacity: isLiked ? 0.5 : 0,
                 shadowRadius: 24,
               },
             }),
@@ -285,10 +285,10 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
         >
           <BlurView
             intensity={Platform.OS === "android" ? 0 : 20}
-            className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl border border-slate-800/50 overflow-hidden ${className}`}
+            className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden ${className}`}
             style={{
               borderWidth: 1,
-              borderColor: moodData?.colorHex,
+              borderColor: isLiked ? moodData?.colorHex : "#1e293b",
               borderRadius: 24,
 
               ...Platform.select({
@@ -296,9 +296,8 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
                   backgroundColor: "rgba(15, 23, 42, 1)",
                   shadowColor: moodData?.colorHex,
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.5,
                   shadowRadius: 24,
-                  elevation: 24,
+                  elevation: isLiked ? 24 : 0,
                 },
               }),
             }}
@@ -357,12 +356,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               />
             )}
             <VStack className="gap-2" style={{ zIndex: 2 }}>
-              {/* TODO: Temporary - remove this later */}
-              {isLiked && (
-                <Text className="text-typography-900" size="md">
-                  IsLiked
-                </Text>
-              )}
               <HStack className="flex-row justify-between items-center">
                 <HStack className="gap-2 items-center">
                   {getMoodIcon(reflectionMood, {
