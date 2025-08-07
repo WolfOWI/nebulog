@@ -24,6 +24,7 @@ import Animated, {
 import EchoCounter from "../information/EchoCounter";
 import ProfileAvatar from "../avatars/ProfileAvatar";
 import { router } from "expo-router";
+import { useUser } from "@/contexts/UserContext";
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
@@ -41,6 +42,8 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   onClose,
   className,
 }) => {
+  const { user } = useUser();
+
   // Animation values - these must be called before any conditional returns
   const translateY = useSharedValue(300); // Start off-screen
   const opacity = useSharedValue(0);
@@ -175,6 +178,23 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
       }
     });
 
+  // Handle user profile press
+  const handleUserProfilePress = () => {
+    // User is the author, go to their profile
+    if (reflection?.authorId === user?.id) {
+      router.push({
+        pathname: "/(app)/myprofile",
+      } as any);
+    }
+    // User is NOT author, go to the author's profile
+    else {
+      router.push({
+        pathname: "/(app)/userprofile",
+        params: { userId: reflection?.authorId },
+      } as any);
+    }
+  };
+
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
@@ -193,7 +213,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
             setBlurViewHeight(height);
           }}
         >
-          {/* Hold gesture containers - cover holdable areas while excluding interactive elements */}
+          {/* Hold gesture container #1 - top area */}
           <Pressable
             onPressIn={startHold}
             onPressOut={isFull ? completeHold : cancelHold}
@@ -206,7 +226,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               zIndex: 10,
             }}
           />
-          {/* Additional hold area for the right side of the bottom area (excluding author profile) */}
+          {/* Hold gesture container #2 - bottom (echo) area */}
           <Pressable
             onPressIn={startHold}
             onPressOut={isFull ? completeHold : cancelHold}
@@ -263,18 +283,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
             <Divider className="my-2" />
 
             <HStack className="flex-row justify-between items-end">
-              <Pressable
-                className="flex-row items-center gap-3"
-                onPress={() => {
-                  // Navigate to user profile page
-                  router.push({
-                    pathname: "/(app)/userprofile",
-                    params: {
-                      userId: reflection.authorId,
-                    },
-                  } as any);
-                }}
-              >
+              <Pressable className="flex-row items-center gap-3" onPress={handleUserProfilePress}>
                 <ProfileAvatar
                   bgColour={reflection.authorProfileColor || "#4ECDC4"}
                   icon={reflection.authorProfileIcon || "ufo-outline"}
