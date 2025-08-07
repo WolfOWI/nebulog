@@ -95,13 +95,12 @@ export default function RightwardSwipeBtn({
   return (
     <GestureDetector gesture={panGesture}>
       <View
-        style={{ width: "100%", position: "relative" }}
         onLayout={handleLayout}
-        className={className}
+        className={`w-full relative rounded-full ${showMessage && "bg-[#0C1321]"} ${className}`}
       >
         {/* Show swipe instruction when touched */}
         {showMessage && (
-          <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000">
+          <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000 gap-2">
             <Text className="text-typography-900 text-center" size="lg">
               {touchMessage}
             </Text>

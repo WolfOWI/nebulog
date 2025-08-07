@@ -92,10 +92,13 @@ export default function LeftwardSwipeBtn({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View style={{ width: "100%", position: "relative" }} onLayout={handleLayout}>
+      <View
+        onLayout={handleLayout}
+        className={`w-full relative rounded-full ${showMessage && "bg-[#0C1321]"}`}
+      >
         {/* Show swipe instruction when touched */}
         {showMessage && (
-          <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000">
+          <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-center items-center z-1000 gap-2">
             <MaterialIcons name="arrow-back" size={24} color="#f8fafc" />
             <Text className="text-typography-900 text-center" size="lg">
               {touchMessage}
