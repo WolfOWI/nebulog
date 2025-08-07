@@ -59,6 +59,13 @@ export default function AppLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="userprofile"
+        options={{
+          title: "User Profile",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

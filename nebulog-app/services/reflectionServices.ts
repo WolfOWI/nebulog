@@ -104,6 +104,25 @@ export const getReflectionsForUser = async (userId: string) => {
 };
 
 /**
+ * Get all public reflections created by a user
+ * @param userId - The user ID to get reflections for
+ */
+export const getPublicReflectionsForUser = async (userId: string) => {
+  try {
+    const reflectionsCollection = collection(db, "reflections");
+    const q = query(
+      reflectionsCollection,
+      where("authorId", "==", userId),
+      where("visibility", "==", "public")
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Reflection));
+  } catch (error) {
+    throw new Error("Failed to get public reflections for user: " + error);
+  }
+};
+
+/**
  * Get all public reflections within a radius of a location
  * @param lat - Latitude of the centre point
  * @param long - Longitude of the centre point

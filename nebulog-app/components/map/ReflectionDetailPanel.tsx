@@ -23,6 +23,7 @@ import Animated, {
 } from "react-native-reanimated";
 import EchoCounter from "../information/EchoCounter";
 import ProfileAvatar from "../avatars/ProfileAvatar";
+import { router } from "expo-router";
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
@@ -265,7 +266,13 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               <Pressable
                 className="flex-row items-center gap-3"
                 onPress={() => {
-                  console.log("Pressed author profile");
+                  // Navigate to user profile page
+                  router.push({
+                    pathname: "/(app)/userprofile",
+                    params: {
+                      userId: reflection.authorId,
+                    },
+                  } as any);
                 }}
               >
                 <ProfileAvatar
