@@ -8,16 +8,17 @@ interface ProfileAvatarProps {
   bgColour?: string;
   icon?: string;
   iconSize?: number;
+  size?: number;
 }
 
-const ProfileAvatar = ({ bgColour, icon, iconSize = 48 }: ProfileAvatarProps) => {
+const ProfileAvatar = ({ bgColour, icon, iconSize = 40, size = 72 }: ProfileAvatarProps) => {
   const iconColor = getIconColourFromBgColour(bgColour || defaultProfileColour);
   const iconName = icon || "ufo-outline";
 
   return (
     <View
-      className="flex items-center justify-center w-24 h-24 rounded-full"
-      style={{ backgroundColor: bgColour || defaultProfileColour }}
+      className={`flex items-center justify-center rounded-full`}
+      style={{ backgroundColor: bgColour || defaultProfileColour, width: size, height: size }}
     >
       <ProfileIcon name={iconName} size={iconSize} color={iconColor} />
     </View>

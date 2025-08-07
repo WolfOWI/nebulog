@@ -17,8 +17,9 @@ import {
   endAt,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { Reflection } from "@/lib/types";
+import { Reflection, User } from "@/lib/types";
 import { geohashQueryBounds, distanceBetween } from "geofire-common";
+import { getUserById } from "./userServices";
 
 /**
  * Create a new reflection
@@ -27,9 +28,20 @@ import { geohashQueryBounds, distanceBetween } from "geofire-common";
  */
 export const createReflection = async (reflection: Reflection, userId: string) => {
   try {
+    // Get user data to include author information
+    const userData = await getUserById(userId);
+
+    // Add author information to the reflection
+    const reflectionWithAuthor = {
+      ...reflection,
+      authorUsername: userData.username,
+      authorProfileColor: userData.profileColor,
+      authorProfileIcon: userData.profileIcon,
+    };
+
     const reflectionsCollection = collection(db, "reflections");
 
-    await addDoc(reflectionsCollection, reflection);
+    await addDoc(reflectionsCollection, reflectionWithAuthor);
 
     // Update user totals (stats)
     try {
@@ -43,6 +55,36 @@ export const createReflection = async (reflection: Reflection, userId: string) =
     }
   } catch (error) {
     throw new Error("Failed to create reflection: " + error);
+  }
+};
+
+/**
+ * Update all reflections by an author when they update their profile
+ * @param userId - The user ID whose reflections should be updated
+ * @param updates - The profile updates to apply to all reflections
+ */
+export const updateAllReflectionsByAuthor = async (
+  userId: string,
+  updates: {
+    authorUsername?: string;
+    authorProfileColor?: string;
+    authorProfileIcon?: string;
+  }
+) => {
+  try {
+    const reflectionsCollection = collection(db, "reflections");
+    const q = query(reflectionsCollection, where("authorId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    const updatePromises = querySnapshot.docs.map(async (docSnapshot) => {
+      const reflectionDoc = doc(db, "reflections", docSnapshot.id);
+      await updateDoc(reflectionDoc, updates);
+    });
+
+    await Promise.all(updatePromises);
+    console.log(`Updated ${querySnapshot.docs.length} reflections for user ${userId}`);
+  } catch (error) {
+    throw new Error("Failed to update reflections: " + error);
   }
 };
 

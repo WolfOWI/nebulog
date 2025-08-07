@@ -17,6 +17,9 @@ export interface User {
 export interface Reflection {
   id?: string;
   authorId: string;
+  authorUsername: string;
+  authorProfileColor?: string;
+  authorProfileIcon?: string;
   text: string;
   visibility: "public" | "private";
   location?: Location;

@@ -22,6 +22,7 @@ import Animated, {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 import EchoCounter from "../information/EchoCounter";
+import ProfileAvatar from "../avatars/ProfileAvatar";
 
 configureReanimatedLogger({ level: ReanimatedLogLevel.warn, strict: false });
 
@@ -45,7 +46,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const fillHeight = useSharedValue(0); // Animated fill height
   const fillOpacity = useSharedValue(0); // Animated fill opacity
 
-  // Hold gesture state
   const [isHolding, setIsHolding] = useState(false);
   const [isFull, setIsFull] = useState(false);
   const [holdProgress, setHoldProgress] = useState(0);
@@ -186,13 +186,13 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
       <GestureDetector gesture={swipeDownGesture}>
         <BlurView
           intensity={20}
-          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border border-transparent ${className}`}
+          className={`absolute bottom-0 left-0 right-0 p-6 mx-6 mb-8 rounded-3xl overflow-hidden border border-slate-800/50 ${className}`}
           onLayout={(event) => {
             const { height } = event.nativeEvent.layout;
             setBlurViewHeight(height);
           }}
         >
-          {/* Hold gesture container */}
+          {/* Hold gesture containers - cover holdable areas while excluding interactive elements */}
           <Pressable
             onPressIn={startHold}
             onPressOut={isFull ? completeHold : cancelHold}
@@ -201,7 +201,20 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
               top: 0,
               left: 0,
               right: 0,
+              bottom: 80,
+              zIndex: 10,
+            }}
+          />
+          {/* Additional hold area for the right side of the bottom area (excluding author profile) */}
+          <Pressable
+            onPressIn={startHold}
+            onPressOut={isFull ? completeHold : cancelHold}
+            style={{
+              position: "absolute",
               bottom: 0,
+              left: "80%",
+              right: 0,
+              height: 80,
               zIndex: 10,
             }}
           />
@@ -240,21 +253,37 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
             <Text className="text-typography-900" size="md">
               {moodData?.subemotions || "Unselected Mood"}
             </Text>
-            <Text className="text-typography-700" size="lg">
+            <Text className="text-typography-600" size="lg">
               {reflection.text}
             </Text>
             <Text className="text-typography-600" size="sm">
               {reflection.location?.placeName || "Unknown Location"}
             </Text>
             <Divider className="my-2" />
-            <Text className="text-typography-600" size="sm">
-              {reflection.authorId || "Someone"}
-              {/* TODO: Add author name */}
-            </Text>
-            <HStack className="flex-row justify-between items-center">
-              <Text className="text-typography-600" size="sm">
-                {reflection.createdAt ? dayjs(reflection.createdAt).fromNow() : "Some time ago"}
-              </Text>
+
+            <HStack className="flex-row justify-between items-end">
+              <Pressable
+                className="flex-row items-center gap-3"
+                onPress={() => {
+                  console.log("Pressed author profile");
+                }}
+              >
+                <ProfileAvatar
+                  bgColour={reflection.authorProfileColor || "#4ECDC4"}
+                  icon={reflection.authorProfileIcon || "ufo-outline"}
+                  iconSize={24}
+                  size={48}
+                />
+                <VStack className="gap-1">
+                  <Text className="text-typography-900" size="md">
+                    {reflection.authorUsername || "Someone"}
+                  </Text>
+                  <Text className="text-typography-600" size="sm">
+                    {reflection.createdAt ? dayjs(reflection.createdAt).fromNow() : "Some time ago"}
+                  </Text>
+                </VStack>
+              </Pressable>
+
               {/* TODO: Add isLiked state */}
               <EchoCounter echoCount={reflection.echoCount} isLiked={false} />
             </HStack>

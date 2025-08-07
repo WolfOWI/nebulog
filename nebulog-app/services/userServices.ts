@@ -12,6 +12,7 @@ import {
   increment,
 } from "firebase/firestore";
 import { User } from "@/lib/types";
+import { updateAllReflectionsByAuthor } from "./reflectionServices";
 
 /**
  * Create a new user document in the database
@@ -73,6 +74,28 @@ export const updateUserDetails = async (userId: string, userData: Partial<User>)
   try {
     const userDoc = doc(db, "users", userId);
     await updateDoc(userDoc, userData);
+
+    // Update all reflections of this user, if their profile info changes
+    const reflectionUpdates: {
+      authorUsername?: string;
+      authorProfileColor?: string;
+      authorProfileIcon?: string;
+    } = {};
+
+    if (userData.username) {
+      reflectionUpdates.authorUsername = userData.username;
+    }
+    if (userData.profileColor) {
+      reflectionUpdates.authorProfileColor = userData.profileColor;
+    }
+    if (userData.profileIcon) {
+      reflectionUpdates.authorProfileIcon = userData.profileIcon;
+    }
+
+    // Only update reflections if there are profile changes
+    if (Object.keys(reflectionUpdates).length > 0) {
+      await updateAllReflectionsByAuthor(userId, reflectionUpdates);
+    }
   } catch (error) {
     throw new Error("Error updating user details: " + error);
   }

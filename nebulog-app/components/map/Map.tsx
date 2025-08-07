@@ -220,10 +220,9 @@ const MapComponent = ({
                 latitude: reflection.location.lat,
                 longitude: reflection.location.long,
               }}
-              title={reflection.location?.placeName || "Reflection"}
               onPress={() => handleReflectionPress(reflection)}
             >
-              <View className=" rounded-full items-center justify-center">
+              <>
                 {getMoodIcon(reflection.mood || "default", {
                   width: 32,
                   height: 32,
@@ -231,7 +230,7 @@ const MapComponent = ({
                     mood[reflection.mood?.toLowerCase() as keyof typeof mood]?.colorHex ||
                     mood.unselected.colorHex,
                 })}
-              </View>
+              </>
             </Marker>
           );
         })}
