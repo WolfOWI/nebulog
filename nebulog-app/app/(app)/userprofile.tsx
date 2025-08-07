@@ -18,6 +18,7 @@ import { Reflection, User } from "@/lib/types";
 import { FlatList } from "react-native-gesture-handler";
 import { getPublicReflectionsForUser } from "@/services/reflectionServices";
 import { getUserById } from "@/services/userServices";
+import { listenToUserTotalEchoes } from "@/services/echoService";
 
 export default function UserProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
@@ -78,6 +79,17 @@ export default function UserProfile() {
       handleGetReflections();
     }
   }, [userId]);
+
+  // Listen to real-time changes in the viewed user's total echoes
+  useEffect(() => {
+    if (!userId || !userProfile) return;
+
+    const unsubscribe = listenToUserTotalEchoes(userId, (totalEchoes) => {
+      setUserProfile((prev) => (prev ? { ...prev, totalEchoes } : null));
+    });
+
+    return unsubscribe;
+  }, [userId, userProfile]);
 
   if (loading) {
     return (

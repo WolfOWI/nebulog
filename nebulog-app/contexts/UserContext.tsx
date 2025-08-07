@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@/lib/types";
 import { onAuthStateChanged } from "@/services/authServices";
+import { listenToUserEchoedReflections, listenToUserTotalEchoes } from "@/services/echoService";
 
 interface UserContextType {
   user: User | null;
   loading: boolean;
   updateUserContext: (updates: Partial<User>) => void;
+  updateEchoedReflections: (reflectionId: string, isLiked: boolean) => void;
 }
 
 // Create context for user state
@@ -25,6 +27,37 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     return () => userStateListener();
   }, []);
 
+  // Listen to real-time changes in user's echoedReflections and totalEchoes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const unsubscribeEchoedReflections = listenToUserEchoedReflections(
+      user.id,
+      (echoedReflections) => {
+        if (user) {
+          setUser({
+            ...user,
+            echoedReflections,
+          });
+        }
+      }
+    );
+
+    const unsubscribeTotalEchoes = listenToUserTotalEchoes(user.id, (totalEchoes) => {
+      if (user) {
+        setUser({
+          ...user,
+          totalEchoes,
+        });
+      }
+    });
+
+    return () => {
+      unsubscribeEchoedReflections();
+      unsubscribeTotalEchoes();
+    };
+  }, [user?.id]);
+
   const updateUserContext = (updates: Partial<User>) => {
     if (user) {
       setUser({ ...user, ...updates });
@@ -32,8 +65,26 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("User will be updated with:", updates);
   };
 
+  const updateEchoedReflections = (reflectionId: string, isLiked: boolean) => {
+    if (user) {
+      const echoedReflections = user.echoedReflections || {};
+      const updatedEchoedReflections = isLiked
+        ? { ...echoedReflections, [reflectionId]: true }
+        : { ...echoedReflections };
+
+      if (!isLiked) {
+        delete updatedEchoedReflections[reflectionId];
+      }
+
+      setUser({
+        ...user,
+        echoedReflections: updatedEchoedReflections,
+      });
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, loading, updateUserContext }}>
+    <UserContext.Provider value={{ user, loading, updateUserContext, updateEchoedReflections }}>
       {children}
     </UserContext.Provider>
   );
