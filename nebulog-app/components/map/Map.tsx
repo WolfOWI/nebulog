@@ -110,7 +110,8 @@ const MapComponent = ({
       const reflections = await getPublicReflectionsInRadius(
         location.latitude,
         location.longitude,
-        5
+        5,
+        user?.id // Pass current user ID to filter out blocked users' reflections
       );
       console.log(`Found ${reflections.length} reflections.`);
       setMapReflections(reflections);

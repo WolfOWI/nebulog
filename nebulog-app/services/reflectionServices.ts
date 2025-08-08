@@ -116,7 +116,11 @@ export const getPublicReflectionsForUser = async (userId: string) => {
       where("visibility", "==", "public")
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Reflection));
+    let reflections = querySnapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() } as Reflection)
+    );
+
+    return reflections;
   } catch (error) {
     throw new Error("Failed to get public reflections for user: " + error);
   }
@@ -127,9 +131,15 @@ export const getPublicReflectionsForUser = async (userId: string) => {
  * @param lat - Latitude of the centre point
  * @param long - Longitude of the centre point
  * @param radius - Radius in kilometres to search within
+ * @param currentUserId - Optional current user ID to filter out blocked users' reflections
  * @returns Array of reflections within the radius
  */
-export const getPublicReflectionsInRadius = async (lat: number, long: number, radius: number) => {
+export const getPublicReflectionsInRadius = async (
+  lat: number,
+  long: number,
+  radius: number,
+  currentUserId?: string
+) => {
   try {
     const center = [lat, long] as [number, number];
     const radiusInM = radius * 1000;
@@ -173,6 +183,20 @@ export const getPublicReflectionsInRadius = async (lat: number, long: number, ra
           matchingDocs.push({ id: doc.id, ...doc.data() } as Reflection);
         }
       }
+    }
+
+    // Filter out reflections from blocked users if currentUserId is provided
+    if (currentUserId) {
+      const { getUserById } = await import("./userServices");
+      const currentUser = await getUserById(currentUserId);
+      const blockedUserIds = currentUser.blockedUserIds || {};
+
+      const filteredDocs = matchingDocs.filter((reflection) => {
+        return !blockedUserIds[reflection.authorId];
+      });
+
+      // console.log(`Found ${filteredDocs.length} reflections within ${radius}km of [${lat}, ${long}] (filtered from ${matchingDocs.length} total)`);
+      return filteredDocs;
     }
 
     // console.log(`Found ${matchingDocs.length} reflections within ${radius}km of [${lat}, ${long}]`);

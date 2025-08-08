@@ -19,12 +19,15 @@ import { FlatList } from "react-native-gesture-handler";
 import { getPublicReflectionsForUser } from "@/services/reflectionServices";
 import { getUserById } from "@/services/userServices";
 import { listenToUserTotalEchoes } from "@/services/echoService";
+import { useUser } from "@/contexts/UserContext";
 
 export default function UserProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isBlocked, setIsBlocked] = useState(false);
   const params = useLocalSearchParams();
+  const { user: currentUser, blockUserById, unblockUserById } = useUser();
 
   // Extract user ID from params
   const userId = params.userId as string;
@@ -33,9 +36,32 @@ export default function UserProfile() {
     router.back();
   };
 
-  const handleBlockUser = () => {
-    console.log("blocking this user");
-    // TODO: Implement actual blocking functionality
+  const handleBlockUser = async () => {
+    if (!currentUser?.id || !userId) {
+      console.log("No current user or target user ID found");
+      return;
+    }
+
+    try {
+      if (isBlocked) {
+        await unblockUserById(userId);
+        setIsBlocked(false);
+        console.log("User unblocked");
+      } else {
+        await blockUserById(userId);
+        setIsBlocked(true);
+        console.log("User blocked");
+      }
+    } catch (error) {
+      console.error("Error handling block/unblock:", error);
+    }
+  };
+
+  const checkIfBlocked = () => {
+    if (!currentUser?.id || !userId) return;
+
+    const blockedUserIds = currentUser.blockedUserIds || {};
+    setIsBlocked(blockedUserIds[userId] === true);
   };
 
   const handleGetUserData = async () => {
@@ -79,6 +105,10 @@ export default function UserProfile() {
       handleGetReflections();
     }
   }, [userId]);
+
+  useEffect(() => {
+    checkIfBlocked();
+  }, [currentUser, userId]);
 
   // Listen to real-time changes in the viewed user's total echoes
   useEffect(() => {
@@ -146,8 +176,13 @@ export default function UserProfile() {
           <Heading className="text-typography-900 text-2xl font-bold">
             {userProfile.username}
           </Heading>
-          <CircleHoldBtn holdDuration={500} onHoldComplete={handleBlockUser} iconName="block" />
+          <CircleHoldBtn
+            holdDuration={500}
+            onHoldComplete={handleBlockUser}
+            iconName={isBlocked ? "thumb-up" : "block"}
+          />
         </HStack>
+        {isBlocked && <Text className="text-red-500 font-bold text-center mb-2">BLOCKED</Text>}
         {userProfile.bio && (
           <Text className="text-typography-600 text-center mb-4">{userProfile.bio}</Text>
         )}

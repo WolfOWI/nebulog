@@ -2,12 +2,15 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@/lib/types";
 import { onAuthStateChanged } from "@/services/authServices";
 import { listenToUserEchoedReflections, listenToUserTotalEchoes } from "@/services/echoService";
+import { blockUser, unblockUser } from "@/services/userServices";
 
 interface UserContextType {
   user: User | null;
   loading: boolean;
   updateUserContext: (updates: Partial<User>) => void;
   updateEchoedReflections: (reflectionId: string, isLiked: boolean) => void;
+  blockUserById: (userToBlockId: string) => Promise<void>;
+  unblockUserById: (userToUnblockId: string) => Promise<void>;
 }
 
 // Create context for user state
@@ -83,8 +86,63 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const blockUserById = async (userToBlockId: string) => {
+    if (!user?.id) {
+      throw new Error("No logged in user found");
+    }
+
+    try {
+      await blockUser(user.id, userToBlockId);
+
+      // Update local user state
+      const blockedUserIds = user.blockedUserIds || {};
+      setUser({
+        ...user,
+        blockedUserIds: {
+          ...blockedUserIds,
+          [userToBlockId]: true,
+        },
+      });
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      throw error;
+    }
+  };
+
+  const unblockUserById = async (userToUnblockId: string) => {
+    if (!user?.id) {
+      throw new Error("No logged in user found");
+    }
+
+    try {
+      await unblockUser(user.id, userToUnblockId);
+
+      // Update local user state
+      const blockedUserIds = user.blockedUserIds || {};
+      const updatedBlockedUserIds = { ...blockedUserIds };
+      delete updatedBlockedUserIds[userToUnblockId];
+
+      setUser({
+        ...user,
+        blockedUserIds: updatedBlockedUserIds,
+      });
+    } catch (error) {
+      console.error("Error unblocking user:", error);
+      throw error;
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, loading, updateUserContext, updateEchoedReflections }}>
+    <UserContext.Provider
+      value={{
+        user,
+        loading,
+        updateUserContext,
+        updateEchoedReflections,
+        blockUserById,
+        unblockUserById,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
