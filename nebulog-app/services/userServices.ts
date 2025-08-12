@@ -171,3 +171,37 @@ export const isUsernameTaken = async (username: string) => {
     return true;
   }
 };
+
+/**
+ * Get blocked users' details
+ * @param currentUserId - The ID of the user whose blocked users to retrieve
+ * @returns Array of blocked users with their details
+ */
+export const getBlockedUsers = async (currentUserId: string): Promise<User[]> => {
+  try {
+    const currentUser = await getUserById(currentUserId);
+    if (!currentUser || !currentUser.blockedUserIds) {
+      return [];
+    }
+
+    const blockedUserIds = Object.keys(currentUser.blockedUserIds).filter(
+      (userId) => currentUser.blockedUserIds![userId] === true
+    );
+
+    const blockedUsers: User[] = [];
+    for (const userId of blockedUserIds) {
+      try {
+        const blockedUser = await getUserById(userId);
+        if (blockedUser) {
+          blockedUsers.push(blockedUser);
+        }
+      } catch (error) {
+        console.error(`Error fetching blocked user ${userId}:`, error);
+      }
+    }
+
+    return blockedUsers;
+  } catch (error) {
+    throw new Error("Error getting blocked users: " + error);
+  }
+};

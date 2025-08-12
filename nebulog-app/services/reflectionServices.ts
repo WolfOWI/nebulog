@@ -15,6 +15,7 @@ import {
   limit,
   startAt,
   endAt,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Reflection, User } from "@/lib/types";
@@ -240,5 +241,67 @@ export const deleteReflection = async (reflectionId: string, userId: string) => 
     }
   } catch (error) {
     throw new Error("Failed to delete reflection: " + error);
+  }
+};
+
+/**
+ * Get echoed reflections for a user
+ * @param userId - The user ID to get echoed reflections for
+ * @returns Array of reflections that the user has echoed
+ */
+export const getEchoedReflectionsForUser = async (userId: string): Promise<Reflection[]> => {
+  try {
+    // First get the user's echoed reflection IDs
+    const userDoc = doc(db, "users", userId);
+    const userSnapshot = await getDoc(userDoc);
+
+    if (!userSnapshot.exists()) {
+      return [];
+    }
+
+    const userData = userSnapshot.data();
+    const echoedReflectionIds = Object.keys(userData.echoedReflections || {}).filter(
+      (reflectionId) => userData.echoedReflections[reflectionId] === true
+    );
+
+    if (echoedReflectionIds.length === 0) {
+      return [];
+    }
+
+    // Fetch the actual reflection documents
+    const reflections: Reflection[] = [];
+
+    for (const reflectionId of echoedReflectionIds) {
+      try {
+        const reflectionDoc = doc(db, "reflections", reflectionId);
+        const reflectionSnapshot = await getDoc(reflectionDoc);
+
+        if (reflectionSnapshot.exists()) {
+          const reflectionData = reflectionSnapshot.data();
+          reflections.push({
+            id: reflectionSnapshot.id,
+            authorId: reflectionData.authorId,
+            authorUsername: reflectionData.authorUsername,
+            authorProfileColor: reflectionData.authorProfileColor,
+            authorProfileIcon: reflectionData.authorProfileIcon,
+            text: reflectionData.text,
+            visibility: reflectionData.visibility,
+            location: reflectionData.location,
+            mood: reflectionData.mood,
+            createdAt: reflectionData.createdAt,
+            echoCount: reflectionData.echoCount,
+          });
+        }
+      } catch (error) {
+        console.error(`Error fetching echoed reflection ${reflectionId}:`, error);
+      }
+    }
+
+    // Sort by creation date (newest first)
+    return reflections.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch (error) {
+    throw new Error("Error getting echoed reflections: " + error);
   }
 };

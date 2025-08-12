@@ -7,7 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
@@ -16,30 +16,27 @@ import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { defaultProfileColour } from "@/constants/Colors";
 import MyReflectionCard from "@/components/cards/MyReflectionCard";
-import { Reflection } from "@/lib/types";
+import BlockedUserCard from "@/components/cards/BlockedUserCard";
+import { Reflection, User } from "@/lib/types";
 import { FlatList } from "react-native-gesture-handler";
-import { deleteReflection, getReflectionsForUser } from "@/services/reflectionServices";
+import {
+  deleteReflection,
+  getReflectionsForUser,
+  getEchoedReflectionsForUser,
+} from "@/services/reflectionServices";
+import { getBlockedUsers, unblockUser } from "@/services/userServices";
+import UserReflectionCard from "@/components/cards/UserReflectionCard";
+import EchoedReflectionCard from "@/components/cards/EchoedReflectionCard";
+
+type TabType = "reflections" | "echoed" | "blocked";
 
 export default function MyProfile() {
   const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [echoedReflections, setEchoedReflections] = useState<Reflection[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>("reflections");
+  const [isLoading, setIsLoading] = useState(false);
   const { user, updateUserContext } = useUser();
-
-  const fakeReflection = {
-    authorId: "KPH6Xrv2rvViazAD4ttushuGHRq1",
-    createdAt: "2025-07-30T18:24:59.817Z",
-    echoCount: 0,
-    location: {
-      formattedAddress: "15 Royal Chalice Cres, Mooikloof, Pretoria, 0081, South Africa",
-      lat: -25.8429741,
-      long: 28.342731,
-      placeId:
-        "Ej4xNSBSb3lhbCBDaGFsaWNlIENyZXMsIE1vb2lrbG9vZiwgUHJldG9yaWEsIDAwODEsIFNvdXRoIEFmcmljYSIwEi4KFAoSCUFM-LccXZUeEV_SrfYGX50CEA8qFAoSCTXfcO0CXZUeEQ1R-2YuzlI4",
-      placeName: "15 Royal Chalice Cres",
-    },
-    mood: "grief",
-    text: "What is life's meaning?",
-    visibility: "public",
-  };
 
   const handleClose = () => {
     router.back();
@@ -69,6 +66,98 @@ export default function MyProfile() {
       setReflections(sortedReflections);
     } catch (error) {
       console.error("Error in handleGetReflections:", error);
+    }
+  };
+
+  const handleGetEchoedReflections = async () => {
+    if (!user?.id) {
+      console.log("No logged in user found");
+      return;
+    }
+    try {
+      const echoedRefs = await getEchoedReflectionsForUser(user.id);
+
+      // Filter out reflections from blocked users
+      const blockedUserIds = user.blockedUserIds || {};
+      const filteredEchoedRefs = echoedRefs.filter(
+        (reflection) => !blockedUserIds[reflection.authorId]
+      );
+
+      setEchoedReflections(filteredEchoedRefs);
+    } catch (error) {
+      console.error("Error in handleGetEchoedReflections:", error);
+    }
+  };
+
+  const handleGetBlockedUsers = async () => {
+    if (!user?.id) {
+      console.log("No logged in user found");
+      return;
+    }
+    try {
+      const blockedUsersList = await getBlockedUsers(user.id);
+      setBlockedUsers(blockedUsersList);
+    } catch (error) {
+      console.error("Error in handleGetBlockedUsers:", error);
+    }
+  };
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setIsLoading(true);
+
+    // Load data for the selected tab
+    switch (tab) {
+      case "reflections":
+        handleGetReflections();
+        break;
+      case "echoed":
+        handleGetEchoedReflections();
+        break;
+      case "blocked":
+        handleGetBlockedUsers();
+        break;
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleUnblockUser = async (userId: string) => {
+    if (!user?.id) {
+      console.log("No logged in user found");
+      return;
+    }
+
+    try {
+      await unblockUser(user.id, userId);
+
+      // Remove the unblocked user from the list
+      setBlockedUsers((prev) => prev.filter((user) => user.id !== userId));
+
+      // Update user context to reflect the change
+      const updatedBlockedUserIds = { ...user.blockedUserIds };
+      delete updatedBlockedUserIds[userId];
+
+      updateUserContext({
+        blockedUserIds: updatedBlockedUserIds,
+      });
+
+      // Refresh echoed reflections to show newly unblocked user's reflections
+      if (activeTab === "echoed") {
+        await handleGetEchoedReflections();
+      }
+
+      console.log(`User ${userId} unblocked successfully`);
+    } catch (error) {
+      console.error("Error unblocking user:", error);
+    }
+  };
+
+  const handleViewBlockedUserProfile = (userId: string) => {
+    try {
+      router.push(`/userprofile?userId=${userId}` as any);
+    } catch (error) {
+      console.error("Error navigating to user profile:", error);
     }
   };
 
@@ -103,6 +192,100 @@ export default function MyProfile() {
     } catch (error) {
       console.error("Error deleting reflection:", error);
       // TODO: Add toast notification for error
+    }
+  };
+
+  const renderTabButton = (tab: TabType, label: string, icon: string) => (
+    <Pressable
+      onPress={() => handleTabChange(tab)}
+      className={`flex-1 py-3 px-4 rounded-lg ${activeTab === tab && "bg-slate-800"}`}
+    >
+      <HStack className="items-center justify-center gap-2">
+        <MaterialIcons
+          name={icon as any}
+          size={20}
+          color={activeTab === tab ? user?.profileColor : "#6b7280"}
+        />
+        <Text
+          className={`${activeTab === tab ? "text-typography-900" : "text-typography-600"}`}
+          size="sm"
+        >
+          {label}
+        </Text>
+      </HStack>
+    </Pressable>
+  );
+
+  const renderTabContent = () => {
+    if (isLoading) {
+      return (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-typography-400">Loading...</Text>
+        </View>
+      );
+    }
+
+    switch (activeTab) {
+      case "reflections":
+        return (
+          <FlatList
+            data={reflections}
+            renderItem={({ item }) => (
+              <MyReflectionCard reflection={item} onDelete={handleDelete} />
+            )}
+            keyExtractor={(item) => item.id!}
+            contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View className="flex-1 justify-center items-center py-20">
+                <MaterialIcons name="article" size={64} color="#475569" />
+                <Text className="text-typography-600 text-center">No reflections yet</Text>
+              </View>
+            }
+          />
+        );
+
+      case "echoed":
+        return (
+          <FlatList
+            data={echoedReflections}
+            renderItem={({ item }) => <EchoedReflectionCard reflection={item} />}
+            keyExtractor={(item) => item.id!}
+            contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View className="flex-1 justify-center items-center py-20">
+                <MaterialIcons name="favorite" size={64} color="#475569" />
+                <Text className="text-typography-600 text-center">No Echoed Reflections Yet</Text>
+              </View>
+            }
+          />
+        );
+
+      case "blocked":
+        return (
+          <FlatList
+            data={blockedUsers}
+            renderItem={({ item }) => (
+              <BlockedUserCard
+                blockedUser={item}
+                onUnblock={handleUnblockUser}
+                onViewProfile={handleViewBlockedUserProfile}
+              />
+            )}
+            keyExtractor={(item) => item.id!}
+            contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-typography-400 text-center">No Blocked Users</Text>
+              </View>
+            }
+          />
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -156,13 +339,16 @@ export default function MyProfile() {
           </VStack>
         </HStack>
       </VStack>
-      <FlatList
-        data={reflections}
-        renderItem={({ item }) => <MyReflectionCard reflection={item} onDelete={handleDelete} />}
-        keyExtractor={(item) => item.id!}
-        contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
-        showsVerticalScrollIndicator={false}
-      />
+
+      {/* Tabs */}
+      <HStack className="mx-4 mb-4 gap-2">
+        {renderTabButton("reflections", "Reflections", "article")}
+        {renderTabButton("echoed", "Echoed", "favorite")}
+        {renderTabButton("blocked", "Blocked", "block")}
+      </HStack>
+
+      {/* Tab Content */}
+      <View className="flex-1">{renderTabContent()}</View>
     </SafeAreaView>
   );
 }
