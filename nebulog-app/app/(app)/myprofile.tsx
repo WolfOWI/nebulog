@@ -39,7 +39,7 @@ export default function MyProfile() {
   const { user, updateUserContext } = useUser();
 
   const handleClose = () => {
-    router.back();
+    router.dismissAll();
   };
 
   const handleEdit = () => {
