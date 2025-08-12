@@ -31,6 +31,7 @@ import { useLocation } from "@/contexts/LocationContext";
 import { updateReflection, deleteReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 import { Reflection } from "@/lib/types";
+import { geohashForLocation } from "geofire-common";
 
 const EditReflection = () => {
   const { user } = useUser();
@@ -91,12 +92,21 @@ const EditReflection = () => {
             placeName: selectedLocation.name,
             formattedAddress: selectedLocation.formatted_address,
             placeId: selectedLocation.place_id,
+            geohash: geohashForLocation([
+              selectedLocation.geometry.location.lat,
+              selectedLocation.geometry.location.lng,
+            ]),
           },
         }),
       ...(isLocationOn &&
         !selectedLocation &&
         reflectionData.location && {
-          location: reflectionData.location,
+          location: {
+            ...reflectionData.location,
+            geohash:
+              reflectionData.location.geohash ||
+              geohashForLocation([reflectionData.location.lat, reflectionData.location.long]),
+          },
         }),
       mood: selectedMood,
     };
