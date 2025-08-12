@@ -37,22 +37,34 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribeEchoedReflections = listenToUserEchoedReflections(
       user.id,
       (echoedReflections) => {
-        if (user) {
-          setUser({
-            ...user,
-            echoedReflections,
-          });
-        }
+        console.log("Real-time echoedReflections update received:", echoedReflections);
+        setUser((currentUser) => {
+          if (currentUser) {
+            console.log("Updating user context with echoedReflections, preserving profile data");
+            // Only update echoedReflections, preserve all other fields including profile changes
+            return {
+              ...currentUser,
+              echoedReflections,
+            };
+          }
+          return currentUser;
+        });
       }
     );
 
     const unsubscribeTotalEchoes = listenToUserTotalEchoes(user.id, (totalEchoes) => {
-      if (user) {
-        setUser({
-          ...user,
-          totalEchoes,
-        });
-      }
+      console.log("Real-time totalEchoes update received:", totalEchoes);
+      setUser((currentUser) => {
+        if (currentUser) {
+          console.log("Updating user context with totalEchoes, preserving profile data");
+          // Only update totalEchoes, preserve all other fields including profile changes
+          return {
+            ...currentUser,
+            totalEchoes,
+          };
+        }
+        return currentUser;
+      });
     });
 
     return () => {
@@ -62,28 +74,40 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user?.id]);
 
   const updateUserContext = (updates: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...updates });
-    }
+    setUser((currentUser) => {
+      if (currentUser) {
+        console.log("Updating user context with:", updates);
+        console.log("Current user state:", currentUser);
+        const updatedUser = { ...currentUser, ...updates };
+        console.log("User context updated");
+        return updatedUser;
+      }
+      return currentUser;
+    });
     console.log("User will be updated with:", updates);
   };
 
   const updateEchoedReflections = (reflectionId: string, isLiked: boolean) => {
-    if (user) {
-      const echoedReflections = user.echoedReflections || {};
-      const updatedEchoedReflections = isLiked
-        ? { ...echoedReflections, [reflectionId]: true }
-        : { ...echoedReflections };
+    console.log("Manual updateEchoedReflections called:", { reflectionId, isLiked });
+    setUser((currentUser) => {
+      if (currentUser) {
+        const echoedReflections = currentUser.echoedReflections || {};
+        const updatedEchoedReflections = isLiked
+          ? { ...echoedReflections, [reflectionId]: true }
+          : { ...echoedReflections };
 
-      if (!isLiked) {
-        delete updatedEchoedReflections[reflectionId];
+        if (!isLiked) {
+          delete updatedEchoedReflections[reflectionId];
+        }
+
+        console.log("Updating echoedReflections manually, preserving profile data");
+        return {
+          ...currentUser,
+          echoedReflections: updatedEchoedReflections,
+        };
       }
-
-      setUser({
-        ...user,
-        echoedReflections: updatedEchoedReflections,
-      });
-    }
+      return currentUser;
+    });
   };
 
   const blockUserById = async (userToBlockId: string) => {
@@ -95,13 +119,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await blockUser(user.id, userToBlockId);
 
       // Update local user state
-      const blockedUserIds = user.blockedUserIds || {};
-      setUser({
-        ...user,
-        blockedUserIds: {
-          ...blockedUserIds,
-          [userToBlockId]: true,
-        },
+      setUser((currentUser) => {
+        if (currentUser) {
+          const blockedUserIds = currentUser.blockedUserIds || {};
+          return {
+            ...currentUser,
+            blockedUserIds: {
+              ...blockedUserIds,
+              [userToBlockId]: true,
+            },
+          };
+        }
+        return currentUser;
       });
     } catch (error) {
       console.error("Error blocking user:", error);
@@ -118,13 +147,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await unblockUser(user.id, userToUnblockId);
 
       // Update local user state
-      const blockedUserIds = user.blockedUserIds || {};
-      const updatedBlockedUserIds = { ...blockedUserIds };
-      delete updatedBlockedUserIds[userToUnblockId];
+      setUser((currentUser) => {
+        if (currentUser) {
+          const blockedUserIds = currentUser.blockedUserIds || {};
+          const updatedBlockedUserIds = { ...blockedUserIds };
+          delete updatedBlockedUserIds[userToUnblockId];
 
-      setUser({
-        ...user,
-        blockedUserIds: updatedBlockedUserIds,
+          return {
+            ...currentUser,
+            blockedUserIds: updatedBlockedUserIds,
+          };
+        }
+        return currentUser;
       });
     } catch (error) {
       console.error("Error unblocking user:", error);

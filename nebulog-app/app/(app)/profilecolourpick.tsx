@@ -20,6 +20,13 @@ import LaunchButton from "@/components/buttons/LaunchButton";
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
   const [selectedColor, setSelectedColor] = useState(user?.profileColor || "#4ECDC4");
+
+  // Update local state when user context changes
+  useEffect(() => {
+    if (user?.profileColor) {
+      setSelectedColor(user.profileColor);
+    }
+  }, [user?.profileColor]);
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [isColorChanging, setIsColorChanging] = useState(false);
 
@@ -27,22 +34,37 @@ export default function ProfileColourPick() {
     router.back();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (user?.id) {
-      updateUserDetails(user.id, { profileColor: selectedColor }); // Update Firestore DB
-      updateUserContext({ profileColor: selectedColor }); // Update Context
+      try {
+        console.log("Updating profile colour:", { userId: user.id, newColour: selectedColor });
+        // Update both the backend and user context
+        await updateUserDetails(user.id, { profileColor: selectedColor });
+        console.log("Backend updated successfully, updating user context");
+        updateUserContext({ profileColor: selectedColor });
 
-      Toast.show({
-        type: "success",
-        text1: "Profile Colour Updated",
-        text2: `Your profile colour has been set to ${GetColorName(selectedColor)}.`,
-        position: "top",
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 50,
-      });
+        Toast.show({
+          type: "success",
+          text1: "Profile Colour Updated",
+          text2: `Your profile colour has been set to ${GetColorName(selectedColor)}.`,
+          position: "top",
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 50,
+        });
 
-      router.back();
+        router.back();
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Update Failed",
+          text2: "There was an error updating your profile colour. Please try again.",
+          position: "top",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
+        });
+      }
     } else {
       Toast.show({
         type: "error",

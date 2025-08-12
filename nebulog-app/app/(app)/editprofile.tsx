@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
@@ -28,7 +29,7 @@ export default function EditProfile() {
   const [profileColor, setProfileColor] = useState("#4ECDC4");
   const [showErrorTooltip, setShowErrorTooltip] = useState(true); // Temporary for styling
 
-  // Load user data when component mounts
+  // Load user data when component mounts and when user context changes
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
@@ -37,6 +38,18 @@ export default function EditProfile() {
       setBio(user.bio || "");
     }
   }, [user]);
+
+  // Refresh local state when screen comes into focus (e.g., returning from icon/colour selection)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        setUsername(user.username || "");
+        setProfileIcon(user.profileIcon || "ufo-outline");
+        setProfileColor(user.profileColor || "#3992ba");
+        setBio(user.bio || "");
+      }
+    }, [user])
+  );
 
   const handleSave = async () => {
     if (user?.id) {
@@ -55,11 +68,27 @@ export default function EditProfile() {
         return;
       }
 
-      // If username or bio is changed, update the profile
-      if (username !== user.username || bio !== user.bio) {
+      // Check if any profile data has changed
+      const hasChanges =
+        username !== user.username ||
+        bio !== user.bio ||
+        profileIcon !== user.profileIcon ||
+        profileColor !== user.profileColor;
+
+      if (hasChanges) {
         try {
-          updateUserDetails(user.id, { username, bio }); // Update Firestore DB
-          updateUserContext({ username: username, bio: bio }); // Update Global Context
+          // Prepare update data
+          const updateData: Partial<typeof user> = {};
+          if (username !== user.username) updateData.username = username;
+          if (bio !== user.bio) updateData.bio = bio;
+          if (profileIcon !== user.profileIcon) updateData.profileIcon = profileIcon;
+          if (profileColor !== user.profileColor) updateData.profileColor = profileColor;
+
+          // Update Firestore DB
+          await updateUserDetails(user.id, updateData);
+
+          // Update Global Context
+          updateUserContext(updateData);
 
           // Show success toast
           Toast.show({

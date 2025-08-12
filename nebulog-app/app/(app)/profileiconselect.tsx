@@ -19,26 +19,51 @@ export default function ProfileIconSelect() {
   const { user, updateUserContext } = useUser();
   const [selectedIcon, setSelectedIcon] = useState(user?.profileIcon || "ufo-outline");
 
+  // Update local state when user context changes
+  useEffect(() => {
+    if (user?.profileIcon) {
+      setSelectedIcon(user.profileIcon);
+    }
+  }, [user?.profileIcon]);
+
   const handleClose = () => {
     router.back();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (user?.id) {
-      updateUserDetails(user.id, { profileIcon: selectedIcon }); // Update Firestore DB
-      updateUserContext({ profileIcon: selectedIcon }); // Update Global Context
+      try {
+        console.log("Updating profile icon:", { userId: user.id, newIcon: selectedIcon });
+        // Update both the backend and user context
+        await updateUserDetails(user.id, { profileIcon: selectedIcon });
+        console.log("Backend updated successfully, updating user context");
+        updateUserContext({ profileIcon: selectedIcon });
 
-      Toast.show({
-        type: "success",
-        text1: "Profile Icon Updated",
-        text2: `Your profile icon has been changed to the ${selectedIcon.replace("-", " ")} icon.`,
-        position: "top",
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 50,
-      });
+        Toast.show({
+          type: "success",
+          text1: "Profile Icon Updated",
+          text2: `Your profile icon has been changed to the ${selectedIcon.replace(
+            "-",
+            " "
+          )} icon.`,
+          position: "top",
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 50,
+        });
 
-      router.back();
+        router.back();
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Update Failed",
+          text2: "There was an error updating your profile icon. Please try again.",
+          position: "top",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 50,
+        });
+      }
     } else {
       Toast.show({
         type: "error",

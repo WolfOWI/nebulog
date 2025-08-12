@@ -104,7 +104,7 @@ export default function Home() {
           <CircleHoldBtn
             onHoldComplete={handleRefreshMap}
             holdDuration={300}
-            iconName="refresh"
+            iconName="radar"
             size="medium"
           />
 
