@@ -32,6 +32,7 @@ import { createReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 import { geohashForLocation } from "geofire-common";
 import Toast from "react-native-toast-message";
+import { getRandomPrompt } from "@/utils/promptUtility";
 
 const ThoughtLaunch = () => {
   const { user, updateUserContext } = useUser();
@@ -157,6 +158,10 @@ const ThoughtLaunch = () => {
   const selectedMoodData = selectedMood ? mood[selectedMood as keyof typeof mood] : null;
   const currentCharacterCount = comment.length;
 
+  useEffect(() => {
+    console.log("selectedMood", selectedMood);
+  }, [selectedMood]);
+
   return (
     <SafeAreaView className="flex-1 bg-background-0">
       <View className="m-4">
@@ -225,17 +230,13 @@ const ThoughtLaunch = () => {
 
               <SelectPortal>
                 <SelectBackdrop />
-                <SelectContent>
+                <SelectContent className="pb-10">
                   <SelectDragIndicatorWrapper>
                     <SelectDragIndicator />
                   </SelectDragIndicatorWrapper>
 
                   {Object.entries(mood).map(([key, moodData]) => (
-                    <SelectItem key={key} label={moodData.spaceObject} value={key}>
-                      <Text className={`font-medium ${moodData.textColor}`}>
-                        {moodData.spaceObject}
-                      </Text>
-                    </SelectItem>
+                    <SelectItem key={key} label={moodData.subemotions} value={key} />
                   ))}
                 </SelectContent>
               </SelectPortal>
@@ -246,7 +247,7 @@ const ThoughtLaunch = () => {
           <VStack className="gap-3">
             <Textarea className="h-[200px]">
               <TextareaInput
-                placeholder="What is on your mind?"
+                placeholder={getRandomPrompt(selectedMood)}
                 value={comment}
                 onChangeText={handleCommentChange}
                 multiline
