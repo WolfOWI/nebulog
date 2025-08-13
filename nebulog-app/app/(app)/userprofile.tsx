@@ -166,7 +166,7 @@ export default function UserProfile() {
       </View>
 
       {/* Profile Header */}
-      <VStack className="items-center mb-8">
+      <VStack className="items-center mb-8 mx-4">
         <ProfileAvatar
           bgColour={userProfile.profileColor || defaultProfileColour}
           icon={userProfile.profileIcon || "ufo-outline"}
@@ -184,7 +184,7 @@ export default function UserProfile() {
         </HStack>
         {isBlocked && <Text className="text-red-500 font-bold text-center mb-2">BLOCKED</Text>}
         {userProfile.bio && (
-          <Text className="text-typography-600 text-center mb-4">{userProfile.bio}</Text>
+          <Text className="text-typography-600 text-center mb-4 mx-4">{userProfile.bio}</Text>
         )}
         <HStack className="justify-between items-center w-full mt-4 px-4">
           <VStack className="items-center w-1/3">

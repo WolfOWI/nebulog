@@ -304,14 +304,14 @@ export default function MyProfile() {
       </View>
 
       {/* Profile Header */}
-      <VStack className="items-center mb-8">
+      <VStack className="items-center mb-8 mx-4">
         <ProfileAvatar bgColour={user.profileColor} icon={user.profileIcon || "ufo-outline"} />
         <HStack className="items-center mt-3 mb-2 gap-3">
           <View className="w-12 h-12" />
           <Heading className="text-typography-900 text-2xl font-bold">{user.username}</Heading>
           <CircleHoldBtn holdDuration={500} onHoldComplete={handleEdit} iconName="more-horiz" />
         </HStack>
-        {user.bio && <Text className="text-typography-600 text-center mb-4">{user.bio}</Text>}
+        {user.bio && <Text className="text-typography-600 text-center mb-4 mx-4">{user.bio}</Text>}
         <HStack className="justify-between items-center w-full mt-4 px-4">
           <VStack className="items-center w-1/3">
             <Text className="text-typography-900 text-center" size="2xl">
