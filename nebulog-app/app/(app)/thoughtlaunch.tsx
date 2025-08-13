@@ -31,6 +31,7 @@ import { useLocation } from "@/contexts/LocationContext";
 import { createReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 import { geohashForLocation } from "geofire-common";
+import Toast from "react-native-toast-message";
 
 const ThoughtLaunch = () => {
   const { user, updateUserContext } = useUser();
@@ -39,6 +40,11 @@ const ThoughtLaunch = () => {
   const { selectedLocation } = useLocation();
   const [isPublic, setIsPublic] = useState(true);
   const [isLocationOn, setIsLocationOn] = useState(true);
+
+  const maxCharacters = 300;
+  const isApproachingLimit =
+    comment.length >= maxCharacters * 0.8 && comment.length !== maxCharacters; // 80% of the max characters (excluding max)
+  const maxCharactersReached = comment.length === maxCharacters;
 
   // If location is off, set public to off
   useEffect(() => {
@@ -54,33 +60,76 @@ const ThoughtLaunch = () => {
     }
   }, [isPublic]);
 
+  // At every comment change, limit the text to the max characters
+  const handleCommentChange = (text: string) => {
+    setComment(text.slice(0, maxCharacters));
+  };
+
+  const showValidationError = (message: string) => {
+    Toast.show({
+      type: "error",
+      text1: "Error Launching Reflection",
+      text2: message,
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
+  const showSuccessToast = () => {
+    Toast.show({
+      type: "success",
+      text1: isPublic ? "Reflection Launched" : "Reflection Saved",
+      text2: isPublic
+        ? "Your reflection has been launched into the universe."
+        : "Your reflection has been saved to your private reflections.",
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
   const handleLaunch = async () => {
     if (!user?.id) {
-      throw new Error("Logged in user's ID not found");
+      showValidationError("User not found. Please log in again.");
+      return;
     }
 
-    // TODO: Add functionality for no location (private)
-    if (!selectedLocation) {
-      throw new Error("No location selected");
+    // Check if comment is filled
+    if (!comment.trim()) {
+      showValidationError("Please write your reflection");
+      return;
+    }
+
+    // Check if location is required and available
+    if (isLocationOn && !selectedLocation) {
+      showValidationError("Please select a location");
+      return;
     }
 
     const reflection = {
       authorId: user.id,
+      authorUsername: user.username,
+      profileColor: user.profileColor,
+      profileIcon: user.profileIcon,
       text: comment,
       visibility: (isPublic ? "public" : "private") as "public" | "private",
-      ...(isLocationOn && {
-        location: {
-          lat: selectedLocation.geometry.location.lat,
-          long: selectedLocation.geometry.location.lng,
-          placeName: selectedLocation.name,
-          formattedAddress: selectedLocation.formatted_address,
-          placeId: selectedLocation.place_id,
-          geohash: geohashForLocation([
-            selectedLocation.geometry.location.lat,
-            selectedLocation.geometry.location.lng,
-          ]),
-        },
-      }),
+      ...(isLocationOn &&
+        selectedLocation && {
+          location: {
+            lat: selectedLocation.geometry.location.lat,
+            long: selectedLocation.geometry.location.lng,
+            placeName: selectedLocation.name,
+            formattedAddress: selectedLocation.formatted_address,
+            placeId: selectedLocation.place_id,
+            geohash: geohashForLocation([
+              selectedLocation.geometry.location.lat,
+              selectedLocation.geometry.location.lng,
+            ]),
+          },
+        }),
       mood: selectedMood,
       createdAt: new Date().toISOString(),
       echoCount: 0,
@@ -88,7 +137,9 @@ const ThoughtLaunch = () => {
 
     try {
       await createReflection(reflection, user.id);
-      router.push("/(app)/home" as any);
+
+      // Show success toast
+      showSuccessToast();
 
       // Update local user context
       updateUserContext({
@@ -96,14 +147,15 @@ const ThoughtLaunch = () => {
         lastReflectDate: new Date().toISOString(),
       });
 
-      // TODO: Add toast notification for success
+      router.push("/(app)/home" as any);
     } catch (error) {
       console.error("Error creating reflection:", error);
-      // TODO: Add toast notification for error
+      showValidationError("Failed to launch reflection. Please try again.");
     }
   };
 
   const selectedMoodData = selectedMood ? mood[selectedMood as keyof typeof mood] : null;
+  const currentCharacterCount = comment.length;
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
@@ -196,13 +248,26 @@ const ThoughtLaunch = () => {
               <TextareaInput
                 placeholder="What is on your mind?"
                 value={comment}
-                onChangeText={setComment}
+                onChangeText={handleCommentChange}
                 multiline
                 numberOfLines={10}
                 className="text-typography-900"
                 textAlignVertical="top"
+                maxLength={maxCharacters}
               />
             </Textarea>
+
+            {/* Character Counter */}
+            <HStack className="justify-end">
+              <Text
+                className={`text-typography-500 ${isApproachingLimit && "text-warning-500"} ${
+                  maxCharactersReached && "text-error-500"
+                }`}
+                size="sm"
+              >
+                {currentCharacterCount}/{maxCharacters}
+              </Text>
+            </HStack>
           </VStack>
 
           {isLocationOn ? (
