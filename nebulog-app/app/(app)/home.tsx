@@ -6,7 +6,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import MapComponent from "@/components/map/Map";
@@ -18,10 +18,61 @@ import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
+import { validateStreak } from "@/utils/streakUtility";
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, validateAndUpdateStreak, refreshUserData } = useUser();
   const insets = useSafeAreaInsets();
+
+  // Validate streak when component mounts
+  useEffect(() => {
+    if (user?.id) {
+      console.log("Home: User data on mount:", {
+        id: user.id,
+        streakCount: user.streakCount,
+        lastReflectDate: user.lastReflectDate,
+        totalReflections: user.totalReflections,
+      });
+      validateAndUpdateStreak();
+    }
+  }, [user?.id, validateAndUpdateStreak]);
+
+  // Show streak status when returning to home screen
+  useEffect(() => {
+    if (user?.id && user?.lastReflectDate) {
+      const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
+
+      if (!isValid && daysSinceLastReflection > 1) {
+        // Show warning if streak is broken
+        setTimeout(() => {
+          Toast.show({
+            type: "warning",
+            text1: "Streak Broken",
+            text2: `It's been ${daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
+            position: "top",
+            visibilityTime: 5000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        }, 1000); // Delay a bit to avoid showing immediately
+      }
+    }
+  }, [user?.id, user?.lastReflectDate]);
+
+  // Show celebration when returning from reflection creation
+  useEffect(() => {
+    if (user?.streakCount && user?.streakCount > 1) {
+      // Check if this is a recent streak increase
+      const lastReflection = new Date(user.lastReflectDate || "");
+      const now = new Date();
+      const timeDiff = now.getTime() - lastReflection.getTime();
+
+      // If the reflection was created in the last 5 minutes, show celebration
+      if (timeDiff < 5 * 60 * 1000) {
+        showStreakCelebration(user.streakCount);
+      }
+    }
+  }, [user?.streakCount, user?.lastReflectDate]);
 
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -45,6 +96,7 @@ export default function Home() {
 
   // Reflection Panel State
   const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
+  const [isRefreshingStreak, setIsRefreshingStreak] = useState(false);
 
   // Get Location of User
   const handleGetLocation = async () => {
@@ -74,6 +126,162 @@ export default function Home() {
         type: "error",
         text1: "Map Refresh Failed",
         text2: "Please try again",
+      });
+    }
+  };
+
+  // Refresh streak data
+  const handleRefreshStreak = async () => {
+    try {
+      setIsRefreshingStreak(true);
+      console.log("Home: Refreshing streak, current user data:", {
+        streakCount: user?.streakCount,
+        lastReflectDate: user?.lastReflectDate,
+        totalReflections: user?.totalReflections,
+      });
+
+      // First refresh user data from database
+      await refreshUserData();
+
+      // Then validate and update streak
+      await validateAndUpdateStreak();
+
+      // Show updated streak status
+      if (user?.lastReflectDate) {
+        const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
+        console.log("Home: After refresh, streak validation:", {
+          isValid,
+          daysSinceLastReflection,
+          currentStreakCount: user.streakCount,
+        });
+
+        if (isValid) {
+          Toast.show({
+            type: "success",
+            text1: `${user.streakCount} Day Streak Active!`,
+            text2: "Your streak is still going strong!",
+            position: "top",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        } else {
+          Toast.show({
+            type: "warning",
+            text1: "Streak Status Updated",
+            text2: `It's been ${daysSinceLastReflection} days since your last reflection`,
+            position: "top",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        }
+      } else {
+        Toast.show({
+          type: "info",
+          text1: "No Streak Yet",
+          text2: "Post your first reflection to start building a streak!",
+          position: "top",
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 50,
+        });
+      }
+    } catch (error) {
+      console.error("Error refreshing streak:", error);
+      Toast.show({
+        type: "error",
+        text1: "Streak Update Failed",
+        text2: "Please try again",
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
+    } finally {
+      setIsRefreshingStreak(false);
+    }
+  };
+
+  // Get streak status message
+  const getStreakStatusMessage = () => {
+    if (!user?.lastReflectDate) {
+      return "Start your journey today!";
+    }
+
+    const today = new Date();
+    const lastReflection = new Date(user.lastReflectDate);
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const lastReflectionStart = new Date(
+      lastReflection.getFullYear(),
+      lastReflection.getMonth(),
+      lastReflection.getDate()
+    );
+
+    if (todayStart.getTime() === lastReflectionStart.getTime()) {
+      return "You've reflected today!";
+    } else if (todayStart.getTime() - lastReflectionStart.getTime() === 24 * 60 * 60 * 1000) {
+      return "Keep the streak going!";
+    } else {
+      return "Time to reflect again!";
+    }
+  };
+
+  // Show streak celebration message
+  const showStreakCelebration = (newStreak: number) => {
+    if (newStreak > 1) {
+      Toast.show({
+        type: "success",
+        text1: `🔥 ${newStreak} Day Streak!`,
+        text2: "Amazing! You're building a great habit!",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+    }
+  };
+
+  // Show current streak status
+  const showStreakStatus = () => {
+    if (!user?.lastReflectDate) {
+      Toast.show({
+        type: "info",
+        text1: "No Streak Yet",
+        text2: "Post your first reflection to start building a streak!",
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
+      return;
+    }
+
+    const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
+
+    if (isValid) {
+      const lastReflection = new Date(user.lastReflectDate);
+      const today = new Date();
+      const isToday = lastReflection.toDateString() === today.toDateString();
+
+      Toast.show({
+        type: "success",
+        text1: `${user.streakCount} Day Streak Active!`,
+        text2: isToday ? "You've already reflected today!" : "Keep the streak going!",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+    } else {
+      Toast.show({
+        type: "warning",
+        text1: "Streak Broken",
+        text2: `It's been ${daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
       });
     }
   };
@@ -169,17 +377,46 @@ export default function Home() {
               />
               <HStack className="w-full gap-2">
                 <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
-                  <View className="bg-slate-500 w-10 h-10 rounded-full flex justify-center items-center">
-                    <MaterialIcons name="sunny" size={24} color="#f8fafc" />
-                  </View>
-                  <Text
-                    className="text-typography-900"
-                    size="md"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
+                  <Pressable
+                    onPress={handleRefreshStreak}
+                    onLongPress={showStreakStatus}
+                    disabled={isRefreshingStreak}
                   >
-                    {user?.streakCount} days
-                  </Text>
+                    <View
+                      className={`w-10 h-10 rounded-full flex justify-center items-center ${
+                        isRefreshingStreak
+                          ? "bg-slate-400"
+                          : user?.lastReflectDate && validateStreak(user.lastReflectDate).isValid
+                          ? "bg-green-500"
+                          : "bg-slate-500"
+                      }`}
+                    >
+                      {isRefreshingStreak ? (
+                        <MaterialIcons name="refresh" size={24} color="#f8fafc" />
+                      ) : (
+                        <MaterialIcons name="sunny" size={24} color="#f8fafc" />
+                      )}
+                    </View>
+                  </Pressable>
+                  <VStack className="flex-1">
+                    <Text
+                      className="text-typography-900"
+                      size="md"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {user?.streakCount || 0} day
+                      {(user?.streakCount || 0) == 1 ? "" : "s"}
+                    </Text>
+                    <Text
+                      className="text-typography-600"
+                      size="xs"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {getStreakStatusMessage()}
+                    </Text>
+                  </VStack>
                 </HStack>
                 <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
                   <View className="bg-slate-500 w-10 h-10 rounded-full flex justify-center items-center">

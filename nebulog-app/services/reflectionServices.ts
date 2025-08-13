@@ -21,6 +21,7 @@ import { db } from "@/config/firebaseConfig";
 import { Reflection, User } from "@/lib/types";
 import { geohashQueryBounds, distanceBetween } from "geofire-common";
 import { getUserById } from "./userServices";
+import { calculateNewStreak } from "@/utils/streakUtility";
 
 /**
  * Create a new reflection
@@ -44,15 +45,31 @@ export const createReflection = async (reflection: Reflection, userId: string) =
 
     await addDoc(reflectionsCollection, reflectionWithAuthor);
 
-    // Update user totals (stats)
+    // Update user totals (stats) and streak
     try {
       const userDoc = doc(db, "users", userId);
+      const currentDate = new Date().toISOString();
+
+      // Calculate new streak count
+      const newStreak = calculateNewStreak(userData.streakCount, userData.lastReflectDate);
+
+      console.log("createReflection: Updating user stats and streak:", {
+        userId,
+        currentStreak: userData.streakCount,
+        lastReflectDate: userData.lastReflectDate,
+        newStreak,
+        currentDate,
+      });
+
       await updateDoc(userDoc, {
         totalReflections: increment(1),
-        lastReflectDate: new Date().toISOString(),
+        lastReflectDate: currentDate,
+        streakCount: newStreak,
       });
+
+      console.log("createReflection: Successfully updated user streak to:", newStreak);
     } catch (error) {
-      console.error("Error incrementing reflection count:", error);
+      console.error("Error updating user stats and streak:", error);
     }
   } catch (error) {
     throw new Error("Failed to create reflection: " + error);

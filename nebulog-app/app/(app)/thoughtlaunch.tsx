@@ -33,6 +33,7 @@ import { useUser } from "@/contexts/UserContext";
 import { geohashForLocation } from "geofire-common";
 import Toast from "react-native-toast-message";
 import { getRandomPrompt } from "@/utils/promptUtility";
+import { calculateNewStreak } from "@/utils/streakUtility";
 
 const ThoughtLaunch = () => {
   const { user, updateUserContext } = useUser();
@@ -142,10 +143,12 @@ const ThoughtLaunch = () => {
       // Show success toast
       showSuccessToast();
 
-      // Update local user context
+      // Calculate new streak and update local user context
+      const newStreak = calculateNewStreak(user.streakCount, user.lastReflectDate);
       updateUserContext({
         totalReflections: user.totalReflections + 1,
         lastReflectDate: new Date().toISOString(),
+        streakCount: newStreak,
       });
 
       router.push("/(app)/home" as any);

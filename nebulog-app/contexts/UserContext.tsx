@@ -2,7 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@/lib/types";
 import { onAuthStateChanged } from "@/services/authServices";
 import { listenToUserEchoedReflections, listenToUserTotalEchoes } from "@/services/echoService";
-import { blockUser, unblockUser } from "@/services/userServices";
+import { blockUser, unblockUser, updateUserDetails } from "@/services/userServices";
+import { validateStreak, shouldResetStreak } from "@/utils/streakUtility";
+import { getUserById } from "@/services/userServices";
 
 interface UserContextType {
   user: User | null;
@@ -11,6 +13,9 @@ interface UserContextType {
   updateEchoedReflections: (reflectionId: string, isLiked: boolean) => void;
   blockUserById: (userToBlockId: string) => Promise<void>;
   unblockUserById: (userToUnblockId: string) => Promise<void>;
+  validateAndUpdateStreak: () => Promise<void>;
+  updateStreakOnReflection: (newStreak: number) => void;
+  refreshUserData: () => Promise<void>;
 }
 
 // Create context for user state
@@ -72,6 +77,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       unsubscribeTotalEchoes();
     };
   }, [user?.id]);
+
+  // Validate streak when user data changes (e.g., when app opens)
+  useEffect(() => {
+    if (user?.id && user.lastReflectDate) {
+      validateAndUpdateStreak();
+    }
+  }, [user?.id, user?.lastReflectDate]);
 
   const updateUserContext = (updates: Partial<User>) => {
     setUser((currentUser) => {
@@ -166,6 +178,79 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const validateAndUpdateStreak = async () => {
+    if (!user?.id || !user.lastReflectDate) {
+      console.log("validateAndUpdateStreak: No user ID or lastReflectDate");
+      return;
+    }
+
+    try {
+      // console.log("validateAndUpdateStreak: Checking streak for user", user.id);
+      // console.log("validateAndUpdateStreak: Current streak count:", user.streakCount);
+      // console.log("validateAndUpdateStreak: Last reflect date:", user.lastReflectDate);
+
+      // Check if streak should be reset
+      const shouldReset = shouldResetStreak(user.lastReflectDate);
+      // console.log("validateAndUpdateStreak: Should reset streak?", shouldReset);
+
+      if (shouldReset) {
+        // console.log("validateAndUpdateStreak: Resetting streak to 0");
+        // Update database
+        await updateUserDetails(user.id, { streakCount: 0 });
+
+        // Update local state
+        setUser((currentUser) => {
+          if (currentUser) {
+            return {
+              ...currentUser,
+              streakCount: 0,
+            };
+          }
+          return currentUser;
+        });
+
+        console.log("Streak reset to 0 due to gap in reflections");
+      } else {
+        console.log("validateAndUpdateStreak: Streak is valid, no reset needed");
+      }
+    } catch (error) {
+      console.error("Error validating streak:", error);
+    }
+  };
+
+  const updateStreakOnReflection = (newStreak: number) => {
+    // console.log("updateStreakOnReflection: Updating streak to:", newStreak);
+    setUser((currentUser) => {
+      if (currentUser) {
+        return {
+          ...currentUser,
+          streakCount: newStreak,
+        };
+      }
+      return currentUser;
+    });
+  };
+
+  const refreshUserData = async () => {
+    if (!user?.id) return;
+
+    try {
+      // console.log("refreshUserData: Refreshing user data from database");
+
+      const freshUserData = await getUserById(user.id);
+
+      console.log("refreshUserData: Fresh user data:", {
+        streakCount: freshUserData.streakCount,
+        lastReflectDate: freshUserData.lastReflectDate,
+        totalReflections: freshUserData.totalReflections,
+      });
+
+      setUser(freshUserData);
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -175,6 +260,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         updateEchoedReflections,
         blockUserById,
         unblockUserById,
+        validateAndUpdateStreak,
+        updateStreakOnReflection,
+        refreshUserData,
       }}
     >
       {children}
