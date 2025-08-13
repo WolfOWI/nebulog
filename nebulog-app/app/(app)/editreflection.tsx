@@ -32,6 +32,7 @@ import { updateReflection, deleteReflection } from "@/services/reflectionService
 import { useUser } from "@/contexts/UserContext";
 import { Reflection } from "@/lib/types";
 import { geohashForLocation } from "geofire-common";
+import Toast from "react-native-toast-message";
 
 const EditReflection = () => {
   const { user } = useUser();
@@ -49,6 +50,11 @@ const EditReflection = () => {
   const [isLocationOn, setIsLocationOn] = useState(!!reflectionData?.location);
   const [originalLocation, setOriginalLocation] = useState(reflectionData?.location || null);
   const { setSelectedLocation } = useLocation();
+
+  const maxCharacters = 300;
+  const isApproachingLimit =
+    comment.length >= maxCharacters * 0.8 && comment.length !== maxCharacters; // 80% of the max characters (excluding max)
+  const maxCharactersReached = comment.length === maxCharacters;
 
   // If location is off, set public to off
   useEffect(() => {
@@ -72,13 +78,51 @@ const EditReflection = () => {
     };
   }, [setSelectedLocation]);
 
+  // At every comment change, limit the text to the max characters
+  const handleCommentChange = (text: string) => {
+    setComment(text.slice(0, maxCharacters));
+  };
+
+  const showValidationError = (message: string) => {
+    Toast.show({
+      type: "error",
+      text1: "Error Updating Reflection",
+      text2: message,
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
+  const showSuccessToast = () => {
+    Toast.show({
+      type: "success",
+      text1: "Reflection Updated",
+      text2: "Your reflection has been successfully updated.",
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
   const handleUpdate = async () => {
     if (!user?.id || !reflectionData?.id) {
-      throw new Error("User ID or reflection ID not found");
+      showValidationError("User ID or reflection ID not found");
+      return;
     }
 
-    if (!selectedLocation && isLocationOn) {
-      throw new Error("No location selected");
+    // Check if comment is filled
+    if (!comment.trim()) {
+      showValidationError("Your reflection can't be empty");
+      return;
+    }
+
+    // Check if location is required and available
+    if (isLocationOn && !selectedLocation && !originalLocation) {
+      showValidationError("You must select a location if you want to make your reflection public");
+      return;
     }
 
     const updates = {
@@ -115,16 +159,19 @@ const EditReflection = () => {
 
     try {
       await updateReflection(reflectionData.id, updates);
-      router.push("/(app)/myprofile" as any);
 
-      // TODO: Add toast notification for success
+      // Show success toast
+      showSuccessToast();
+
+      router.push("/(app)/myprofile" as any);
     } catch (error) {
       console.error("Error updating reflection:", error);
-      // TODO: Add toast notification for error
+      showValidationError("Failed to update reflection. Please try again.");
     }
   };
 
   const selectedMoodData = selectedMood ? mood[selectedMood as keyof typeof mood] : null;
+  const currentCharacterCount = comment.length;
 
   if (!reflectionData) {
     return (
@@ -222,13 +269,26 @@ const EditReflection = () => {
               <TextareaInput
                 placeholder="What is on your mind?"
                 value={comment}
-                onChangeText={setComment}
+                onChangeText={handleCommentChange}
                 multiline
                 numberOfLines={10}
                 className="text-typography-900"
                 textAlignVertical="top"
+                maxLength={maxCharacters}
               />
             </Textarea>
+
+            {/* Character Counter */}
+            <HStack className="justify-end">
+              <Text
+                className={`text-typography-500 ${isApproachingLimit && "text-warning-500"} ${
+                  maxCharactersReached && "text-error-500"
+                }`}
+                size="sm"
+              >
+                {currentCharacterCount}/{maxCharacters}
+              </Text>
+            </HStack>
           </VStack>
 
           {isLocationOn ? (

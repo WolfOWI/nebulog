@@ -99,13 +99,13 @@ const ThoughtLaunch = () => {
 
     // Check if comment is filled
     if (!comment.trim()) {
-      showValidationError("Please write your reflection");
+      showValidationError("Your reflection can't be empty");
       return;
     }
 
     // Check if location is required and available
     if (isLocationOn && !selectedLocation) {
-      showValidationError("Please select a location");
+      showValidationError("You must select a location if you want to make your reflection public");
       return;
     }
 
