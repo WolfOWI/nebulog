@@ -162,8 +162,10 @@ export const updateUserDetails = async (userId: string, userData: Partial<User>)
  * @returns Boolean
  */
 export const isUsernameTaken = async (username: string) => {
+  const usernameFormatted = username.toLowerCase().trim();
+
   const userDoc = collection(db, "users");
-  const q = query(userDoc, where("username", "==", username));
+  const q = query(userDoc, where("username", "==", usernameFormatted));
   const querySnapshot = await getDocs(q);
   if (querySnapshot.empty) {
     return false;
