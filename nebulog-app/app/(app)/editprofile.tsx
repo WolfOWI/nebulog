@@ -20,6 +20,7 @@ import Toast from "react-native-toast-message";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import { logOutUser } from "@/services/authServices";
 import { GetColorName } from "hex-color-to-color-name";
+import { Textarea, TextareaInput } from "@/components/ui/textarea";
 
 export default function EditProfile() {
   const { user, loading, updateUserContext } = useUser();
@@ -28,6 +29,11 @@ export default function EditProfile() {
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
   const [profileColor, setProfileColor] = useState("#4ECDC4");
   const [showErrorTooltip, setShowErrorTooltip] = useState(true); // Temporary for styling
+
+  const maxBioCharacters = 100;
+  const isApproachingBioLimit =
+    bio.length >= maxBioCharacters * 0.8 && bio.length !== maxBioCharacters; // 80% of the max characters (excluding max)
+  const maxBioCharactersReached = bio.length === maxBioCharacters;
 
   // Load user data when component mounts and when user context changes
   useEffect(() => {
@@ -52,6 +58,20 @@ export default function EditProfile() {
   );
 
   const handleSave = async () => {
+    // Check if username is at least 3 characters long
+    if (username.length < 3) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Username",
+        text2: "Your username must be at least 3 characters long",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+      return;
+    }
+
     if (user?.id) {
       // Check if username is already taken (and not the same as the current username)
       const isTaken = await isUsernameTaken(username);
@@ -140,6 +160,11 @@ export default function EditProfile() {
     router.push("/profilecolourpick" as any);
   };
 
+  // At every bio input change, limit the text to the max characters
+  const handleBioChange = (text: string) => {
+    setBio(text.slice(0, maxBioCharacters));
+  };
+
   const handleLogout = async () => {
     await logOutUser();
     setTimeout(() => {
@@ -186,10 +211,13 @@ export default function EditProfile() {
             <Text className="text-typography-700 text-sm font-medium mb-2">Username</Text>
             <Input>
               <InputField
-                value={username}
-                onChangeText={setUsername}
-                placeholder="Enter your username"
+                value={username.toLowerCase().trim()}
+                onChangeText={(text) => setUsername(text.toLowerCase().trim())}
+                placeholder="Enter a username"
                 className="text-typography-900"
+                inputMode="text"
+                maxLength={20}
+                autoCapitalize="none"
               />
             </Input>
           </VStack>
@@ -197,9 +225,31 @@ export default function EditProfile() {
           {/* Bio Input */}
           <VStack className="mb-6">
             <Text className="text-typography-700 text-sm font-medium mb-2">Bio</Text>
-            <Input>
-              <InputField value={bio} onChangeText={setBio} placeholder="Enter your bio" />
-            </Input>
+            <Textarea className="h-[112px]">
+              <TextareaInput
+                placeholder="Enter your bio"
+                value={bio}
+                onChangeText={handleBioChange}
+                inputMode="text"
+                maxLength={maxBioCharacters}
+                className="text-typography-900"
+                textAlignVertical="top"
+                multiline
+                numberOfLines={5}
+              />
+            </Textarea>
+
+            {/* Character Counter */}
+            <HStack className="justify-end mt-2">
+              <Text
+                className={`text-typography-500 ${isApproachingBioLimit && "text-warning-500"} ${
+                  maxBioCharactersReached && "text-error-500"
+                }`}
+                size="sm"
+              >
+                {bio.length}/{maxBioCharacters}
+              </Text>
+            </HStack>
           </VStack>
 
           {/* Profile Icon Selection */}
