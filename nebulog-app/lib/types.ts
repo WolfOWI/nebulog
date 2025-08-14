@@ -88,6 +88,18 @@ export interface SignupCredentials {
   password: string;
 }
 
+// Auth result types
+export interface AuthResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
+export interface LogoutResult {
+  success: boolean;
+  error?: string;
+}
+
 // Navigation types
 export type RootStackParamList = {
   "/": undefined;

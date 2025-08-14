@@ -1,6 +1,6 @@
 // Authentication Services
 import { auth } from "@/config/firebaseConfig";
-import { LoginCredentials, SignupCredentials, User } from "@/lib/types";
+import { LoginCredentials, SignupCredentials, User, AuthResult, LogoutResult } from "@/lib/types";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -20,9 +20,9 @@ export const isUserLoggedIn = async (): Promise<boolean> => {
 /**
  * Log in user with email and password
  * @param credentials - Login credentials (email, password)
- * @returns User object on successful login
+ * @returns Result object with success status and user data or error message
  */
-export const logInUser = async (credentials: LoginCredentials): Promise<User> => {
+export const logInUser = async (credentials: LoginCredentials): Promise<AuthResult> => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -32,21 +32,34 @@ export const logInUser = async (credentials: LoginCredentials): Promise<User> =>
     const user = userCredential.user;
     if (user) {
       const userDoc = await getUserById(user.uid);
-      return userDoc;
+      return { success: true, user: userDoc };
     } else {
-      throw new Error("User not found");
+      return { success: false, error: "User not found" };
     }
-  } catch (error) {
-    throw new Error("Error logging in user: " + error);
+  } catch (error: any) {
+    // Handle Firebase authentication errors gracefully
+    console.log(error.code);
+    if (error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") {
+      return { success: false, error: "Invalid email or password" };
+    } else if (error.code === "auth/invalid-email") {
+      return { success: false, error: "Invalid email format" };
+    } else if (error.code === "auth/too-many-requests") {
+      return { success: false, error: "Too many failed attempts. Please try again later" };
+    } else if (error.code === "auth/network-request-failed") {
+      return { success: false, error: "Network error. Please check your connection" };
+    } else {
+      // Generic message
+      return { success: false, error: "Login failed. Please try again" };
+    }
   }
 };
 
 /**
  * Sign up new user with email and password
  * @param credentials - Signup credentials (username, email, password)
- * @returns User object on successful signup
+ * @returns Result object with success status and user data or error message
  */
-export const signUpUser = async (credentials: SignupCredentials): Promise<User> => {
+export const signUpUser = async (credentials: SignupCredentials): Promise<AuthResult> => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -57,9 +70,21 @@ export const signUpUser = async (credentials: SignupCredentials): Promise<User> 
 
     await createNewUserDoc(user.uid, credentials.username, credentials.email);
     const userDoc = await getUserById(user.uid);
-    return userDoc;
-  } catch (error) {
-    throw new Error("Error signing up user: " + error);
+    return { success: true, user: userDoc };
+  } catch (error: any) {
+    // Handle Firebase authentication errors gracefully
+    if (error.code === "auth/email-already-in-use") {
+      return { success: false, error: "Email already in use. Please use a different email" };
+    } else if (error.code === "auth/invalid-email") {
+      return { success: false, error: "Invalid email format" };
+    } else if (error.code === "auth/weak-password") {
+      return { success: false, error: "Password is too weak. Please choose a stronger password" };
+    } else if (error.code === "auth/network-request-failed") {
+      return { success: false, error: "Network error. Please check your connection" };
+    } else {
+      // For any other Firebase errors, return a generic user-friendly message
+      return { success: false, error: "Signup failed. Please try again" };
+    }
   }
 };
 
@@ -90,16 +115,6 @@ export const getCurrentUser = async (): Promise<User | null> => {
     console.error("Error getting current user:", error);
     return null;
   }
-};
-
-/**
- * Update user profile information
- * @param userData - User data to update
- * @returns Updated user object
- */
-export const updateUserProfile = async (userData: Partial<User>): Promise<User> => {
-  // TODO: Implement user profile update
-  throw new Error("Not implemented");
 };
 
 /**

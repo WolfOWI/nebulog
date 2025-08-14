@@ -13,6 +13,7 @@ import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
+import isEmail from "validator/lib/isEmail";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,8 +23,21 @@ export default function Login() {
   const { user } = useUser();
 
   const handleLogin = async () => {
+    // Check if email and password are filled
     if (!email || !password) {
       setError("Please fill in all fields");
+      return;
+    }
+
+    // Check if email is valid
+    if (!isEmail(email)) {
+      setError("The email you entered is not valid");
+      return;
+    }
+
+    // Check if password is valid
+    if (password.length < 6) {
+      setError("Your password must be at least 6 characters long");
       return;
     }
 
@@ -31,12 +45,18 @@ export default function Login() {
     setError("");
 
     try {
-      await logInUser({ email, password });
-      // Navigate to home after successful login
-      router.replace("/(app)/home" as any);
+      const result = await logInUser({ email, password });
+
+      if (result.success && result.user) {
+        // Navigate to home after successful login
+        router.replace("/(app)/home" as any);
+      } else {
+        // Show error message from the service
+        setError(result.error || "Login failed");
+      }
     } catch (error) {
-      console.error("Error logging in user: ", error);
-      setError("Invalid email or password");
+      console.error("Unexpected error during login: ", error);
+      setError("An unexpected error occurred. Please try again");
     } finally {
       setIsLoading(false);
     }
@@ -74,10 +94,12 @@ export default function Login() {
               <Input variant="outline">
                 <InputField
                   placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
+                  value={email.toLowerCase().trim()}
+                  onChangeText={(text) => setEmail(text.toLowerCase().trim())}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  inputMode="email"
+                  maxLength={50}
                 />
               </Input>
             </FormControl>
@@ -94,6 +116,8 @@ export default function Login() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
+                  inputMode="text"
+                  maxLength={50}
                 />
               </Input>
             </FormControl>

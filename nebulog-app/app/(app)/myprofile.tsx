@@ -9,7 +9,6 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, View, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { logOutUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";

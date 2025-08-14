@@ -28,7 +28,6 @@ export default function EditProfile() {
   const [bio, setBio] = useState("");
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
   const [profileColor, setProfileColor] = useState("#4ECDC4");
-  const [showErrorTooltip, setShowErrorTooltip] = useState(true); // Temporary for styling
 
   const maxBioCharacters = 100;
   const isApproachingBioLimit =
@@ -214,7 +213,6 @@ export default function EditProfile() {
                 value={username.toLowerCase().trim()}
                 onChangeText={(text) => setUsername(text.toLowerCase().trim())}
                 placeholder="Enter a username"
-                className="text-typography-900"
                 inputMode="text"
                 maxLength={20}
                 autoCapitalize="none"

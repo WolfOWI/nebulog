@@ -13,6 +13,7 @@ import { signUpUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
+import isEmail from "validator/lib/isEmail";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -24,6 +25,22 @@ export default function Signup() {
   const { user } = useUser();
 
   const handleSignup = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (name.length < 3) {
+      setError("Username must be at least 3 characters long");
+      return;
+    }
+
+    // Check if email is valid
+    if (!isEmail(email)) {
+      setError("The email you entered is not valid");
+      return;
+    }
+
     if (password.length < 6) {
       setError("Password must be at least 6 characters long");
       return;
@@ -34,21 +51,22 @@ export default function Signup() {
       return;
     }
 
-    if (!name || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields");
-      return;
-    }
-
     setIsLoading(true);
     setError("");
 
     try {
-      await signUpUser({ username: name, email, password });
-      // Navigate to home after successful signup
-      router.replace("/(app)/home" as any);
+      const result = await signUpUser({ username: name, email, password });
+
+      if (result.success && result.user) {
+        // Navigate to home after successful signup
+        router.replace("/(app)/home" as any);
+      } else {
+        // Show error message from the service
+        setError(result.error || "Signup failed");
+      }
     } catch (error) {
-      console.error("Error creating user: ", error);
-      setError("Error creating account. Please try again.");
+      console.error("Unexpected error during signup: ", error);
+      setError("An unexpected error occurred. Please try again");
     } finally {
       setIsLoading(false);
     }
@@ -87,10 +105,12 @@ export default function Signup() {
               </FormControlLabel>
               <Input>
                 <InputField
-                  placeholder="Enter your username"
-                  value={name}
-                  onChangeText={setName}
+                  placeholder="Enter a username"
+                  value={name.toLowerCase().trim()}
+                  onChangeText={(text) => setName(text.toLowerCase().trim())}
                   autoCapitalize="none"
+                  inputMode="text"
+                  maxLength={20}
                 />
               </Input>
             </FormControl>
@@ -104,10 +124,12 @@ export default function Signup() {
               <Input>
                 <InputField
                   placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
+                  value={email.toLowerCase().trim()}
+                  onChangeText={(text) => setEmail(text.toLowerCase().trim())}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  inputMode="email"
+                  maxLength={50}
                 />
               </Input>
             </FormControl>
@@ -124,6 +146,8 @@ export default function Signup() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
+                  inputMode="text"
+                  maxLength={50}
                 />
               </Input>
             </FormControl>
@@ -140,6 +164,8 @@ export default function Signup() {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
+                  inputMode="text"
+                  maxLength={50}
                 />
               </Input>
             </FormControl>
