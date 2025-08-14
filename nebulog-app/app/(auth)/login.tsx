@@ -42,32 +42,9 @@ export default function Login() {
     }
   };
 
-  // Temporary Quick Login
-  // TODO: Remove this later
-  const tempQuickLogin = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await logInUser({ email: "wolf@gmail.com", password: "123456" });
-      // Navigate to home after successful login
-      router.replace("/(app)/home" as any);
-    } catch (error) {
-      console.error("Error logging in user: ", error);
-      setError("Invalid email or password");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-background-0">
       <ScrollView>
-        {/* TODO: Remove this later */}
-        <Button className="mt-4" onPress={tempQuickLogin} disabled={isLoading}>
-          <ButtonText>{isLoading ? "Quick Login" : "Quick Login"}</ButtonText>
-        </Button>
-        {/* ---------------------------- */}
         <VStack className="flex-1 justify-center items-center px-6 py-8">
           {/* Logo */}
           <Image source={nebulogText} className="w-[150px] h-6 object-cover mb-12" />
