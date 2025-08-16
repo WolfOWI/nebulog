@@ -14,6 +14,7 @@ import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 import isEmail from "validator/lib/isEmail";
+import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -64,6 +65,13 @@ export default function Login() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
+      <View className="m-4">
+        <LeftwardSwipeBtn
+          onSwipeComplete={() => router.dismissTo("/onboarding" as any)}
+          iconName="arrow-back"
+          touchMessage="Swipe to Go Back"
+        />
+      </View>
       <ScrollView>
         <VStack className="flex-1 justify-center items-center px-6 py-8">
           {/* Logo */}
@@ -74,7 +82,7 @@ export default function Login() {
             <Heading className="text-typography-900 text-2xl font-bold mb-2">Welcome Back</Heading>
             <HStack className="">
               <Text className="text-typography-600">Don't have an account? </Text>
-              <Link href="/signup" asChild>
+              <Link href="/(auth)/signup" asChild>
                 <Text className="text-primary-600 font-bold">Join us</Text>
               </Link>
             </HStack>

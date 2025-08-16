@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -68,6 +68,16 @@ export default function LaunchThoughtSwipeBtn({
         });
       }
     });
+
+  // After the swipe is complete, after a short while, reset the button to the starting position
+  useEffect(() => {
+    if (translateX.value > 0) {
+      translateX.value = withSpring(0, {
+        damping: 20,
+        stiffness: 150,
+      });
+    }
+  }, [translateX.value]);
 
   // Create the animated style for the button
   const animatedStyle = useAnimatedStyle(() => {

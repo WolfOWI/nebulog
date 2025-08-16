@@ -15,8 +15,8 @@ export default function Index() {
       // User is authenticated, redirect to home
       router.replace("/(app)/home" as any);
     } else {
-      // User is not authenticated, redirect to login
-      router.replace("/(auth)/login" as any);
+      // User is not authenticated, redirect to onboarding
+      router.replace("/onboarding" as any);
     }
   }, [user, loading]);
 
