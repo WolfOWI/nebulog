@@ -83,10 +83,10 @@ const EditReflection = () => {
     setComment(text.slice(0, maxCharacters));
   };
 
-  const showValidationError = (message: string) => {
+  const showValidationError = (title: string, message: string) => {
     Toast.show({
       type: "error",
-      text1: "Error Updating Reflection",
+      text1: title,
       text2: message,
       position: "top",
       visibilityTime: 4000,
@@ -95,11 +95,11 @@ const EditReflection = () => {
     });
   };
 
-  const showSuccessToast = () => {
+  const showSuccessToast = (title: string, message: string) => {
     Toast.show({
       type: "success",
-      text1: "Reflection Updated",
-      text2: "Your reflection has been successfully updated.",
+      text1: title,
+      text2: message,
       position: "top",
       visibilityTime: 4000,
       autoHide: true,
@@ -109,19 +109,22 @@ const EditReflection = () => {
 
   const handleUpdate = async () => {
     if (!user?.id || !reflectionData?.id) {
-      showValidationError("User ID or reflection ID not found");
+      showValidationError("Error Updating Reflection", "User ID or reflection ID not found");
       return;
     }
 
     // Check if comment is filled
     if (!comment.trim()) {
-      showValidationError("Your reflection can't be empty");
+      showValidationError("Error Updating Reflection", "Your reflection can't be empty");
       return;
     }
 
     // Check if location is required and available
     if (isLocationOn && !selectedLocation && !originalLocation) {
-      showValidationError("You must select a location if you want to make your reflection public");
+      showValidationError(
+        "Error Updating Reflection",
+        "You must select a location if you want to make your reflection public"
+      );
       return;
     }
 
@@ -161,12 +164,15 @@ const EditReflection = () => {
       await updateReflection(reflectionData.id, updates);
 
       // Show success toast
-      showSuccessToast();
+      showSuccessToast("Success", "Your reflection has been successfully updated.");
 
       router.push("/(app)/myprofile" as any);
     } catch (error) {
       console.error("Error updating reflection:", error);
-      showValidationError("Failed to update reflection. Please try again.");
+      showValidationError(
+        "Error Updating Reflection",
+        "Failed to update reflection. Please try again."
+      );
     }
   };
 

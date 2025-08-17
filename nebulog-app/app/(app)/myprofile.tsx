@@ -26,6 +26,7 @@ import {
 import { getBlockedUsers, unblockUser } from "@/services/userServices";
 import UserReflectionCard from "@/components/cards/UserReflectionCard";
 import EchoedReflectionCard from "@/components/cards/EchoedReflectionCard";
+import Toast from "react-native-toast-message";
 
 type TabType = "reflections" | "echoed" | "blocked";
 
@@ -160,6 +161,30 @@ export default function MyProfile() {
     }
   };
 
+  const showValidationError = (title: string, message: string) => {
+    Toast.show({
+      type: "error",
+      text1: title,
+      text2: message,
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
+  const showSuccessToast = (title: string, message: string) => {
+    Toast.show({
+      type: "success",
+      text1: title,
+      text2: message,
+      position: "top",
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
   // TODO: Store reflections in context
   useEffect(() => {
     if (user) {
@@ -187,10 +212,13 @@ export default function MyProfile() {
         totalReflections: user.totalReflections - 1,
       });
 
-      // TODO: Add toast notification for success
+      showSuccessToast("Reflection Deleted", "Your reflection has been successfully deleted.");
     } catch (error) {
       console.error("Error deleting reflection:", error);
-      // TODO: Add toast notification for error
+      showValidationError(
+        "Error Deleting Reflection",
+        "Failed to delete reflection. Please try again."
+      );
     }
   };
 

@@ -204,28 +204,28 @@ export default function Home() {
   };
 
   // Get streak status message
-  const getStreakStatusMessage = () => {
-    if (!user?.lastReflectDate) {
-      return "Start your journey today!";
-    }
+  // const getStreakStatusMessage = () => {
+  //   if (!user?.lastReflectDate) {
+  //     return "Start your journey today!";
+  //   }
 
-    const today = new Date();
-    const lastReflection = new Date(user.lastReflectDate);
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const lastReflectionStart = new Date(
-      lastReflection.getFullYear(),
-      lastReflection.getMonth(),
-      lastReflection.getDate()
-    );
+  //   const today = new Date();
+  //   const lastReflection = new Date(user.lastReflectDate);
+  //   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  //   const lastReflectionStart = new Date(
+  //     lastReflection.getFullYear(),
+  //     lastReflection.getMonth(),
+  //     lastReflection.getDate()
+  //   );
 
-    if (todayStart.getTime() === lastReflectionStart.getTime()) {
-      return "You've reflected today!";
-    } else if (todayStart.getTime() - lastReflectionStart.getTime() === 24 * 60 * 60 * 1000) {
-      return "Keep the streak going!";
-    } else {
-      return "Time to reflect again!";
-    }
-  };
+  //   if (todayStart.getTime() === lastReflectionStart.getTime()) {
+  //     return "You've reflected today!";
+  //   } else if (todayStart.getTime() - lastReflectionStart.getTime() === 24 * 60 * 60 * 1000) {
+  //     return "Keep the streak going!";
+  //   } else {
+  //     return "Time to reflect again!";
+  //   }
+  // };
 
   // Show streak celebration message
   const showStreakCelebration = (newStreak: number) => {
@@ -337,15 +337,6 @@ export default function Home() {
             opacity: isReflectionPanelOpen ? 0 : 1,
           }}
         >
-          {/* TODO: Add a switch to toggle between my reflections and all reflections */}
-          <CircularSwitchBtn
-            onToggle={() => {
-              console.log("pressed");
-            }}
-            onText="Me"
-            offText="All"
-            size={56}
-          />
           <CircleHoldBtn
             onHoldComplete={handlePresentModalPress}
             holdDuration={300}
@@ -408,14 +399,17 @@ export default function Home() {
                       {user?.streakCount || 0} day
                       {(user?.streakCount || 0) == 1 ? "" : "s"}
                     </Text>
-                    <Text
-                      className="text-typography-600"
-                      size="xs"
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {getStreakStatusMessage()}
-                    </Text>
+                    {/* If user has reflected today, show "You've already reflected today!" */}
+                    {user?.lastReflectDate && validateStreak(user.lastReflectDate).isValid && (
+                      <Text
+                        className="text-typography-600"
+                        size="xs"
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        You've reflected today!
+                      </Text>
+                    )}
                   </VStack>
                 </HStack>
                 <HStack className="flex-1 gap-2 items-center w-1/2 overflow-hidden">
