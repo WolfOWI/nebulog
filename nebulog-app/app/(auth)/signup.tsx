@@ -15,6 +15,7 @@ import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 import isEmail from "validator/lib/isEmail";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -59,8 +60,10 @@ export default function Signup() {
       const result = await signUpUser({ username: name, email, password });
 
       if (result.success && result.user) {
-        // Navigate to home after successful signup
-        router.replace("/(app)/home" as any);
+        // Navigate to home after successful signup (show loading screen for atleast 2 seconds)
+        setTimeout(() => {
+          router.replace("/(app)/home" as any);
+        }, 2000);
       } else {
         // Show error message from the service
         setError(result.error || "Signup failed");
@@ -69,9 +72,22 @@ export default function Signup() {
       console.error("Unexpected error during signup: ", error);
       setError("An unexpected error occurred. Please try again");
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000); // Show loading screen for atleast 2 seconds
     }
   };
+
+  if (isLoading) {
+    return (
+      <LoadingScreen
+        loadingText="Creating Your Account"
+        showText={true}
+        size={300}
+        animationSource={require("@/assets/animations/astronaut-animation.json")}
+      />
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">

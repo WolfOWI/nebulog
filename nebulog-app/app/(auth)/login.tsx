@@ -15,6 +15,7 @@ import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 import isEmail from "validator/lib/isEmail";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -49,8 +50,10 @@ export default function Login() {
       const result = await logInUser({ email, password });
 
       if (result.success && result.user) {
-        // Navigate to home after successful login
-        router.replace("/(app)/home" as any);
+        // Navigate to home after successful login (show loading screen for atleast 2 seconds)
+        setTimeout(() => {
+          router.replace("/(app)/home" as any);
+        }, 2000);
       } else {
         // Show error message from the service
         setError(result.error || "Login failed");
@@ -59,9 +62,22 @@ export default function Login() {
       console.error("Unexpected error during login: ", error);
       setError("An unexpected error occurred. Please try again");
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2000); // Show loading screen for atleast 2 seconds
     }
   };
+
+  if (isLoading) {
+    return (
+      <LoadingScreen
+        loadingText="Logging In"
+        showText={true}
+        size={300}
+        animationSource={require("@/assets/animations/astronaut-animation.json")}
+      />
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
