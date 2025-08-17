@@ -69,7 +69,7 @@ export default function Onboarding() {
         </View>
         <VStack className="items-center gap-2">
           <Text className="text-typography-900 text-2xl font-bold text-center">{item.title}</Text>
-          <Text className="text-typography-600 text-center">{item.description}</Text>
+          <Text className="text-typography-500 text-center px-4">{item.description}</Text>
         </VStack>
       </View>
     );

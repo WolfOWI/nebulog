@@ -1,7 +1,14 @@
 /**
- * Streak Utility Functions
- * Handles streak validation and calculation for habit tracking
+ * Calculate the number of days between two dates
+ * @param date1 - First date
+ * @param date2 - Second date
+ * @returns Number of days between the dates
  */
+const getDaysBetween = (date1: Date, date2: Date): number => {
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const diffTime = Math.abs(date2.getTime() - date1.getTime());
+  return Math.round(diffTime / oneDay);
+};
 
 /**
  * Check if a user's streak is still valid based on their last reflection date
@@ -17,7 +24,7 @@ export const validateStreak = (lastReflectDate?: string) => {
   const lastReflection = new Date(lastReflectDate);
   const today = new Date();
 
-  // Reset time to start of day
+  // Reset time to start of day for accurate day calculation
   const lastReflectionStart = new Date(
     lastReflection.getFullYear(),
     lastReflection.getMonth(),
@@ -25,8 +32,7 @@ export const validateStreak = (lastReflectDate?: string) => {
   );
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const timeDiff = todayStart.getTime() - lastReflectionStart.getTime();
-  const daysSinceLastReflection = Math.floor(timeDiff / (1000 * 3600 * 24));
+  const daysSinceLastReflection = getDaysBetween(lastReflectionStart, todayStart);
 
   // Streak is valid if the reflection wasn't more than 1 day ago
   const isValid = daysSinceLastReflection <= 1;
@@ -35,7 +41,6 @@ export const validateStreak = (lastReflectDate?: string) => {
     lastReflectDate,
     lastReflectionStart: lastReflectionStart.toISOString(),
     todayStart: todayStart.toISOString(),
-    timeDiff,
     daysSinceLastReflection,
     isValid,
   });
@@ -57,12 +62,12 @@ export const calculateNewStreak = (currentStreak: number, lastReflectDate?: stri
     return 1; // First reflection ever
   }
 
-  const { isValid, daysSinceLastReflection } = validateStreak(lastReflectDate);
-  console.log("calculateNewStreak: Streak validation:", { isValid, daysSinceLastReflection });
+  const { daysSinceLastReflection } = validateStreak(lastReflectDate);
+  console.log("calculateNewStreak: Days since last reflection:", daysSinceLastReflection);
 
   let newStreak: number;
   if (daysSinceLastReflection === 0) {
-    // Same day reflection: if current streak is 0, make it 1; otherwise keep current streak
+    // Same day reflection: keep current streak or set to 1 if it was 0
     newStreak = currentStreak === 0 ? 1 : currentStreak;
     console.log("calculateNewStreak: Same day reflection, setting streak to:", newStreak);
   } else if (daysSinceLastReflection === 1) {
@@ -70,7 +75,7 @@ export const calculateNewStreak = (currentStreak: number, lastReflectDate?: stri
     newStreak = currentStreak + 1;
     console.log("calculateNewStreak: Consecutive day, incrementing streak to:", newStreak);
   } else {
-    // Gap in streak, reset to 1 (will become active streak)
+    // Gap in streak (more than 1 day), reset to 1
     newStreak = 1;
     console.log("calculateNewStreak: Gap in streak, resetting to 1");
   }
@@ -90,12 +95,12 @@ export const shouldResetStreak = (lastReflectDate?: string): boolean => {
     return false; // No previous reflections, don't reset
   }
 
-  const { isValid, daysSinceLastReflection } = validateStreak(lastReflectDate);
-  const shouldReset = !isValid && daysSinceLastReflection > 1;
+  const { daysSinceLastReflection } = validateStreak(lastReflectDate);
+  // Only reset if more than 1 day has passed since last reflection
+  const shouldReset = daysSinceLastReflection > 1;
 
   console.log("shouldResetStreak:", {
     lastReflectDate,
-    isValid,
     daysSinceLastReflection,
     shouldReset,
   });

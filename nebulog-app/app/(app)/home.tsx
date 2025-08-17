@@ -24,7 +24,7 @@ export default function Home() {
   const { user, validateAndUpdateStreak, refreshUserData } = useUser();
   const insets = useSafeAreaInsets();
 
-  // Validate streak when component mounts
+  // On mount, validate streak (only once)
   useEffect(() => {
     if (user?.id) {
       console.log("Home: User data on mount:", {
@@ -35,7 +35,7 @@ export default function Home() {
       });
       validateAndUpdateStreak();
     }
-  }, [user?.id, validateAndUpdateStreak]);
+  }, [user?.id]);
 
   // Show streak status when returning to home screen
   useEffect(() => {

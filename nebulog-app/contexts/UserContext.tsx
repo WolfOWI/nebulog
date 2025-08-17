@@ -25,6 +25,7 @@ const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isValidatingStreak, setIsValidatingStreak] = useState(false);
 
   // Update user state when auth state changes
   useEffect(() => {
@@ -77,13 +78,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       unsubscribeTotalEchoes();
     };
   }, [user?.id]);
-
-  // Validate streak when user data changes (e.g., when app opens)
-  useEffect(() => {
-    if (user?.id && user.lastReflectDate) {
-      validateAndUpdateStreak();
-    }
-  }, [user?.id, user?.lastReflectDate]);
 
   const updateUserContext = (updates: Partial<User>) => {
     setUser((currentUser) => {
@@ -184,19 +178,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    try {
-      // console.log("validateAndUpdateStreak: Checking streak for user", user.id);
-      // console.log("validateAndUpdateStreak: Current streak count:", user.streakCount);
-      // console.log("validateAndUpdateStreak: Last reflect date:", user.lastReflectDate);
+    if (isValidatingStreak) {
+      console.log("validateAndUpdateStreak: Already validating streak, skipping");
+      return;
+    }
 
+    setIsValidatingStreak(true);
+
+    try {
       // Check if streak should be reset
       const shouldReset = shouldResetStreak(user.lastReflectDate);
-      // console.log("validateAndUpdateStreak: Should reset streak?", shouldReset);
+      console.log("validateAndUpdateStreak: Should reset streak?", shouldReset);
 
       if (shouldReset) {
-        // console.log("validateAndUpdateStreak: Resetting streak to 0");
-        // Update database
-        await updateUserDetails(user.id, { streakCount: 0 });
+        console.log("validateAndUpdateStreak: Resetting streak to 0");
+
+        // Only update database if the streak count is different
+        if (user.streakCount !== 0) {
+          await updateUserDetails(user.id, { streakCount: 0 });
+        }
 
         // Update local state
         setUser((currentUser) => {
@@ -215,6 +215,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error("Error validating streak:", error);
+    } finally {
+      setIsValidatingStreak(false);
     }
   };
 
