@@ -268,7 +268,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
 
   return (
-    // TODO: Setup stylisation between true and false isLiked states
     <Animated.View style={animatedStyle}>
       <GestureDetector gesture={swipeDownGesture}>
         <View

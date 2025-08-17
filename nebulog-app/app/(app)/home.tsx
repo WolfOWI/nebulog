@@ -6,11 +6,11 @@ import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { router } from "expo-router";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { ScrollView, View, Pressable } from "react-native";
+import { ScrollView, View, Pressable, Dimensions } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import MapComponent from "@/components/map/Map";
-import { Location as LocationType } from "@/lib/types";
+import { Location as LocationType, PlaceDetails } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
 import Toast from "react-native-toast-message";
 import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
@@ -18,11 +18,18 @@ import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
+import CircleHoldTextBtn from "@/components/buttons/CircleHoldTextBtn";
 import { validateStreak } from "@/utils/streakUtility";
+import { useLocation } from "@/contexts/LocationContext";
+import { reverseGeocode } from "@/services/placesServices";
 
 export default function Home() {
   const { user, validateAndUpdateStreak, refreshUserData } = useUser();
+  const { setSelectedLocation } = useLocation();
   const insets = useSafeAreaInsets();
+
+  // State for selected map location
+  const [selectedMapLocation, setSelectedMapLocation] = useState<PlaceDetails | null>(null);
 
   // On mount, validate streak (only once)
   useEffect(() => {
@@ -76,15 +83,33 @@ export default function Home() {
 
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const handleSheetChanges = useCallback((index: number) => {
-    // console.log("handleSheetChanges", index);
-  }, []);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      // console.log("handleSheetChanges", index);
+
+      // Clear selected location when bottom sheet is closed (index = -1)
+      if (index === -1 && selectedMapLocation) {
+        setSelectedMapLocation(null);
+      }
+    },
+    [selectedMapLocation]
+  );
   const handlePresentModalPress = useCallback(() => {
+    // Clear any selected location when opening the bottom sheet
+    if (selectedMapLocation) {
+      setSelectedMapLocation(null);
+    }
+
     bottomSheetRef.current?.expand();
-  }, []);
+  }, [selectedMapLocation]);
   const handleDismiss = useCallback(() => {
+    // Clear any selected location when dismissing the bottom sheet
+    if (selectedMapLocation) {
+      setSelectedMapLocation(null);
+    }
+
     bottomSheetRef.current?.close();
-  }, []);
+  }, [selectedMapLocation]);
 
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
@@ -97,10 +122,15 @@ export default function Home() {
   // Reflection Panel State
   const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
   const [isRefreshingStreak, setIsRefreshingStreak] = useState(false);
-
+  const [isLocationPanelOpen, setIsLocationPanelOpen] = useState(false);
   // Get Location of User
   const handleGetLocation = async () => {
     try {
+      // Clear any selected location when user chooses to go to their current location
+      if (selectedMapLocation) {
+        setSelectedMapLocation(null);
+      }
+
       if (mapRef.current.getCurrentLocation) {
         await mapRef.current.getCurrentLocation();
       }
@@ -112,13 +142,13 @@ export default function Home() {
   // Refresh map
   const handleRefreshMap = async () => {
     try {
+      // Clear any selected location when refreshing the map
+      if (selectedMapLocation) {
+        setSelectedMapLocation(null);
+      }
+
       if (mapRef.current.refreshReflections) {
         await mapRef.current.refreshReflections();
-        // Toast.show({
-        //   type: "success",
-        //   text1: "Map Refreshed",
-        //   text2: "Reflections updated successfully",
-        // });
       }
     } catch (error) {
       console.error("Error refreshing map:", error);
@@ -203,30 +233,6 @@ export default function Home() {
     }
   };
 
-  // Get streak status message
-  // const getStreakStatusMessage = () => {
-  //   if (!user?.lastReflectDate) {
-  //     return "Start your journey today!";
-  //   }
-
-  //   const today = new Date();
-  //   const lastReflection = new Date(user.lastReflectDate);
-  //   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  //   const lastReflectionStart = new Date(
-  //     lastReflection.getFullYear(),
-  //     lastReflection.getMonth(),
-  //     lastReflection.getDate()
-  //   );
-
-  //   if (todayStart.getTime() === lastReflectionStart.getTime()) {
-  //     return "You've reflected today!";
-  //   } else if (todayStart.getTime() - lastReflectionStart.getTime() === 24 * 60 * 60 * 1000) {
-  //     return "Keep the streak going!";
-  //   } else {
-  //     return "Time to reflect again!";
-  //   }
-  // };
-
   // Show streak celebration message
   const showStreakCelebration = (newStreak: number) => {
     if (newStreak > 1) {
@@ -290,9 +296,90 @@ export default function Home() {
   const handleReflectionPanelChange = (isOpen: boolean) => {
     setIsReflectionPanelOpen(isOpen);
     if (isOpen) {
+      // Clear any selected location when opening a reflection panel
+      if (selectedMapLocation) {
+        setSelectedMapLocation(null);
+      }
+
       bottomSheetRef.current?.close();
     }
   };
+
+  // Handle Location Panel Change (close bottom sheet if open)
+  const handleLocationPanelChange = (isOpen: boolean) => {
+    setIsLocationPanelOpen(isOpen);
+    if (isOpen) {
+      bottomSheetRef.current?.close();
+    }
+
+    // Clear selected location when location panel is closed
+    if (!isOpen && selectedMapLocation) {
+      setSelectedMapLocation(null);
+    }
+  };
+
+  // Handle map tap to select location (only called for taps on empty map areas)
+  const handleMapTap = async (event: any) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+
+    try {
+      const placeDetails = await reverseGeocode(latitude, longitude);
+
+      if (placeDetails) {
+        setSelectedMapLocation(placeDetails);
+
+        // Center the map on the selected location
+        if (mapRef.current && mapRef.current.centerMap) {
+          mapRef.current.centerMap(latitude, longitude);
+        }
+
+        Toast.show({
+          type: "info",
+          text1: "Location Selected",
+          text2: placeDetails.formatted_address || "Swipe to reflect here",
+          position: "top",
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 50,
+        });
+      }
+    } catch (error) {
+      console.error("Error getting place details:", error);
+
+      Toast.show({
+        type: "error",
+        text1: "Error Selecting Location.",
+        text2: "Could not determine location details.",
+        position: "top",
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 50,
+      });
+    }
+  };
+
+  // Clear selected location
+  const clearSelectedLocation = () => {
+    setSelectedMapLocation(null);
+  };
+
+  // Handle creating thought at selected location
+  const handleCreateThoughtAtLocation = () => {
+    if (!selectedMapLocation) return;
+
+    // Set the selected location in context
+    setSelectedLocation(selectedMapLocation);
+
+    // Clear the selected map location
+    setSelectedMapLocation(null);
+
+    // Navigate to thought launch
+    router.push("/thoughtlaunch" as any);
+  };
+
+  useEffect(() => {
+    console.log("selectedMapLocation", selectedMapLocation);
+  }, [selectedMapLocation]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -301,6 +388,11 @@ export default function Home() {
           ref={mapRef}
           className="absolute inset-0 z-0"
           onReflectionPanelChange={handleReflectionPanelChange}
+          onMapTap={handleMapTap}
+          onClearSelectedLocation={clearSelectedLocation}
+          onCreateThought={handleCreateThoughtAtLocation}
+          selectedLocation={selectedMapLocation}
+          onLocationPanelChange={handleLocationPanelChange}
         />
 
         {/* Top Screen overlay */}
@@ -325,7 +417,15 @@ export default function Home() {
               size="large"
             />
 
-            <AvatarHoldBtn onHoldComplete={() => router.push("/myprofile" as any)} />
+            <AvatarHoldBtn
+              onHoldComplete={() => {
+                // Clear any selected location when navigating to profile
+                if (selectedMapLocation) {
+                  setSelectedMapLocation(null);
+                }
+                router.push("/myprofile" as any);
+              }}
+            />
           </HStack>
         </HStack>
 
@@ -334,7 +434,7 @@ export default function Home() {
           className="absolute bottom-0 left-0 right-0 items-end px-4 gap-8 justify-end"
           style={{
             paddingBottom: insets.bottom,
-            opacity: isReflectionPanelOpen ? 0 : 1,
+            opacity: isReflectionPanelOpen || isLocationPanelOpen ? 0 : 1,
           }}
         >
           <CircleHoldBtn
@@ -362,7 +462,13 @@ export default function Home() {
           <BottomSheetView className="flex-1 px-6 pt-4 pb-8">
             <VStack className="items-center mb-6 gap-6">
               <LaunchThoughtSwipeBtn
-                onSwipeComplete={() => router.push("/thoughtlaunch" as any)}
+                onSwipeComplete={() => {
+                  // Clear any selected location when launching thought from bottom sheet
+                  if (selectedMapLocation) {
+                    setSelectedMapLocation(null);
+                  }
+                  router.push("/thoughtlaunch" as any);
+                }}
                 iconName="rocket-launch"
                 displayMessage="What's on your mind?"
               />

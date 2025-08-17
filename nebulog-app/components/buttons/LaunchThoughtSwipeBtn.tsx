@@ -17,6 +17,7 @@ interface LaunchThoughtSwipeBtnProps {
   threshold?: number; // How much to swipe before triggering (0-1)
   displayMessage: string;
   className?: string;
+  size?: "small" | "standard";
 }
 
 export default function LaunchThoughtSwipeBtn({
@@ -25,6 +26,7 @@ export default function LaunchThoughtSwipeBtn({
   threshold = 0.3,
   displayMessage,
   className,
+  size = "standard",
 }: LaunchThoughtSwipeBtnProps) {
   // Track the button's position
   const translateX = useSharedValue(0);
@@ -98,16 +100,28 @@ export default function LaunchThoughtSwipeBtn({
         className={`bg-slate-900 w-full ${className} relative rounded-full`}
         onLayout={handleLayout}
       >
-        <View className="absolute top-0 left-0 right-0 bottom-0 flex-row justify-start items-center z-1000 gap-4">
+        <View
+          className={`absolute top-0 left-0 right-0 bottom-0 flex-row justify-start items-center z-1000 overflow-hidden ${
+            size === "small" ? "gap-1" : "gap-4"
+          }`}
+        >
           <View className="w-16 h-16" />
-          <Text className="text-typography-900 text-center" size="lg">
+          <Text
+            className="text-typography-900 text-center line-clamp-1 truncate"
+            size={size === "small" ? "md" : "lg"}
+          >
             {displayMessage}
           </Text>
         </View>
 
         {/* The animated button */}
         <Animated.View style={[animatedStyle]}>
-          <CircleBtn primary iconName={iconName} className="self-start" size="large" />
+          <CircleBtn
+            primary
+            iconName={iconName}
+            className="self-start"
+            size={size === "small" ? "medium" : "large"}
+          />
         </Animated.View>
       </View>
     </GestureDetector>

@@ -95,3 +95,44 @@ export const getPlaceDetails = async (placeId: string): Promise<PlaceDetails | n
     return null;
   }
 };
+
+export const reverseGeocode = async (
+  latitude: number,
+  longitude: number
+): Promise<PlaceDetails | null> => {
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${Constants.expoConfig?.extra?.GOOGLE_PLATFORM_API_KEY}`
+    );
+
+    const data = await response.json();
+
+    // console.log("Reverse geocoding data:", data);
+
+    if (data.status === "OK" && data.results && data.results.length > 0) {
+      const result = data.results[0];
+
+      // Create a PlaceDetails object from the geocoding result
+      const placeDetails: PlaceDetails = {
+        place_id: result.place_id,
+        name: result.formatted_address.split(",")[0], // Only show the first little section of the address
+        formatted_address: result.formatted_address,
+        geometry: {
+          location: {
+            lat: result.geometry.location.lat,
+            lng: result.geometry.location.lng,
+          },
+        },
+        address_components: result.address_components || [],
+      };
+
+      return placeDetails;
+    } else {
+      console.error("Reverse geocoding API error:", data.error_message || "No results found");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error reverse geocoding:", error);
+    return null;
+  }
+};

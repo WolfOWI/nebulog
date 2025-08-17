@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { VStack } from "@/components/ui/vstack";
 import { customMapStyle } from "@/styles/mapStyles";
 import ReflectionDetailPanel from "./ReflectionDetailPanel";
-import { Reflection } from "@/lib/types";
+import { PlaceDetails, Reflection } from "@/lib/types";
 import { getCurrentLocation } from "@/services/locationServices";
 import { getPublicReflectionsInRadius } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
@@ -13,6 +13,8 @@ import Toast from "react-native-toast-message";
 import { getMoodIcon, MoodIcons } from "@/constants/moodIcons";
 import { mood } from "@/constants/moods";
 import { ProfileIcon } from "../building-blocks/ProfileIcon";
+import { MaterialIcons } from "@expo/vector-icons";
+import LocSelectCreateBox from "./LocSelectCreateBox";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -29,8 +31,13 @@ interface MapComponentProps {
   onMarkerPress?: (marker: any) => void;
   onRegionChange?: (region: Region) => void;
   onReflectionPanelChange?: (isOpen: boolean) => void;
+  onMapTap?: (event: any) => void;
+  onClearSelectedLocation?: () => void;
+  onCreateThought?: () => void;
+  selectedLocation?: PlaceDetails | null;
   className?: string;
   ref?: React.Ref<any>;
+  onLocationPanelChange?: (isOpen: boolean) => void;
 }
 
 const MapComponent = ({
@@ -38,8 +45,13 @@ const MapComponent = ({
   onMarkerPress,
   onRegionChange,
   onReflectionPanelChange,
+  onMapTap,
+  onClearSelectedLocation,
+  onCreateThought,
+  selectedLocation,
   className,
   ref,
+  onLocationPanelChange,
 }: MapComponentProps) => {
   const { user } = useUser();
   const mapRef = useRef<MapView>(null);
@@ -146,6 +158,11 @@ const MapComponent = ({
     setSelectedReflection(reflection);
     onReflectionPanelChange?.(true);
 
+    // Clear any selected location when opening a reflection
+    if (selectedLocation && onClearSelectedLocation) {
+      onClearSelectedLocation();
+    }
+
     // Animate map to centre on the reflection
     if (mapRef.current && reflection.location) {
       mapRef.current.animateToRegion({
@@ -162,6 +179,45 @@ const MapComponent = ({
     onReflectionPanelChange?.(false);
   };
 
+  const closeSelectCreateBox = () => {
+    // Close the location panel
+    onLocationPanelChange?.(false);
+
+    // Clear the selected location to remove the marker and reset state
+    if (onClearSelectedLocation) {
+      onClearSelectedLocation();
+    }
+  };
+
+  const handleMapTap = (event: any) => {
+    // No map taps when reflection is open
+    if (selectedReflection) {
+      return;
+    }
+
+    // Check if the tap is on (or very close to) an existing reflection marker
+    const tapCoordinate = event.nativeEvent.coordinate;
+    const isNearReflection = mapReflections.some((reflection) => {
+      if (!reflection.location) return false;
+
+      const distance = Math.sqrt(
+        Math.pow(tapCoordinate.latitude - reflection.location.lat, 2) +
+          Math.pow(tapCoordinate.longitude - reflection.location.long, 2)
+      );
+      if (distance < 0.0001) {
+        return true;
+      }
+
+      return false;
+    });
+
+    // If tap is not near a reflection marker, call onMapTap
+    if (!isNearReflection && onMapTap) {
+      onMapTap(event);
+      onLocationPanelChange?.(true);
+    }
+  };
+
   // Expose methods & data through the ref
   useEffect(() => {
     if (ref && "current" in ref) {
@@ -170,6 +226,16 @@ const MapComponent = ({
         userLocation,
         getReflectionsByLocation,
         refreshReflections,
+        centerMap: (latitude: number, longitude: number) => {
+          if (mapRef.current) {
+            mapRef.current.animateToRegion({
+              latitude,
+              longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            });
+          }
+        },
       };
     }
   }, [ref, userLocation]);
@@ -187,6 +253,7 @@ const MapComponent = ({
         showsScale={false}
         toolbarEnabled={false}
         onRegionChangeComplete={handleRegionChange}
+        onPress={handleMapTap}
         customMapStyle={customMapStyle}
         scrollEnabled={!selectedReflection} // Prevent map from scrolling when reflection is open (android fix)
       >
@@ -235,6 +302,33 @@ const MapComponent = ({
             </Marker>
           );
         })}
+
+        {/* Selected location marker */}
+        {selectedLocation && (
+          <Marker
+            coordinate={{
+              latitude: selectedLocation.geometry.location.lat,
+              longitude: selectedLocation.geometry.location.lng,
+            }}
+            title={selectedLocation.name || "Selected Location"}
+            description="Tap here to create a thought"
+            onPress={() => {
+              // Center the map on the selected location when marker is tapped
+              if (mapRef.current) {
+                mapRef.current.animateToRegion({
+                  latitude: selectedLocation.geometry.location.lat,
+                  longitude: selectedLocation.geometry.location.lng,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                });
+              }
+            }}
+          >
+            <View className="w-12 h-12 rounded-full items-center justify-center">
+              <MaterialIcons name="my-location" size={32} color="white" />
+            </View>
+          </Marker>
+        )}
       </MapView>
 
       {/* Reflection Detail Panel */}
@@ -243,6 +337,15 @@ const MapComponent = ({
         onClose={closeReflection}
         className="z-999"
       />
+
+      {/* LocSelectCreateBox */}
+      {selectedLocation && (
+        <LocSelectCreateBox
+          selectedLocation={selectedLocation}
+          onClose={closeSelectCreateBox}
+          onCreateThought={onCreateThought || (() => {})}
+        />
+      )}
     </VStack>
   );
 };
