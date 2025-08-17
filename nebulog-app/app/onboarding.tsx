@@ -14,6 +14,8 @@ import CircleHoldTextBtn from "@/components/buttons/CircleHoldTextBtn";
 import onboarding1 from "@/assets/images/onboarding/onboard-01.png";
 import onboarding2 from "@/assets/images/onboarding/onboard-02.png";
 import onboarding3 from "@/assets/images/onboarding/onboard-03.png";
+import LoadingScreen from "@/components/LoadingScreen";
+import AnimatedElement from "@/components/AnimatedElement";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -77,7 +79,12 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
-      <VStack className="flex-1">
+      <AnimatedElement
+        size={1000}
+        animationSource={require("@/assets/animations/starry-bg-animation.json")}
+        className="-z-50 opacity-70"
+      />
+      <VStack className="flex-1 z-1">
         {/* Logo */}
         <View className="items-center pt-8">
           <Image source={nebulogText} className="w-[150px] h-6 object-cover" />

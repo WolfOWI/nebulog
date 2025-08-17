@@ -1,15 +1,13 @@
 import { useEffect } from "react";
 import { router } from "expo-router";
 import { useUser } from "@/contexts/UserContext";
-import { View, ActivityIndicator } from "react-native";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function Index() {
   const { user, loading } = useUser();
 
   useEffect(() => {
-    if (loading) return; // Don't navigate while loading
+    if (loading) return;
 
     if (user) {
       // User is authenticated, redirect to home
@@ -23,12 +21,11 @@ export default function Index() {
   // Show loading screen while checking authentication
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-background-0">
-        <VStack className="items-center space-y-4">
-          <ActivityIndicator size="large" color="#6366f1" />
-          <Text className="text-typography-600">Loading...</Text>
-        </VStack>
-      </View>
+      <LoadingScreen
+        loadingText="Loading"
+        size={300}
+        animationSource={require("@/assets/animations/astronaut-animation.json")}
+      />
     );
   }
 
