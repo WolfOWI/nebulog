@@ -255,7 +255,7 @@ const MapComponent = ({
         onRegionChangeComplete={handleRegionChange}
         onPress={handleMapTap}
         customMapStyle={customMapStyle}
-        scrollEnabled={!selectedReflection} // Prevent map from scrolling when reflection is open (android fix)
+        scrollEnabled={!selectedReflection && !selectedLocation} // Prevent map from scrolling when reflection or location is open (android fix)
       >
         {/* User location marker */}
         {userLocation && (
