@@ -377,9 +377,9 @@ export default function Home() {
     router.push("/thoughtlaunch" as any);
   };
 
-  useEffect(() => {
-    console.log("selectedMapLocation", selectedMapLocation);
-  }, [selectedMapLocation]);
+  // useEffect(() => {
+  //   console.log("selectedMapLocation", selectedMapLocation);
+  // }, [selectedMapLocation]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

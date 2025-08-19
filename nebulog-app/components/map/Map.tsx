@@ -15,6 +15,8 @@ import { mood } from "@/constants/moods";
 import { ProfileIcon } from "../building-blocks/ProfileIcon";
 import { MaterialIcons } from "@expo/vector-icons";
 import LocSelectCreateBox from "./LocSelectCreateBox";
+import AnimatedElement from "../AnimatedElement";
+import LoadingScreen from "../LoadingScreen";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -61,6 +63,8 @@ const MapComponent = ({
   const [mayAnimateToUserLocation, setMayAnimateToUserLocation] = useState(true);
   const [selectedReflection, setSelectedReflection] = useState<any>(null);
   const [mapReflections, setMapReflections] = useState<Reflection[]>([]);
+  const [isSearchingForReflections, setIsSearchingForReflections] = useState(false);
+  const [isFindingUserLocation, setIsFindingUserLocation] = useState(false);
 
   // On mount
   useEffect(() => {
@@ -69,10 +73,19 @@ const MapComponent = ({
 
   // Get & set location of user
   const getSetUserLocation = async () => {
-    console.log("Getting user location");
-    const loc = await getCurrentLocation();
-    if (loc) {
-      setUserLocation(loc);
+    try {
+      setIsFindingUserLocation(true);
+      console.log("Getting user location");
+      const loc = await getCurrentLocation();
+      if (loc) {
+        setUserLocation(loc);
+      }
+    } catch (error) {
+      console.error("Error getting user location:", error);
+    } finally {
+      setTimeout(() => {
+        setIsFindingUserLocation(false);
+      }, 1000);
     }
   };
 
@@ -104,7 +117,7 @@ const MapComponent = ({
   // On startup, when user location is available, get reflections of user location
   useEffect(() => {
     if (userLocation && maySearchForReflections) {
-      console.log("Getting reflections of user location", userLocation);
+      // console.log("Getting reflections of user location", userLocation);
       getReflectionsByLocation({
         latitude: userLocation.coords.latitude,
         longitude: userLocation.coords.longitude,
@@ -118,6 +131,7 @@ const MapComponent = ({
   // Handle get reflections by location (given)
   const getReflectionsByLocation = async (location: Region) => {
     try {
+      setIsSearchingForReflections(true);
       console.log(`Searching for reflections near: ${location.latitude}, ${location.longitude}`);
       const reflections = await getPublicReflectionsInRadius(
         location.latitude,
@@ -138,6 +152,10 @@ const MapComponent = ({
       }
     } catch (error) {
       console.error("Error searching reflections in area:", error);
+    } finally {
+      setTimeout(() => {
+        setIsSearchingForReflections(false);
+      }, 1500); // Show atleast for 1.5s
     }
   };
 
@@ -242,6 +260,20 @@ const MapComponent = ({
 
   return (
     <VStack className={className}>
+      {/* Finding user location animation */}
+      <AnimatedElement
+        animationSource={require("@/assets/animations/getting-location-animation.json")}
+        size={400}
+        className="z-50 mb-8"
+        isVisible={isFindingUserLocation}
+      />
+      {/* Scanning animation */}
+      <AnimatedElement
+        animationSource={require("@/assets/animations/scan-animation.json")}
+        size={500}
+        className="z-40 mb-8"
+        isVisible={isSearchingForReflections}
+      />
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -356,5 +388,6 @@ const styles = StyleSheet.create({
   map: {
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
+    zIndex: 1,
   },
 });
