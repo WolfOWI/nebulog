@@ -39,6 +39,21 @@ const EchoedReflectionCard: React.FC<EchoedReflectionCardProps> = ({ reflection 
     }
   };
 
+  const handleLocationPress = () => {
+    if (reflection.location) {
+      try {
+        router.push({
+          pathname: "/(app)/home" as any,
+          params: {
+            highlightedReflection: JSON.stringify(reflection),
+          },
+        });
+      } catch (error) {
+        console.error("Error navigating to home with reflection:", error);
+      }
+    }
+  };
+
   return (
     <View className="p-6 rounded-3xl overflow-hidden bg-background-100">
       <VStack className="gap-2">
@@ -58,9 +73,21 @@ const EchoedReflectionCard: React.FC<EchoedReflectionCardProps> = ({ reflection 
         <Text className="text-typography-600" size="md">
           {reflection.text}
         </Text>
-        <Text className="text-typography-600" size="sm">
-          {reflection.location?.placeName || "No location"}
-        </Text>
+        {reflection.location ? (
+          <Pressable onPress={handleLocationPress} className="flex-row items-center gap-1 w-fit">
+            <MaterialIcons name="location-on" size={24} color={moodData?.colorHex || "#334155"} />
+            <Text className="text-typography-600 text-sm w-fit" size="sm">
+              {reflection.location.placeName || "View on map"}
+            </Text>
+          </Pressable>
+        ) : (
+          <View className="flex-row items-center gap-1 w-fit">
+            <MaterialIcons name="location-off" size={24} color="#64748b" />
+            <Text className="text-typography-600" size="sm">
+              No location
+            </Text>
+          </View>
+        )}
         <Divider className="my-2" />
 
         {/* Author Details Section */}

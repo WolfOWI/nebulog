@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { Text } from "@/components/ui/text";
 import { HStack } from "../ui/hstack";
 import { getMoodIcon } from "@/constants/moodIcons";
@@ -10,6 +10,8 @@ import { Divider } from "../ui/divider";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { getIcon } from "@/constants/customIcons";
+import { router } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 
 // Extend dayjs with relative time plugin
 dayjs.extend(relativeTime);
@@ -24,6 +26,21 @@ const UserReflectionCard: React.FC<UserReflectionCardProps> = ({ reflection }) =
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
+
+  const handleLocationPress = () => {
+    if (reflection.location) {
+      try {
+        router.push({
+          pathname: "/(app)/home" as any,
+          params: {
+            highlightedReflection: JSON.stringify(reflection),
+          },
+        });
+      } catch (error) {
+        console.error("Error navigating to home with reflection:", error);
+      }
+    }
+  };
 
   return (
     <View className="p-6 rounded-3xl overflow-hidden bg-background-100">
@@ -46,9 +63,21 @@ const UserReflectionCard: React.FC<UserReflectionCardProps> = ({ reflection }) =
         <Text className="text-typography-600" size="md">
           {reflection.text}
         </Text>
-        <Text className="text-typography-600" size="sm">
-          {reflection.location?.placeName || "No location"}
-        </Text>
+        {reflection.location ? (
+          <Pressable onPress={handleLocationPress} className="flex-row items-center gap-1 w-fit">
+            <MaterialIcons name="location-on" size={24} color={moodData?.colorHex || "#334155"} />
+            <Text className="text-typography-600 text-sm w-fit" size="sm">
+              {reflection.location.placeName || "View on map"}
+            </Text>
+          </Pressable>
+        ) : (
+          <View className="flex-row items-center gap-1 w-fit">
+            <MaterialIcons name="location-off" size={24} color="#64748b" />
+            <Text className="text-typography-600" size="sm">
+              No location
+            </Text>
+          </View>
+        )}
         <Divider className="my-2" />
         <HStack className="flex-row justify-between items-center">
           <Text className="text-typography-600" size="sm">
