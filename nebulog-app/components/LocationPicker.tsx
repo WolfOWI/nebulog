@@ -59,8 +59,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         className={`border border-background-100 rounded-2xl p-4 ${className}`}
       >
         <HStack className="items-center gap-3">
-          <View className="w-10 h-10 bg-indigo-100 rounded-full items-center justify-center">
-            <MaterialIcons name="location-on" size={20} color="#6366f1" />
+          <View className="w-12 h-12 bg-cyan-600 rounded-full items-center justify-center">
+            <MaterialIcons name="location-on" size={24} color="#f8fafc" />
           </View>
           <VStack className="flex-1">
             <Text className="text-typography-900 font-medium" size="md">
@@ -70,7 +70,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
               {selectedLocation.formatted_address}
             </Text>
           </VStack>
-          <MaterialIcons name="edit" size={20} color="#6B7280" />
+          <MaterialIcons name="edit" size={24} color="#94a3b8" />
         </HStack>
       </Pressable>
     );
@@ -82,8 +82,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
       className={`border border-background-100 rounded-2xl p-6 ${className}`}
     >
       <VStack className="items-center gap-3">
-        <View className="w-12 h-12 bg-gray-100 rounded-full items-center justify-center">
-          <MaterialIcons name="add-location" size={24} color="#6B7280" />
+        <View className="w-12 h-12 bg-slate-800 rounded-full items-center justify-center">
+          <MaterialIcons name="add-location" size={24} color="#94a3b8" />
         </View>
         <VStack className="items-center">
           <Text className="text-typography-700 font-medium" size="md">

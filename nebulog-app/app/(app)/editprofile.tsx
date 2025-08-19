@@ -9,7 +9,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Input, InputField } from "@/components/ui/input";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
@@ -156,7 +156,7 @@ export default function EditProfile() {
   };
 
   const handleColorSelect = () => {
-    router.push("/profilecolourpick" as any);
+    router.push("/(app)/profilecolourpick" as any);
   };
 
   // At every bio input change, limit the text to the max characters
@@ -183,17 +183,17 @@ export default function EditProfile() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
-      {/* Header */}
-      <View className="m-4">
-        <LeftwardSwipeBtn
-          onSwipeComplete={handleSave}
-          iconName="check"
-          touchMessage="Swipe to Save"
-        />
-      </View>
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
+        {/* Header */}
+        <View className="m-4">
+          <LeftwardSwipeBtn
+            onSwipeComplete={handleSave}
+            iconName="check"
+            touchMessage="Swipe to Save"
+          />
+        </View>
 
-      <ScrollView className="flex-1 px-6">
-        <VStack className="flex-1">
+        <ScrollView className="flex-1 px-6">
           {/* Title */}
           <VStack className="items-center mb-8">
             <Heading className="text-typography-900 text-2xl font-bold mb-2">Edit Profile</Heading>
@@ -251,12 +251,9 @@ export default function EditProfile() {
           </VStack>
 
           {/* Profile Icon Selection */}
-          <VStack className="mb-6">
+          <Pressable onPress={handleIconSelect} className="mb-6">
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Icon</Text>
-            <Pressable
-              onPress={handleIconSelect}
-              className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl"
-            >
+            <View className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl">
               <HStack className="items-center">
                 <View
                   className="w-10 h-10 rounded-full mr-3 items-center justify-center"
@@ -269,16 +266,13 @@ export default function EditProfile() {
                 </Text>
               </HStack>
               <MaterialIcons name="chevron-right" size={24} color="#6B7280" />
-            </Pressable>
-          </VStack>
+            </View>
+          </Pressable>
 
           {/* Profile Color Selection */}
-          <VStack className="mb-8">
+          <Pressable onPress={handleColorSelect} className="mb-8">
             <Text className="text-typography-700 text-sm font-medium mb-2">Profile Color</Text>
-            <Pressable
-              onPress={handleColorSelect}
-              className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl"
-            >
+            <View className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl">
               <HStack className="items-center">
                 <View
                   className="w-10 h-10 rounded-full mr-3 border-2 border-border-200"
@@ -289,10 +283,10 @@ export default function EditProfile() {
                 </Text>
               </HStack>
               <MaterialIcons name="chevron-right" size={24} color="#6B7280" />
-            </Pressable>
-          </VStack>
-        </VStack>
-      </ScrollView>
+            </View>
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
       <View className="m-4">
         <LaunchButton
           iconName="logout"

@@ -8,7 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View, Image } from "react-native";
+import { ScrollView, View, Image, KeyboardAvoidingView } from "react-native";
 import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
@@ -81,86 +81,90 @@ export default function Login() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-0">
-      <View className="m-4">
-        <LeftwardSwipeBtn
-          onSwipeComplete={() => router.dismissTo("/onboarding" as any)}
-          iconName="arrow-back"
-          touchMessage="Swipe to Go Back"
-        />
-      </View>
-      <ScrollView>
-        <VStack className="flex-1 justify-center items-center px-6 py-8">
-          {/* Logo */}
-          <Image source={nebulogText} className="w-[150px] h-6 object-cover mb-12" />
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
+        <View className="m-4">
+          <LeftwardSwipeBtn
+            onSwipeComplete={() => router.dismissTo("/onboarding" as any)}
+            iconName="arrow-back"
+            touchMessage="Swipe to Go Back"
+          />
+        </View>
+        <ScrollView>
+          <VStack className="flex-1 justify-center items-center px-6 py-8">
+            {/* Logo */}
+            <Image source={nebulogText} className="w-[150px] h-6 object-cover mb-12" />
 
-          {/* Welcome Text */}
-          <VStack className="items-center mb-8">
-            <Heading className="text-typography-900 text-2xl font-bold mb-2">Welcome Back</Heading>
-            <HStack className="">
-              <Text className="text-typography-600">Don't have an account? </Text>
-              <Link href="/(auth)/signup" asChild>
-                <Text className="text-primary-600 font-bold">Join us</Text>
-              </Link>
-            </HStack>
-          </VStack>
+            {/* Welcome Text */}
+            <VStack className="items-center mb-8">
+              <Heading className="text-typography-900 text-2xl font-bold mb-2">
+                Welcome Back
+              </Heading>
+              <HStack className="">
+                <Text className="text-typography-600">Don't have an account? </Text>
+                <Link href="/(auth)/signup" asChild>
+                  <Text className="text-primary-600 font-bold">Join us</Text>
+                </Link>
+              </HStack>
+            </VStack>
 
-          {/* Error Message */}
-          {error ? <Text className="text-error-400 text-center mb-4">{error}</Text> : null}
+            {/* Error Message */}
+            {error ? <Text className="text-error-400 text-center mb-4">{error}</Text> : null}
 
-          {/* Login Form */}
-          <VStack className="w-full gap-4 mb-24">
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText className="text-typography-700 font-medium mb-1">
-                  Email
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input variant="outline">
-                <InputField
-                  placeholder="Enter your email"
-                  value={email.toLowerCase().trim()}
-                  onChangeText={(text) => setEmail(text.toLowerCase().trim())}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  inputMode="email"
-                  maxLength={50}
-                />
-              </Input>
-            </FormControl>
+            {/* Login Form */}
+            <VStack className="w-full gap-4 mb-24">
+              <FormControl>
+                <FormControlLabel>
+                  <FormControlLabelText className="text-typography-700 font-medium mb-1">
+                    Email
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input variant="outline">
+                  <InputField
+                    placeholder="Enter your email"
+                    value={email.toLowerCase().trim()}
+                    onChangeText={(text) => setEmail(text.toLowerCase().trim())}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    inputMode="email"
+                    maxLength={50}
+                  />
+                </Input>
+              </FormControl>
 
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText className="text-typography-700 font-medium mb-1">
-                  Password
-                </FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  inputMode="text"
-                  maxLength={50}
-                />
-              </Input>
-            </FormControl>
+              <FormControl>
+                <FormControlLabel>
+                  <FormControlLabelText className="text-typography-700 font-medium mb-1">
+                    Password
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input>
+                  <InputField
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    inputMode="text"
+                    maxLength={50}
+                  />
+                </Input>
+              </FormControl>
 
-            {/* <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
+              {/* <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
             </Button> */}
+            </VStack>
           </VStack>
-        </VStack>
-      </ScrollView>
-      <View className="m-4">
-        <LaunchButton
-          iconName="login"
-          onLaunch={handleLogin}
-          label="Hold to Log In"
-          holdDuration={500}
-          size={88}
-        />
-      </View>
+        </ScrollView>
+        <View className="m-4">
+          <LaunchButton
+            iconName="login"
+            onLaunch={handleLogin}
+            label="Hold to Log In"
+            holdDuration={500}
+            size={88}
+          />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
