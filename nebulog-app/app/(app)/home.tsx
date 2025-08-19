@@ -68,11 +68,6 @@ export default function Home() {
             topOffset: 50,
           });
         }
-
-        // Refresh map reflections to show reflection & reflections in area
-        setTimeout(() => {
-          handleRefreshMap();
-        }, 500);
       } catch (error) {
         console.error("Error accessing highlighted reflection:", error);
       }
@@ -461,7 +456,7 @@ export default function Home() {
           highlightedReflection={highlightedReflection}
           onHighlightedReflectionProcessed={() => {
             setHighlightedReflection(null);
-            handleRefreshMap();
+            // handleRefreshMap();
           }}
         />
 

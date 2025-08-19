@@ -62,16 +62,22 @@ const MapComponent = ({
   const { user } = useUser();
   const mapRef = useRef<MapView>(null);
   const currentRegionRef = useRef<Region | null>(null);
+
+  // Location state
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [maySearchForReflections, setMaySearchForReflections] = useState(true);
   const [mayAnimateToUserLocation, setMayAnimateToUserLocation] = useState(true);
+
+  // Reflection state
   const [selectedReflection, setSelectedReflection] = useState<any>(null);
   const [mapReflections, setMapReflections] = useState<Reflection[]>([]);
   const [isSearchingForReflections, setIsSearchingForReflections] = useState(false);
-  const [isFindingUserLocation, setIsFindingUserLocation] = useState(false);
   const [isProcessingHighlightedReflection, setIsProcessingHighlightedReflection] = useState(false);
   const [isShowingReflectionCreatedAnimation, setIsShowingReflectionCreatedAnimation] =
     useState(false);
+
+  // Location finding state
+  const [isFindingUserLocation, setIsFindingUserLocation] = useState(false);
 
   // On mount
   useEffect(() => {
@@ -83,6 +89,7 @@ const MapComponent = ({
     try {
       setIsFindingUserLocation(true);
       console.log("Getting user location");
+
       const loc = await getCurrentLocation();
       if (loc) {
         setUserLocation(loc);
@@ -95,14 +102,6 @@ const MapComponent = ({
       }, 1000);
     }
   };
-
-  // Animate to user location (only on first time load)
-  useEffect(() => {
-    if (userLocation && mayAnimateToUserLocation && !isProcessingHighlightedReflection) {
-      animateToLocation(userLocation);
-      setMayAnimateToUserLocation(false);
-    }
-  }, [userLocation, mayAnimateToUserLocation, isProcessingHighlightedReflection]);
 
   // Animate to location
   const animateToLocation = (location: Location.LocationObject) => {
@@ -121,6 +120,14 @@ const MapComponent = ({
     currentRegionRef.current = region;
   };
 
+  // Animate to user location (only on first time load)
+  useEffect(() => {
+    if (userLocation && mayAnimateToUserLocation && !isProcessingHighlightedReflection) {
+      animateToLocation(userLocation);
+      setMayAnimateToUserLocation(false);
+    }
+  }, [userLocation, mayAnimateToUserLocation, isProcessingHighlightedReflection]);
+
   // On startup, when user location is available, get reflections of user location
   useEffect(() => {
     if (userLocation && maySearchForReflections) {
@@ -138,92 +145,53 @@ const MapComponent = ({
   // Handle highlighted reflection when received
   useEffect(() => {
     if (highlightedReflection) {
-      // console.log("Processing highlighted reflection:", {
-      //   id: highlightedReflection.id,
-      //   visibility: highlightedReflection.visibility,
-      //   hasLocation: !!highlightedReflection.location,
-      //   location: highlightedReflection.location,
-      // });
-
       try {
         setIsProcessingHighlightedReflection(true);
 
-        // Only process public reflections with location data
-        if (highlightedReflection.visibility === "public" && highlightedReflection.location) {
-          // Show the reflection created animation
-          console.log("Showing reflection created animation for public reflection");
+        // Only process reflections with location data
+        if (highlightedReflection.location) {
           setIsShowingReflectionCreatedAnimation(true);
 
-          // Add the highlighted reflection to the map reflections
-          setMapReflections((prevReflections) => {
-            // Check if reflection already exists to avoid duplicates
-            const exists = prevReflections.some((r) => r.id === highlightedReflection.id);
-            if (!exists) {
-              return [highlightedReflection, ...prevReflections];
-            }
-            return prevReflections;
-          });
-
-          // Prevent user location animation from overriding our highlighted reflection animation
           setMayAnimateToUserLocation(false);
 
-          // Center the map on the highlighted reflection with a slight delay to ensure it takes priority
-          setTimeout(() => {
-            if (mapRef.current && highlightedReflection.location) {
-              mapRef.current.animateToRegion({
-                latitude: highlightedReflection.location.lat,
-                longitude: highlightedReflection.location.long,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-              });
+          // Animate to the new reflection location
+          if (mapRef.current && highlightedReflection.location) {
+            mapRef.current.animateToRegion({
+              latitude: highlightedReflection.location.lat,
+              longitude: highlightedReflection.location.long,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            });
+          }
 
-              // After animation starts, wait a bit then search for reflections
-              setTimeout(() => {
-                console.log("Animation started, searching for reflections in highlighted area");
-                // Search around the highlighted reflection location
-                if (highlightedReflection.location) {
-                  getReflectionsByLocation({
-                    latitude: highlightedReflection.location.lat,
-                    longitude: highlightedReflection.location.long,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  });
-                }
-              }, 800);
-            }
-          }, 100);
+          // Add the new reflection to the map immediately if it's public
+          if (highlightedReflection.visibility === "public") {
+            setMapReflections((prev) => {
+              // Check if reflection already exists to avoid duplicates
+              const exists = prev.some((r) => r.id === highlightedReflection.id);
+              if (!exists) {
+                return [highlightedReflection, ...prev];
+              }
+              return prev;
+            });
+          }
 
-          // Automatically show the reflection detail panel after a short delay
+          // Show the reflection panel
+          setSelectedReflection(highlightedReflection);
           setTimeout(() => {
-            setSelectedReflection(highlightedReflection);
             onReflectionPanelChange?.(true);
-            // Clear processing flag after showing the panel
-            setIsProcessingHighlightedReflection(false);
-          }, 1000);
+          }, 500);
+
+          // Clear processing flag after showing the panel
+          setIsProcessingHighlightedReflection(false);
 
           // Hide the animation after a delay
           setTimeout(() => {
             console.log("Hiding reflection created animation");
             setIsShowingReflectionCreatedAnimation(false);
           }, 2000);
-        } else if (highlightedReflection.visibility === "private") {
-          // For private reflections, just refresh the current region to get updated data
-          if (currentRegionRef.current) {
-            getReflectionsByLocation(currentRegionRef.current);
-          }
-          // Clear processing flag immediately for private reflections
-          setIsProcessingHighlightedReflection(false);
-
-          // Show a brief animation for private reflections too
-          console.log("Showing reflection created animation for private reflection");
-          setIsShowingReflectionCreatedAnimation(true);
-          setTimeout(() => {
-            console.log("Hiding reflection created animation for private reflection");
-            setIsShowingReflectionCreatedAnimation(false);
-          }, 1500);
         }
 
-        // Notify parent that the highlighted reflection has been processed
         onHighlightedReflectionProcessed?.();
       } catch (error) {
         console.error("Error processing highlighted reflection:", error);
@@ -249,8 +217,9 @@ const MapComponent = ({
       console.log(`Found ${reflections.length} reflections.`);
       setMapReflections(reflections);
 
-      // Show toast if no reflections found in search
-      if (reflections.length === 0) {
+      // Only show "no reflections found" message if this is the initial search
+      // and we don't have any reflections yet (to avoid overshadowing success messages)
+      if (reflections.length === 0 && mapReflections.length === 0) {
         Toast.show({
           type: "info",
           text1: "No Reflections Nearby",
@@ -275,7 +244,10 @@ const MapComponent = ({
   // Refresh reflections in current region
   const refreshReflections = async () => {
     if (currentRegionRef.current) {
-      await getReflectionsByLocation(currentRegionRef.current);
+      // Only refresh if we're not currently processing a highlighted reflection
+      if (!isProcessingHighlightedReflection) {
+        await getReflectionsByLocation(currentRegionRef.current);
+      }
     }
   };
 
@@ -315,13 +287,14 @@ const MapComponent = ({
   };
 
   const handleMapTap = (event: any) => {
-    // No map taps when reflection is open
+    // Don't handle map taps when reflection is open
     if (selectedReflection) {
       return;
     }
 
-    // Check if the tap is on (or very close to) an existing reflection marker
     const tapCoordinate = event.nativeEvent.coordinate;
+
+    // Check if the tap is on (or very close to) an existing reflection marker
     const isNearReflection = mapReflections.some((reflection) => {
       if (!reflection.location) return false;
 
@@ -329,14 +302,11 @@ const MapComponent = ({
         Math.pow(tapCoordinate.latitude - reflection.location.lat, 2) +
           Math.pow(tapCoordinate.longitude - reflection.location.long, 2)
       );
-      if (distance < 0.0001) {
-        return true;
-      }
 
-      return false;
+      return distance < 0.0001;
     });
 
-    // If tap is not near a reflection marker, call onMapTap
+    // If tap is not near a reflection marker, handle as location selection
     if (!isNearReflection && onMapTap) {
       onMapTap(event);
       onLocationPanelChange?.(true);
@@ -441,15 +411,13 @@ const MapComponent = ({
               }}
               onPress={() => handleReflectionPress(reflection)}
             >
-              <>
-                {getMoodIcon(reflection.mood || "default", {
-                  width: 32,
-                  height: 32,
-                  fill:
-                    mood[reflection.mood?.toLowerCase() as keyof typeof mood]?.colorHex ||
-                    mood.unselected.colorHex,
-                })}
-              </>
+              {getMoodIcon(reflection.mood || "default", {
+                width: 32,
+                height: 32,
+                fill:
+                  mood[reflection.mood?.toLowerCase() as keyof typeof mood]?.colorHex ||
+                  mood.unselected.colorHex,
+              })}
             </Marker>
           );
         })}

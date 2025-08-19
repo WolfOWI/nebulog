@@ -381,22 +381,37 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
 
               <HStack className="flex-row justify-between items-end">
                 <Pressable className="flex-row items-center gap-3" onPress={handleUserProfilePress}>
-                  <ProfileAvatar
-                    bgColour={reflection.authorProfileColor || "#4ECDC4"}
-                    icon={reflection.authorProfileIcon || "ufo-outline"}
-                    iconSize={24}
-                    size={48}
-                  />
-                  <VStack className="gap-1">
-                    <Text className="text-typography-900" size="md">
-                      {isAuthor ? "You" : reflection.authorUsername || "Someone"}
-                    </Text>
-                    <Text className="text-typography-600" size="sm">
-                      {reflection.createdAt
-                        ? dayjs(reflection.createdAt).fromNow()
-                        : "Some time ago"}
-                    </Text>
-                  </VStack>
+                  {isAuthor ? (
+                    <HStack className="gap-3 items-center bg-background-100 h-10 px-4 rounded-lg">
+                      <Text className="text-typography-900" size="md">
+                        You
+                      </Text>
+                      <Text className="text-typography-600" size="sm">
+                        {reflection.createdAt
+                          ? dayjs(reflection.createdAt).fromNow()
+                          : "Some time ago"}
+                      </Text>
+                    </HStack>
+                  ) : (
+                    <>
+                      <ProfileAvatar
+                        bgColour={reflection.authorProfileColor || "#4ECDC4"}
+                        icon={reflection.authorProfileIcon || "ufo-outline"}
+                        iconSize={24}
+                        size={48}
+                      />
+                      <VStack className="gap-1">
+                        <Text className="text-typography-900" size="md">
+                          {isAuthor ? "You" : reflection.authorUsername || "Someone"}
+                        </Text>
+                        <Text className="text-typography-600" size="sm">
+                          {reflection.createdAt
+                            ? dayjs(reflection.createdAt).fromNow()
+                            : "Some time ago"}
+                        </Text>
+                      </VStack>
+                    </>
+                  )}
                 </Pressable>
 
                 {!isAuthor ? (
