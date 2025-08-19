@@ -55,11 +55,6 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const [isEchoing, setIsEchoing] = useState(false);
   const [echoCount, setEchoCount] = useState(0);
 
-  // Debug logging
-  console.log("ReflectionDetailPanel render - reflection:", reflection);
-  console.log("ReflectionDetailPanel render - user:", user);
-
-  // Animation values - these must be called before any conditional returns
   const translateY = useSharedValue(300); // Start off-screen
   const opacity = useSharedValue(0);
   const fillHeight = useSharedValue(0); // Animated fill height

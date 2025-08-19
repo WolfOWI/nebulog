@@ -138,7 +138,7 @@ const ThoughtLaunch = () => {
     };
 
     try {
-      await createReflection(reflection, user.id);
+      const docRef = await createReflection(reflection, user.id);
 
       // Show success toast
       showSuccessToast();
@@ -151,7 +151,17 @@ const ThoughtLaunch = () => {
         streakCount: newStreak,
       });
 
-      router.push("/(app)/home" as any);
+      // Navigate back to home with the created reflection data
+      router.push({
+        pathname: "/(app)/home" as any,
+        params: {
+          highlightedReflection: JSON.stringify({
+            ...reflection,
+            id: docRef.id,
+            location: reflection.location,
+          }),
+        },
+      });
     } catch (error) {
       console.error("Error creating reflection:", error);
       showValidationError("Failed to launch reflection. Please try again.");

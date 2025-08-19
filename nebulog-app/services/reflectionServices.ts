@@ -27,6 +27,7 @@ import { calculateNewStreak } from "@/utils/streakUtility";
  * Create a new reflection
  * @param reflection - The reflection to create
  * @param userId - The user ID of the reflection's author
+ * @returns The created reflection document reference
  */
 export const createReflection = async (reflection: Reflection, userId: string) => {
   try {
@@ -43,7 +44,7 @@ export const createReflection = async (reflection: Reflection, userId: string) =
 
     const reflectionsCollection = collection(db, "reflections");
 
-    await addDoc(reflectionsCollection, reflectionWithAuthor);
+    const docRef = await addDoc(reflectionsCollection, reflectionWithAuthor);
 
     // Update user totals (stats) and streak
     try {
@@ -71,6 +72,9 @@ export const createReflection = async (reflection: Reflection, userId: string) =
     } catch (error) {
       console.error("Error updating user stats and streak:", error);
     }
+
+    // Return the created document reference
+    return docRef;
   } catch (error) {
     throw new Error("Failed to create reflection: " + error);
   }

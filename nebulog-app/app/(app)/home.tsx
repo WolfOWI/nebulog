@@ -4,13 +4,13 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, View, Pressable, Dimensions } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import MapComponent from "@/components/map/Map";
-import { Location as LocationType, PlaceDetails } from "@/lib/types";
+import { Location as LocationType, PlaceDetails, Reflection } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
 import Toast from "react-native-toast-message";
 import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
@@ -22,14 +22,55 @@ import CircleHoldTextBtn from "@/components/buttons/CircleHoldTextBtn";
 import { validateStreak } from "@/utils/streakUtility";
 import { useLocation } from "@/contexts/LocationContext";
 import { reverseGeocode } from "@/services/placesServices";
+import { isWithinLast20Seconds } from "@/utils/dateUtility";
 
 export default function Home() {
   const { user, validateAndUpdateStreak, refreshUserData } = useUser();
   const { setSelectedLocation } = useLocation();
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams();
 
-  // State for selected map location
+  // State for tapping on the map to select a location
   const [selectedMapLocation, setSelectedMapLocation] = useState<PlaceDetails | null>(null);
+
+  // State for highlighted reflection (selecting a reflection from navigation, profile, etc.)
+  const [highlightedReflection, setHighlightedReflection] = useState<Reflection | null>(null);
+
+  // Handle highlighted reflection from nav params
+  useEffect(() => {
+    if (params.highlightedReflection) {
+      try {
+        const reflectionData = JSON.parse(params.highlightedReflection as string);
+        setHighlightedReflection(reflectionData);
+
+        // Clear the params
+        router.setParams({});
+
+        // Show success message (if reflection was created in the last 20 seconds)
+        if (reflectionData.createdAt && isWithinLast20Seconds(reflectionData.createdAt)) {
+          Toast.show({
+            type: "success",
+            text1: "Reflection Created!",
+            text2:
+              reflectionData.visibility === "public"
+                ? "Your reflection is now visible on the map"
+                : "Your reflection has been saved privately",
+            position: "top",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        }
+
+        // Refresh map reflections to show reflection & reflections in area
+        setTimeout(() => {
+          handleRefreshMap();
+        }, 500);
+      } catch (error) {
+        console.error("Error accessing highlighted reflection:", error);
+      }
+    }
+  }, [params.highlightedReflection]);
 
   // On mount, validate streak (only once)
   useEffect(() => {
@@ -393,6 +434,11 @@ export default function Home() {
           onCreateThought={handleCreateThoughtAtLocation}
           selectedLocation={selectedMapLocation}
           onLocationPanelChange={handleLocationPanelChange}
+          highlightedReflection={highlightedReflection}
+          onHighlightedReflectionProcessed={() => {
+            setHighlightedReflection(null);
+            handleRefreshMap();
+          }}
         />
 
         {/* Top Screen overlay */}

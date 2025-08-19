@@ -40,6 +40,8 @@ interface MapComponentProps {
   className?: string;
   ref?: React.Ref<any>;
   onLocationPanelChange?: (isOpen: boolean) => void;
+  highlightedReflection?: Reflection | null;
+  onHighlightedReflectionProcessed?: () => void;
 }
 
 const MapComponent = ({
@@ -54,6 +56,8 @@ const MapComponent = ({
   className,
   ref,
   onLocationPanelChange,
+  highlightedReflection,
+  onHighlightedReflectionProcessed,
 }: MapComponentProps) => {
   const { user } = useUser();
   const mapRef = useRef<MapView>(null);
@@ -65,6 +69,9 @@ const MapComponent = ({
   const [mapReflections, setMapReflections] = useState<Reflection[]>([]);
   const [isSearchingForReflections, setIsSearchingForReflections] = useState(false);
   const [isFindingUserLocation, setIsFindingUserLocation] = useState(false);
+  const [isProcessingHighlightedReflection, setIsProcessingHighlightedReflection] = useState(false);
+  const [isShowingReflectionCreatedAnimation, setIsShowingReflectionCreatedAnimation] =
+    useState(false);
 
   // On mount
   useEffect(() => {
@@ -81,7 +88,7 @@ const MapComponent = ({
         setUserLocation(loc);
       }
     } catch (error) {
-      console.error("Error getting user location:", error);
+      console.error("Error getting user location", error);
     } finally {
       setTimeout(() => {
         setIsFindingUserLocation(false);
@@ -91,11 +98,11 @@ const MapComponent = ({
 
   // Animate to user location (only on first time load)
   useEffect(() => {
-    if (userLocation && mayAnimateToUserLocation) {
+    if (userLocation && mayAnimateToUserLocation && !isProcessingHighlightedReflection) {
       animateToLocation(userLocation);
       setMayAnimateToUserLocation(false);
     }
-  }, [userLocation, mayAnimateToUserLocation]);
+  }, [userLocation, mayAnimateToUserLocation, isProcessingHighlightedReflection]);
 
   // Animate to location
   const animateToLocation = (location: Location.LocationObject) => {
@@ -127,6 +134,106 @@ const MapComponent = ({
       setMaySearchForReflections(false);
     }
   }, [userLocation]);
+
+  // Handle highlighted reflection when received
+  useEffect(() => {
+    if (highlightedReflection) {
+      // console.log("Processing highlighted reflection:", {
+      //   id: highlightedReflection.id,
+      //   visibility: highlightedReflection.visibility,
+      //   hasLocation: !!highlightedReflection.location,
+      //   location: highlightedReflection.location,
+      // });
+
+      try {
+        setIsProcessingHighlightedReflection(true);
+
+        // Only process public reflections with location data
+        if (highlightedReflection.visibility === "public" && highlightedReflection.location) {
+          // Show the reflection created animation
+          console.log("Showing reflection created animation for public reflection");
+          setIsShowingReflectionCreatedAnimation(true);
+
+          // Add the highlighted reflection to the map reflections
+          setMapReflections((prevReflections) => {
+            // Check if reflection already exists to avoid duplicates
+            const exists = prevReflections.some((r) => r.id === highlightedReflection.id);
+            if (!exists) {
+              return [highlightedReflection, ...prevReflections];
+            }
+            return prevReflections;
+          });
+
+          // Prevent user location animation from overriding our highlighted reflection animation
+          setMayAnimateToUserLocation(false);
+
+          // Center the map on the highlighted reflection with a slight delay to ensure it takes priority
+          setTimeout(() => {
+            if (mapRef.current && highlightedReflection.location) {
+              mapRef.current.animateToRegion({
+                latitude: highlightedReflection.location.lat,
+                longitude: highlightedReflection.location.long,
+                latitudeDelta: 0.005,
+                longitudeDelta: 0.005,
+              });
+
+              // After animation starts, wait a bit then search for reflections
+              setTimeout(() => {
+                console.log("Animation started, searching for reflections in highlighted area");
+                // Search around the highlighted reflection location
+                if (highlightedReflection.location) {
+                  getReflectionsByLocation({
+                    latitude: highlightedReflection.location.lat,
+                    longitude: highlightedReflection.location.long,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  });
+                }
+              }, 800);
+            }
+          }, 100);
+
+          // Automatically show the reflection detail panel after a short delay
+          setTimeout(() => {
+            setSelectedReflection(highlightedReflection);
+            onReflectionPanelChange?.(true);
+            // Clear processing flag after showing the panel
+            setIsProcessingHighlightedReflection(false);
+          }, 1000);
+
+          // Hide the animation after a delay
+          setTimeout(() => {
+            console.log("Hiding reflection created animation");
+            setIsShowingReflectionCreatedAnimation(false);
+          }, 2000);
+        } else if (highlightedReflection.visibility === "private") {
+          // For private reflections, just refresh the current region to get updated data
+          if (currentRegionRef.current) {
+            getReflectionsByLocation(currentRegionRef.current);
+          }
+          // Clear processing flag immediately for private reflections
+          setIsProcessingHighlightedReflection(false);
+
+          // Show a brief animation for private reflections too
+          console.log("Showing reflection created animation for private reflection");
+          setIsShowingReflectionCreatedAnimation(true);
+          setTimeout(() => {
+            console.log("Hiding reflection created animation for private reflection");
+            setIsShowingReflectionCreatedAnimation(false);
+          }, 1500);
+        }
+
+        // Notify parent that the highlighted reflection has been processed
+        onHighlightedReflectionProcessed?.();
+      } catch (error) {
+        console.error("Error processing highlighted reflection:", error);
+        // Clear processing flag on error
+        setIsProcessingHighlightedReflection(false);
+        // Still notify parent even if there was an error
+        onHighlightedReflectionProcessed?.();
+      }
+    }
+  }, [highlightedReflection]);
 
   // Handle get reflections by location (given)
   const getReflectionsByLocation = async (location: Region) => {
@@ -260,19 +367,31 @@ const MapComponent = ({
 
   return (
     <VStack className={className}>
-      {/* Finding user location animation */}
+      {!isShowingReflectionCreatedAnimation && (
+        <>
+          {/* Finding user location animation */}
+          <AnimatedElement
+            animationSource={require("@/assets/animations/getting-location-animation.json")}
+            size={400}
+            className="z-50 mb-8"
+            isVisible={isFindingUserLocation}
+          />
+          {/* Scanning animation */}
+          <AnimatedElement
+            animationSource={require("@/assets/animations/scan-animation.json")}
+            size={500}
+            className="z-40 mb-8"
+            isVisible={isSearchingForReflections}
+          />
+        </>
+      )}
+
+      {/* Reflection created animation */}
       <AnimatedElement
-        animationSource={require("@/assets/animations/getting-location-animation.json")}
-        size={400}
-        className="z-50 mb-8"
-        isVisible={isFindingUserLocation}
-      />
-      {/* Scanning animation */}
-      <AnimatedElement
-        animationSource={require("@/assets/animations/scan-animation.json")}
-        size={500}
-        className="z-40 mb-8"
-        isVisible={isSearchingForReflections}
+        animationSource={require("@/assets/animations/blurry-glow-animation.json")}
+        size={600}
+        className="z-30 mb-8"
+        isVisible={isShowingReflectionCreatedAnimation}
       />
       <MapView
         ref={mapRef}
