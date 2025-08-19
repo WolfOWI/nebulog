@@ -39,7 +39,7 @@ export const AnimatedElement: React.FC<AnimatedElementProps> = ({
 
   return (
     <Animated.View
-      className={`flex-1 justify-center items-center absolute top-0 left-0 right-0 bottom-0 ${className}`}
+      className={`flex-1 justify-center items-center absolute top-0 left-0 right-0 bottom-0 ${className} pointer-events-none`}
       style={{
         opacity: fadeAnim,
       }}
