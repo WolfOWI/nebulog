@@ -21,6 +21,7 @@ interface LocSelectCreateBoxProps {
   onCreateThought: () => void;
   className?: string;
   selectedLocation: PlaceDetails;
+  style?: any;
 }
 
 const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
@@ -28,6 +29,7 @@ const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
   onCreateThought,
   className,
   selectedLocation,
+  style,
 }) => {
   // Animation values
   const translateY = useSharedValue(300); // Start off-screen
@@ -85,7 +87,7 @@ const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
   if (!selectedLocation) return null;
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[animatedStyle, style]}>
       <GestureDetector gesture={swipeDownGesture}>
         <BlurView
           intensity={Platform.OS === "android" ? 0 : 20}

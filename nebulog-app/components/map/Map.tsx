@@ -367,7 +367,7 @@ const MapComponent = ({
       <ReflectionDetailPanel
         reflection={selectedReflection}
         onClose={closeReflection}
-        className="z-999"
+        style={{ zIndex: 999 }}
       />
 
       {/* LocSelectCreateBox */}
@@ -376,6 +376,7 @@ const MapComponent = ({
           selectedLocation={selectedLocation}
           onClose={closeSelectCreateBox}
           onCreateThought={onCreateThought || (() => {})}
+          style={{ zIndex: 999 }}
         />
       )}
     </VStack>

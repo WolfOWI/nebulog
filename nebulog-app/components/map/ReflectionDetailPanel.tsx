@@ -41,17 +41,23 @@ interface ReflectionDetailPanelProps {
   reflection: Reflection | null;
   onClose: () => void;
   className?: string;
+  style?: any;
 }
 
 const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   reflection,
   onClose,
   className,
+  style,
 }) => {
   const { user, updateEchoedReflections } = useUser();
   const [isLiked, setIsLiked] = useState(false);
   const [isEchoing, setIsEchoing] = useState(false);
   const [echoCount, setEchoCount] = useState(0);
+
+  // Debug logging
+  console.log("ReflectionDetailPanel render - reflection:", reflection);
+  console.log("ReflectionDetailPanel render - user:", user);
 
   // Animation values - these must be called before any conditional returns
   const translateY = useSharedValue(300); // Start off-screen
@@ -268,7 +274,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   const moodData = mood[reflectionMood as keyof typeof mood] || mood.unselected;
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View style={[animatedStyle, style]}>
       <GestureDetector gesture={swipeDownGesture}>
         <View
           style={{
