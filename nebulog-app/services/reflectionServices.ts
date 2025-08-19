@@ -249,17 +249,39 @@ export const updateReflection = async (reflectionId: string, updates: Partial<Re
  */
 export const deleteReflection = async (reflectionId: string, userId: string) => {
   try {
-    const reflectionDoc = doc(db, "reflections", reflectionId);
-    await deleteDoc(reflectionDoc);
+    // STEP 1: Get all users who echoed this reflection
+    const userCollection = collection(db, "users");
+    const q = query(userCollection, where(`echoedReflections.${reflectionId}`, "==", true));
+    const usersSnapshot = await getDocs(q);
 
-    try {
-      const userDoc = doc(db, "users", userId);
-      await updateDoc(userDoc, {
-        totalReflections: increment(-1),
+    // STEP 2: Remove the reflection from all users' echoedReflections
+    const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
+      const userData = userDoc.data();
+      const echoedReflections = userData.echoedReflections || {};
+      delete echoedReflections[reflectionId];
+
+      return updateDoc(doc(db, "users", userDoc.id), {
+        echoedReflections: echoedReflections,
       });
-    } catch (error) {
-      console.error("Error decreasing reflection count:", error);
-    }
+    });
+
+    // Wait for all user updates to complete
+    await Promise.all(updatePromises);
+
+    // STEP 3: Update users stats (total echoes & total reflections)
+    const reflectionDoc = doc(db, "reflections", reflectionId);
+    const reflectionSnapshot = await getDoc(reflectionDoc);
+    const reflectionData = reflectionSnapshot.data();
+    const echoCount = reflectionData?.echoCount || 0;
+
+    const userDoc = doc(db, "users", userId);
+    await updateDoc(userDoc, {
+      totalEchoes: increment(-echoCount),
+      totalReflections: increment(-1),
+    });
+
+    // STEP 4: Delete the reflection
+    await deleteDoc(reflectionDoc);
   } catch (error) {
     throw new Error("Failed to delete reflection: " + error);
   }
