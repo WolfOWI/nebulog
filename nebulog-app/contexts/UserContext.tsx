@@ -16,6 +16,9 @@ interface UserContextType {
   validateAndUpdateStreak: () => Promise<void>;
   updateStreakOnReflection: (newStreak: number) => void;
   refreshUserData: () => Promise<void>;
+  streakValidationCache: { isValid: boolean; daysSinceLastReflection: number } | null;
+  hasValidatedStreakOnStart: boolean;
+  refreshStreakValidationCache: () => void;
 }
 
 // Create context for user state
@@ -26,6 +29,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isValidatingStreak, setIsValidatingStreak] = useState(false);
+  const [streakValidationCache, setStreakValidationCache] = useState<{
+    isValid: boolean;
+    daysSinceLastReflection: number;
+  } | null>(null);
+  const [hasValidatedStreakOnStart, setHasValidatedStreakOnStart] = useState(false);
 
   // Update user state when auth state changes
   useEffect(() => {
@@ -213,6 +221,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         console.log("validateAndUpdateStreak: Streak is valid, no reset needed");
       }
+
+      // Cache the validation result
+      const validationResult = validateStreak(user.lastReflectDate);
+      setStreakValidationCache(validationResult);
+
+      // Mark that we've validated on start
+      if (!hasValidatedStreakOnStart) {
+        setHasValidatedStreakOnStart(true);
+      }
     } catch (error) {
       console.error("Error validating streak:", error);
     } finally {
@@ -231,6 +248,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return currentUser;
     });
+
+    // Invalidate streak validation cache since we have new reflection data
+    setStreakValidationCache(null);
   };
 
   const refreshUserData = async () => {
@@ -248,8 +268,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       setUser(freshUserData);
+
+      // Invalidate streak validation cache since we have fresh data
+      setStreakValidationCache(null);
     } catch (error) {
       console.error("Error refreshing user data:", error);
+    }
+  };
+
+  const refreshStreakValidationCache = () => {
+    if (user?.lastReflectDate) {
+      const validationResult = validateStreak(user.lastReflectDate);
+      setStreakValidationCache(validationResult);
     }
   };
 
@@ -265,6 +295,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         validateAndUpdateStreak,
         updateStreakOnReflection,
         refreshUserData,
+        streakValidationCache,
+        hasValidatedStreakOnStart,
+        refreshStreakValidationCache,
       }}
     >
       {children}

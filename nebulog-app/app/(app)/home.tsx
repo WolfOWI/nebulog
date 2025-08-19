@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text } from "@/components/ui/text";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
@@ -19,13 +19,20 @@ import { useUser } from "@/contexts/UserContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
 import CircleHoldTextBtn from "@/components/buttons/CircleHoldTextBtn";
-import { validateStreak } from "@/utils/streakUtility";
+
 import { useLocation } from "@/contexts/LocationContext";
 import { reverseGeocode } from "@/services/placesServices";
 import { isWithinLast20Seconds } from "@/utils/dateUtility";
 
 export default function Home() {
-  const { user, validateAndUpdateStreak, refreshUserData } = useUser();
+  const {
+    user,
+    validateAndUpdateStreak,
+    refreshUserData,
+    streakValidationCache,
+    hasValidatedStreakOnStart,
+    refreshStreakValidationCache,
+  } = useUser();
   const { setSelectedLocation } = useLocation();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams();
@@ -74,7 +81,7 @@ export default function Home() {
 
   // On mount, validate streak (only once)
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && !hasValidatedStreakOnStart) {
       console.log("Home: User data on mount:", {
         id: user.id,
         streakCount: user.streakCount,
@@ -83,29 +90,30 @@ export default function Home() {
       });
       validateAndUpdateStreak();
     }
-  }, [user?.id]);
+  }, [user?.id, hasValidatedStreakOnStart]);
 
-  // Show streak status when returning to home screen
+  // Show streak status when returning to home screen (only if we have cached validation)
   useEffect(() => {
-    if (user?.id && user?.lastReflectDate) {
-      const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
-
-      if (!isValid && daysSinceLastReflection > 1) {
-        // Show warning if streak is broken
-        setTimeout(() => {
-          Toast.show({
-            type: "warning",
-            text1: "Streak Broken",
-            text2: `It's been ${daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
-            position: "top",
-            visibilityTime: 5000,
-            autoHide: true,
-            topOffset: 50,
-          });
-        }, 1000); // Delay a bit to avoid showing immediately
-      }
+    if (
+      user?.lastReflectDate &&
+      streakValidationCache &&
+      !streakValidationCache.isValid &&
+      streakValidationCache.daysSinceLastReflection > 1
+    ) {
+      // Show warning if streak is broken
+      setTimeout(() => {
+        Toast.show({
+          type: "warning",
+          text1: "Streak Broken",
+          text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
+          position: "top",
+          visibilityTime: 5000,
+          autoHide: true,
+          topOffset: 50,
+        });
+      }, 1000); // Delay a bit to avoid showing immediately
     }
-  }, [user?.id, user?.lastReflectDate]);
+  }, [user?.lastReflectDate, streakValidationCache]);
 
   // Show celebration when returning from reflection creation
   useEffect(() => {
@@ -201,12 +209,16 @@ export default function Home() {
     }
   };
 
-  // Refresh streak data
+  // Handle streak refresh (on streak tap)
   const handleRefreshStreak = async () => {
+    if (!user?.id) return;
+
+    setIsRefreshingStreak(true);
+
     try {
-      setIsRefreshingStreak(true);
-      console.log("Home: Refreshing streak, current user data:", {
-        streakCount: user?.streakCount,
+      console.log("Home: Refreshing streak manually:", {
+        userId: user.id,
+        currentStreakCount: user.streakCount,
         lastReflectDate: user?.lastReflectDate,
         totalReflections: user?.totalReflections,
       });
@@ -217,16 +229,15 @@ export default function Home() {
       // Then validate and update streak
       await validateAndUpdateStreak();
 
-      // Show updated streak status
-      if (user?.lastReflectDate) {
-        const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
+      // Show updated streak status using cached validation
+      if (streakValidationCache) {
         console.log("Home: After refresh, streak validation:", {
-          isValid,
-          daysSinceLastReflection,
+          isValid: streakValidationCache.isValid,
+          daysSinceLastReflection: streakValidationCache.daysSinceLastReflection,
           currentStreakCount: user.streakCount,
         });
 
-        if (isValid) {
+        if (streakValidationCache.isValid) {
           Toast.show({
             type: "success",
             text1: `${user.streakCount} Day Streak Active!`,
@@ -240,7 +251,7 @@ export default function Home() {
           Toast.show({
             type: "warning",
             text1: "Streak Status Updated",
-            text2: `It's been ${daysSinceLastReflection} days since your last reflection`,
+            text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection`,
             position: "top",
             visibilityTime: 3000,
             autoHide: true,
@@ -289,7 +300,7 @@ export default function Home() {
     }
   };
 
-  // Show current streak status
+  // Show current streak status (only called on long press)
   const showStreakStatus = () => {
     if (!user?.lastReflectDate) {
       Toast.show({
@@ -304,7 +315,20 @@ export default function Home() {
       return;
     }
 
-    const { isValid, daysSinceLastReflection } = validateStreak(user.lastReflectDate);
+    // Use cached validation if available, otherwise refresh it
+    let validation = streakValidationCache;
+    if (!validation) {
+      refreshStreakValidationCache();
+      // Wait a bit for the cache to update, then use it
+      setTimeout(() => {
+        if (streakValidationCache) {
+          showStreakStatus();
+        }
+      }, 100);
+      return;
+    }
+
+    const { isValid, daysSinceLastReflection } = validation;
 
     if (isValid) {
       const lastReflection = new Date(user.lastReflectDate);
@@ -529,7 +553,7 @@ export default function Home() {
                       className={`w-10 h-10 rounded-full flex justify-center items-center ${
                         isRefreshingStreak
                           ? "bg-slate-400"
-                          : user?.lastReflectDate && validateStreak(user.lastReflectDate).isValid
+                          : streakValidationCache?.isValid
                           ? "bg-green-500"
                           : "bg-slate-500"
                       }`}
@@ -552,7 +576,7 @@ export default function Home() {
                       {(user?.streakCount || 0) == 1 ? "" : "s"}
                     </Text>
                     {/* If user has reflected today, show "You've already reflected today!" */}
-                    {user?.lastReflectDate && validateStreak(user.lastReflectDate).isValid && (
+                    {streakValidationCache?.isValid && (
                       <Text
                         className="text-typography-600"
                         size="xs"

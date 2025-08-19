@@ -389,7 +389,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
                   />
                   <VStack className="gap-1">
                     <Text className="text-typography-900" size="md">
-                      {reflection.authorUsername || "Someone"}
+                      {isAuthor ? "You" : reflection.authorUsername || "Someone"}
                     </Text>
                     <Text className="text-typography-600" size="sm">
                       {reflection.createdAt
