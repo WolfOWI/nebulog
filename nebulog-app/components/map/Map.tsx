@@ -248,6 +248,19 @@ const MapComponent = ({
       if (!isProcessingHighlightedReflection) {
         await getReflectionsByLocation(currentRegionRef.current);
       }
+      // Close the reflection panel & location panel
+      closeReflection();
+      closeSelectCreateBox();
+
+      // Animate map to centre on the reflection
+      if (mapRef.current && currentRegionRef.current) {
+        mapRef.current.animateToRegion({
+          latitude: currentRegionRef.current.latitude,
+          longitude: currentRegionRef.current.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        });
+      }
     }
   };
 
@@ -272,8 +285,10 @@ const MapComponent = ({
   };
 
   const closeReflection = () => {
-    setSelectedReflection(null);
     onReflectionPanelChange?.(false);
+    setTimeout(() => {
+      setSelectedReflection(null);
+    }, 300);
   };
 
   const closeSelectCreateBox = () => {
@@ -337,20 +352,24 @@ const MapComponent = ({
 
   return (
     <VStack className={className}>
-      {/* Finding user location animation */}
-      <AnimatedElement
-        animationSource={require("@/assets/animations/getting-location-animation.json")}
-        size={400}
-        className="z-50 mb-8"
-        isVisible={isFindingUserLocation}
-      />
-      {/* Scanning animation */}
-      <AnimatedElement
-        animationSource={require("@/assets/animations/scan-animation.json")}
-        size={500}
-        className="z-40 mb-8"
-        isVisible={isSearchingForReflections}
-      />
+      {!isShowingReflectionCreatedAnimation && (
+        <>
+          {/* Finding user location animation */}
+          <AnimatedElement
+            animationSource={require("@/assets/animations/getting-location-animation.json")}
+            size={400}
+            className="z-50 mb-8"
+            isVisible={isFindingUserLocation}
+          />
+          {/* Scanning animation */}
+          <AnimatedElement
+            animationSource={require("@/assets/animations/scan-animation.json")}
+            size={500}
+            className="z-40 mb-8"
+            isVisible={isSearchingForReflections}
+          />
+        </>
+      )}
       {/* Reflection created animation */}
       <AnimatedElement
         animationSource={require("@/assets/animations/blurry-glow-animation.json")}
