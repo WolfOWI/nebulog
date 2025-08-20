@@ -17,6 +17,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import LocSelectCreateBox from "./LocSelectCreateBox";
 import AnimatedElement from "../AnimatedElement";
 import LoadingScreen from "../LoadingScreen";
+import { isWithinLast20Seconds } from "@/utils/dateUtility";
 
 interface MapComponentProps {
   initialRegion?: Region;
@@ -73,8 +74,8 @@ const MapComponent = ({
   const [mapReflections, setMapReflections] = useState<Reflection[]>([]);
   const [isSearchingForReflections, setIsSearchingForReflections] = useState(false);
   const [isProcessingHighlightedReflection, setIsProcessingHighlightedReflection] = useState(false);
-  const [isShowingReflectionCreatedAnimation, setIsShowingReflectionCreatedAnimation] =
-    useState(false);
+  const [showRippleAnimation, setShowRippleAnimation] = useState(false);
+  const [showCreationAnimation, setShowCreationAnimation] = useState(false);
 
   // Location finding state
   const [isFindingUserLocation, setIsFindingUserLocation] = useState(false);
@@ -99,7 +100,7 @@ const MapComponent = ({
     } finally {
       setTimeout(() => {
         setIsFindingUserLocation(false);
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -150,7 +151,12 @@ const MapComponent = ({
 
         // Only process reflections with location data
         if (highlightedReflection.location) {
-          setIsShowingReflectionCreatedAnimation(true);
+          // Only show the glow animation for newly created reflections
+          if (highlightedReflection.isNewlyCreated) {
+            setShowCreationAnimation(true);
+          } else {
+            setShowRippleAnimation(true);
+          }
 
           setMayAnimateToUserLocation(false);
 
@@ -161,18 +167,6 @@ const MapComponent = ({
               longitude: highlightedReflection.location.long,
               latitudeDelta: 0.005,
               longitudeDelta: 0.005,
-            });
-          }
-
-          // Add the new reflection to the map immediately if it's public
-          if (highlightedReflection.visibility === "public") {
-            setMapReflections((prev) => {
-              // Check if reflection already exists to avoid duplicates
-              const exists = prev.some((r) => r.id === highlightedReflection.id);
-              if (!exists) {
-                return [highlightedReflection, ...prev];
-              }
-              return prev;
             });
           }
 
@@ -188,8 +182,15 @@ const MapComponent = ({
           // Hide the animation after a delay
           setTimeout(() => {
             console.log("Hiding reflection created animation");
-            setIsShowingReflectionCreatedAnimation(false);
+            setShowCreationAnimation(false);
+            setShowRippleAnimation(false);
           }, 2000);
+
+          setTimeout(() => {
+            if (currentRegionRef.current) {
+              getReflectionsByLocation(currentRegionRef.current);
+            }
+          }, 1000);
         }
 
         onHighlightedReflectionProcessed?.();
@@ -352,7 +353,7 @@ const MapComponent = ({
 
   return (
     <VStack className={className}>
-      {!isShowingReflectionCreatedAnimation && (
+      {!showCreationAnimation && !showRippleAnimation && (
         <>
           {/* Finding user location animation */}
           <AnimatedElement
@@ -370,13 +371,24 @@ const MapComponent = ({
           />
         </>
       )}
-      {/* Reflection created animation */}
-      <AnimatedElement
-        animationSource={require("@/assets/animations/blurry-glow-animation.json")}
-        size={600}
-        className="z-30 mb-8"
-        isVisible={isShowingReflectionCreatedAnimation}
-      />
+      {!showRippleAnimation && (
+        // Reflection created animation (show a created reflection from thought launch)
+        <AnimatedElement
+          animationSource={require("@/assets/animations/blurry-glow-animation.json")}
+          size={600}
+          className="z-30 mb-8"
+          isVisible={showCreationAnimation}
+        />
+      )}
+      {!showCreationAnimation && (
+        // Highlighted reflection animation (show a reflection from a card tap)
+        <AnimatedElement
+          animationSource={require("@/assets/animations/ripple-animation.json")}
+          size={300}
+          className="z-30 mb-2"
+          isVisible={showRippleAnimation}
+        />
+      )}
       <MapView
         ref={mapRef}
         style={styles.map}

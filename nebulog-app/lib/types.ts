@@ -26,6 +26,7 @@ export interface Reflection {
   mood?: string;
   createdAt: string;
   echoCount: number;
+  isNewlyCreated?: boolean;
 }
 
 export interface Location {

@@ -163,6 +163,7 @@ const ThoughtLaunch = () => {
             highlightedReflection: JSON.stringify({
               ...reflection,
               id: docRef.id,
+              isNewlyCreated: true,
             }),
           },
         });
