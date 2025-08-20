@@ -14,11 +14,13 @@ interface UserContextType {
   blockUserById: (userToBlockId: string) => Promise<void>;
   unblockUserById: (userToUnblockId: string) => Promise<void>;
   validateAndUpdateStreak: () => Promise<void>;
-  updateStreakOnReflection: (newStreak: number) => void;
+  updateStreakOnReflection: (newStreak: number, wasExtended: boolean) => void;
+  resetStreakExtendedFlag: () => void;
   refreshUserData: () => Promise<void>;
   streakValidationCache: { isValid: boolean; daysSinceLastReflection: number } | null;
   hasValidatedStreakOnStart: boolean;
   refreshStreakValidationCache: () => void;
+  wasStreakExtended: boolean;
 }
 
 // Create context for user state
@@ -34,6 +36,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     daysSinceLastReflection: number;
   } | null>(null);
   const [hasValidatedStreakOnStart, setHasValidatedStreakOnStart] = useState(false);
+  const [wasStreakExtended, setWasStreakExtended] = useState(false);
 
   // Update user state when auth state changes
   useEffect(() => {
@@ -237,8 +240,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const updateStreakOnReflection = (newStreak: number) => {
-    // console.log("updateStreakOnReflection: Updating streak to:", newStreak);
+  const updateStreakOnReflection = (newStreak: number, wasExtended: boolean) => {
+    // console.log("updateStreakOnReflection: Updating streak to:", newStreak, "wasExtended:", wasExtended);
     setUser((currentUser) => {
       if (currentUser) {
         return {
@@ -249,8 +252,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return currentUser;
     });
 
-    // Invalidate streak validation cache since we have new reflection data
+    // Track whether the streak was actually extended
+    setWasStreakExtended(wasExtended);
+
+    // Invalidate streak validation cache since there's new reflection data
     setStreakValidationCache(null);
+  };
+
+  const resetStreakExtendedFlag = () => {
+    setWasStreakExtended(false);
   };
 
   const refreshUserData = async () => {
@@ -294,10 +304,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         unblockUserById,
         validateAndUpdateStreak,
         updateStreakOnReflection,
+        resetStreakExtendedFlag,
         refreshUserData,
         streakValidationCache,
         hasValidatedStreakOnStart,
         refreshStreakValidationCache,
+        wasStreakExtended,
       }}
     >
       {children}

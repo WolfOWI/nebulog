@@ -36,7 +36,7 @@ import { getRandomPrompt } from "@/utils/promptUtility";
 import { calculateNewStreak } from "@/utils/streakUtility";
 
 const ThoughtLaunch = () => {
-  const { user, updateUserContext } = useUser();
+  const { user, updateUserContext, updateStreakOnReflection } = useUser();
   const [selectedMood, setSelectedMood] = useState<string>("unselected");
   const [comment, setComment] = useState("");
   const { selectedLocation } = useLocation();
@@ -145,11 +145,15 @@ const ThoughtLaunch = () => {
 
       // Calculate new streak and update local user context
       const newStreak = calculateNewStreak(user.streakCount, user.lastReflectDate);
+      const wasStreakExtended = newStreak > user.streakCount;
+
       updateUserContext({
         totalReflections: user.totalReflections + 1,
         lastReflectDate: new Date().toISOString(),
         streakCount: newStreak,
       });
+
+      updateStreakOnReflection(newStreak, wasStreakExtended);
 
       // If public, go to home, otherwise go to my reflections on profile
       if (isPublic) {

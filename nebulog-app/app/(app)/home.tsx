@@ -28,6 +28,8 @@ export default function Home() {
     streakValidationCache,
     hasValidatedStreakOnStart,
     refreshStreakValidationCache,
+    wasStreakExtended,
+    resetStreakExtendedFlag,
   } = useUser();
   const { setSelectedLocation } = useLocation();
   const insets = useSafeAreaInsets();
@@ -85,11 +87,13 @@ export default function Home() {
 
   // Show streak status when returning to home screen (only if we have cached validation)
   useEffect(() => {
+    // Don't show streak messages if user just created a reflection (within last 20 seconds)
     if (
       user?.lastReflectDate &&
       streakValidationCache &&
       !streakValidationCache.isValid &&
-      streakValidationCache.daysSinceLastReflection > 1
+      streakValidationCache.daysSinceLastReflection > 1 &&
+      !isWithinLast20Seconds(user.lastReflectDate)
     ) {
       // Show warning if streak is broken
       setTimeout(() => {
@@ -106,20 +110,20 @@ export default function Home() {
     }
   }, [user?.lastReflectDate, streakValidationCache]);
 
-  // Show celebration when returning from reflection creation
+  // Show celebration only when a streak is actually extended (not for same-day reflections)
   useEffect(() => {
-    if (user?.streakCount && user?.streakCount > 1) {
+    if (wasStreakExtended && user?.streakCount && user?.streakCount > 1) {
       // Check if this is a recent streak increase
       const lastReflection = new Date(user.lastReflectDate || "");
       const now = new Date();
       const timeDiff = now.getTime() - lastReflection.getTime();
 
-      // If the reflection was created in the last 5 minutes, show celebration
-      if (timeDiff < 5 * 60 * 1000) {
+      // Only show celebration if reflection was created 20s to 5min after last reflection
+      if (timeDiff < 5 * 60 * 1000 && timeDiff > 20 * 1000) {
         showStreakCelebration(user.streakCount);
       }
     }
-  }, [user?.streakCount, user?.lastReflectDate]);
+  }, [wasStreakExtended, user?.streakCount, user?.lastReflectDate, resetStreakExtendedFlag]);
 
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -293,6 +297,10 @@ export default function Home() {
         autoHide: true,
         topOffset: 50,
       });
+
+      setTimeout(() => {
+        resetStreakExtendedFlag();
+      }, 100);
     }
   };
 
