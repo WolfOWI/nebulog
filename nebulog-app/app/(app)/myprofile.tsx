@@ -162,7 +162,7 @@ export default function MyProfile() {
     }
   };
 
-  const showValidationError = (title: string, message: string) => {
+  const showErrorToast = (title: string, message: string) => {
     Toast.show({
       type: "error",
       text1: title,
@@ -206,10 +206,15 @@ export default function MyProfile() {
       if (activeTab === "echoed") {
         await handleGetEchoedReflections();
       }
+      showSuccessToast("Thought Unechoed", "Thought removed from your echoed thoughts.");
 
       // console.log(`Reflection ${reflectionId} unliked successfully`);
     } catch (error) {
       console.error("Error unliking reflection:", error);
+      showErrorToast(
+        "Error Unechoing Thought",
+        "Failed to remove thought from your echoed thoughts. Please try again."
+      );
     }
   };
 
@@ -236,10 +241,7 @@ export default function MyProfile() {
       showSuccessToast("Reflection Deleted", "Your reflection has been successfully deleted.");
     } catch (error) {
       console.error("Error deleting reflection:", error);
-      showValidationError(
-        "Error Deleting Reflection",
-        "Failed to delete reflection. Please try again."
-      );
+      showErrorToast("Error Deleting Reflection", "Failed to delete reflection. Please try again.");
     }
   };
 
