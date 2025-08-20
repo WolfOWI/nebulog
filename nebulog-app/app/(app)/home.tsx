@@ -53,7 +53,7 @@ export default function Home() {
         if (reflectionData.createdAt && isWithinLast20Seconds(reflectionData.createdAt)) {
           Toast.show({
             type: "success",
-            text1: "Reflection Created!",
+            text1: "Thought Launched!",
             text2:
               reflectionData.visibility === "public"
                 ? "Your reflection is now visible on the map"

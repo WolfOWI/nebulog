@@ -83,7 +83,7 @@ const EditReflection = () => {
     setComment(text.slice(0, maxCharacters));
   };
 
-  const showValidationError = (title: string, message: string) => {
+  const showErrorToast = (title: string, message: string) => {
     Toast.show({
       type: "error",
       text1: title,
@@ -109,20 +109,20 @@ const EditReflection = () => {
 
   const handleUpdate = async () => {
     if (!user?.id || !reflectionData?.id) {
-      showValidationError("Error Updating Reflection", "User ID or reflection ID not found");
+      showErrorToast("Error Updating Thought", "User ID or reflection ID not found");
       return;
     }
 
     // Check if comment is filled
     if (!comment.trim()) {
-      showValidationError("Error Updating Reflection", "Your reflection can't be empty");
+      showErrorToast("Error Updating Thought", "Your thought can't be left empty");
       return;
     }
 
     // Check if location is required and available
     if (isLocationOn && !selectedLocation && !originalLocation) {
-      showValidationError(
-        "Error Updating Reflection",
+      showErrorToast(
+        "Error Updating Thought",
         "You must select a location if you want to make your reflection public"
       );
       return;
@@ -164,15 +164,12 @@ const EditReflection = () => {
       await updateReflection(reflectionData.id, updates);
 
       // Show success toast
-      showSuccessToast("Success", "Your reflection has been successfully updated.");
+      showSuccessToast("Thought Updated", "Your thought has been successfully updated.");
 
       router.push("/(app)/myprofile" as any);
     } catch (error) {
       console.error("Error updating reflection:", error);
-      showValidationError(
-        "Error Updating Reflection",
-        "Failed to update reflection. Please try again."
-      );
+      showErrorToast("Error Updating Thought", "Failed to update thought. Please try again.");
     }
   };
 
