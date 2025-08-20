@@ -21,9 +21,10 @@ dayjs.extend(relativeTime);
 
 interface EchoedReflectionCardProps {
   reflection: Reflection;
+  onUnlike: (reflectionId: string, reflectionAuthorId: string) => void;
 }
 
-const EchoedReflectionCard: React.FC<EchoedReflectionCardProps> = ({ reflection }) => {
+const EchoedReflectionCard: React.FC<EchoedReflectionCardProps> = ({ reflection, onUnlike }) => {
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
@@ -54,18 +55,27 @@ const EchoedReflectionCard: React.FC<EchoedReflectionCardProps> = ({ reflection 
     }
   };
 
+  if (!reflection.id || !reflection.authorId) {
+    return null;
+  }
+
   return (
     <View className="p-6 rounded-3xl overflow-hidden bg-background-100">
       <VStack className="gap-2">
-        <HStack className="gap-2 items-center">
-          {getMoodIcon(reflectionMood, {
-            fill: moodData?.colorHex,
-            width: 32,
-            height: 32,
-          })}
-          <Text className={`text-2xl ${moodData?.textColor}`}>
-            {moodData?.spaceObject || "Unknown Planet"}
-          </Text>
+        <HStack className="flex-row justify-between items-center">
+          <HStack className="gap-2 items-center">
+            {getMoodIcon(reflectionMood, {
+              fill: moodData?.colorHex,
+              width: 32,
+              height: 32,
+            })}
+            <Text className={`text-2xl ${moodData?.textColor}`}>
+              {moodData?.spaceObject || "Unknown Planet"}
+            </Text>
+          </HStack>
+          <Pressable onPress={() => onUnlike(reflection.id!, reflection.authorId)}>
+            <MaterialIcons name="close" size={24} color="#64748b" />
+          </Pressable>
         </HStack>
         <Text className="text-typography-900" size="md">
           {moodData?.subemotions || "Unselected Mood"}

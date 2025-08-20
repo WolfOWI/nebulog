@@ -27,6 +27,7 @@ import { getBlockedUsers, unblockUser } from "@/services/userServices";
 import UserReflectionCard from "@/components/cards/UserReflectionCard";
 import EchoedReflectionCard from "@/components/cards/EchoedReflectionCard";
 import Toast from "react-native-toast-message";
+import { unlikeReflection } from "@/services/echoService";
 
 type TabType = "reflections" | "echoed" | "blocked";
 
@@ -185,12 +186,32 @@ export default function MyProfile() {
     });
   };
 
-  // TODO: Store reflections in context
   useEffect(() => {
     if (user) {
       handleGetReflections();
     }
   }, [user]);
+
+  const handleUnlikeReflection = async (reflectionId: string, reflectionAuthorId: string) => {
+    if (!user?.id) {
+      console.log("No logged in user found");
+      return;
+    }
+
+    try {
+      // console.log("Unliking reflection", reflectionId, reflectionAuthorId);
+      await unlikeReflection(user.id, reflectionId, reflectionAuthorId);
+
+      // Refresh echoed reflections to show newly unliked reflection
+      if (activeTab === "echoed") {
+        await handleGetEchoedReflections();
+      }
+
+      // console.log(`Reflection ${reflectionId} unliked successfully`);
+    } catch (error) {
+      console.error("Error unliking reflection:", error);
+    }
+  };
 
   const handleDelete = async (reflectionId: string) => {
     if (!reflectionId) {
@@ -276,7 +297,9 @@ export default function MyProfile() {
         return (
           <FlatList
             data={echoedReflections}
-            renderItem={({ item }) => <EchoedReflectionCard reflection={item} />}
+            renderItem={({ item }) => (
+              <EchoedReflectionCard reflection={item} onUnlike={handleUnlikeReflection} />
+            )}
             keyExtractor={(item) => item.id!}
             contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
             showsVerticalScrollIndicator={false}
