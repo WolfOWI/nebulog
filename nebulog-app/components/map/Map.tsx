@@ -337,25 +337,20 @@ const MapComponent = ({
 
   return (
     <VStack className={className}>
-      {!isShowingReflectionCreatedAnimation && (
-        <>
-          {/* Finding user location animation */}
-          <AnimatedElement
-            animationSource={require("@/assets/animations/getting-location-animation.json")}
-            size={400}
-            className="z-50 mb-8"
-            isVisible={isFindingUserLocation}
-          />
-          {/* Scanning animation */}
-          <AnimatedElement
-            animationSource={require("@/assets/animations/scan-animation.json")}
-            size={500}
-            className="z-40 mb-8"
-            isVisible={isSearchingForReflections}
-          />
-        </>
-      )}
-
+      {/* Finding user location animation */}
+      <AnimatedElement
+        animationSource={require("@/assets/animations/getting-location-animation.json")}
+        size={400}
+        className="z-50 mb-8"
+        isVisible={isFindingUserLocation}
+      />
+      {/* Scanning animation */}
+      <AnimatedElement
+        animationSource={require("@/assets/animations/scan-animation.json")}
+        size={500}
+        className="z-40 mb-8"
+        isVisible={isSearchingForReflections}
+      />
       {/* Reflection created animation */}
       <AnimatedElement
         animationSource={require("@/assets/animations/blurry-glow-animation.json")}

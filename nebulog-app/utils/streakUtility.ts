@@ -34,8 +34,8 @@ export const validateStreak = (lastReflectDate?: string) => {
 
   const daysSinceLastReflection = getDaysBetween(lastReflectionStart, todayStart);
 
-  // Streak is valid if the reflection wasn't more than 1 day ago
-  const isValid = daysSinceLastReflection <= 1;
+  // Streak is only valid if the user reflected today (0 days ago)
+  const isValid = daysSinceLastReflection === 0;
 
   console.log("validateStreak:", {
     lastReflectDate,
@@ -62,8 +62,18 @@ export const calculateNewStreak = (currentStreak: number, lastReflectDate?: stri
     return 1; // First reflection ever
   }
 
-  const { daysSinceLastReflection } = validateStreak(lastReflectDate);
-  console.log("calculateNewStreak: Days since last reflection:", daysSinceLastReflection);
+  const lastReflection = new Date(lastReflectDate);
+  const today = new Date();
+
+  // Reset time to start of day for accurate day calculation
+  const lastReflectionStart = new Date(
+    lastReflection.getFullYear(),
+    lastReflection.getMonth(),
+    lastReflection.getDate()
+  );
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  const daysSinceLastReflection = getDaysBetween(lastReflectionStart, todayStart);
 
   let newStreak: number;
   if (daysSinceLastReflection === 0) {
@@ -95,8 +105,20 @@ export const shouldResetStreak = (lastReflectDate?: string): boolean => {
     return false; // No previous reflections, don't reset
   }
 
-  const { daysSinceLastReflection } = validateStreak(lastReflectDate);
-  // Only reset if more than 1 day has passed since last reflection
+  const lastReflection = new Date(lastReflectDate);
+  const today = new Date();
+
+  // Reset time to start of day for accurate day calculation
+  const lastReflectionStart = new Date(
+    lastReflection.getFullYear(),
+    lastReflection.getMonth(),
+    lastReflection.getDate()
+  );
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  const daysSinceLastReflection = getDaysBetween(lastReflectionStart, todayStart);
+
+  // Reset streak if more than 1 day has passed since last reflection
   const shouldReset = daysSinceLastReflection > 1;
 
   console.log("shouldResetStreak:", {

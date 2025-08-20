@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text } from "@/components/ui/text";
-import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
-import { Heading } from "@/components/ui/heading";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, View, Pressable, Dimensions } from "react-native";
@@ -17,8 +15,6 @@ import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
-import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
-import CircleHoldTextBtn from "@/components/buttons/CircleHoldTextBtn";
 
 import { useLocation } from "@/contexts/LocationContext";
 import { reverseGeocode } from "@/services/placesServices";
@@ -138,6 +134,7 @@ export default function Home() {
     },
     [selectedMapLocation]
   );
+
   const handlePresentModalPress = useCallback(() => {
     // Clear any selected location when opening the bottom sheet
     if (selectedMapLocation) {
@@ -167,6 +164,7 @@ export default function Home() {
   const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
   const [isRefreshingStreak, setIsRefreshingStreak] = useState(false);
   const [isLocationPanelOpen, setIsLocationPanelOpen] = useState(false);
+
   // Get Location of User
   const handleGetLocation = async () => {
     try {
@@ -211,13 +209,6 @@ export default function Home() {
     setIsRefreshingStreak(true);
 
     try {
-      console.log("Home: Refreshing streak manually:", {
-        userId: user.id,
-        currentStreakCount: user.streakCount,
-        lastReflectDate: user?.lastReflectDate,
-        totalReflections: user?.totalReflections,
-      });
-
       // First refresh user data from database
       await refreshUserData();
 
@@ -236,7 +227,17 @@ export default function Home() {
           Toast.show({
             type: "success",
             text1: `${user.streakCount} Day Streak Active!`,
-            text2: "Your streak is still going strong!",
+            text2: "You've already reflected today!",
+            position: "top",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 50,
+          });
+        } else if (streakValidationCache.daysSinceLastReflection === 1) {
+          Toast.show({
+            type: "info",
+            text1: `${user.streakCount} Day Streak`,
+            text2: "You reflected yesterday. Post today to keep your streak alive!",
             position: "top",
             visibilityTime: 3000,
             autoHide: true,
@@ -326,20 +327,29 @@ export default function Home() {
     const { isValid, daysSinceLastReflection } = validation;
 
     if (isValid) {
-      const lastReflection = new Date(user.lastReflectDate);
-      const today = new Date();
-      const isToday = lastReflection.toDateString() === today.toDateString();
-
+      // Streak is valid only if reflected today
       Toast.show({
         type: "success",
         text1: `${user.streakCount} Day Streak Active!`,
-        text2: isToday ? "You've already reflected today!" : "Keep the streak going!",
+        text2: "You've already reflected today! Keep it going!",
+        position: "top",
+        visibilityTime: 4000,
+        autoHide: true,
+        topOffset: 50,
+      });
+    } else if (daysSinceLastReflection === 1) {
+      // Reflected yesterday - streak is still counting but needs today's reflection
+      Toast.show({
+        type: "info",
+        text1: `${user.streakCount} Day Streak`,
+        text2: "You reflected yesterday. Post today to keep your streak alive!",
         position: "top",
         visibilityTime: 4000,
         autoHide: true,
         topOffset: 50,
       });
     } else {
+      // Streak broken - more than 1 day gap
       Toast.show({
         type: "warning",
         text1: "Streak Broken",
@@ -436,10 +446,6 @@ export default function Home() {
     // Navigate to thought launch
     router.push("/thoughtlaunch" as any);
   };
-
-  // useEffect(() => {
-  //   console.log("selectedMapLocation", selectedMapLocation);
-  // }, [selectedMapLocation]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
