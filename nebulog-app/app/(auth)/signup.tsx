@@ -16,6 +16,7 @@ import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
 import isEmail from "validator/lib/isEmail";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import LoadingScreen from "@/components/LoadingScreen";
+import { isUsernameTaken } from "@/services/userServices";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -34,6 +35,13 @@ export default function Signup() {
 
     if (name.length < 3) {
       setError("Username must be at least 3 characters long");
+      return;
+    }
+
+    // Check if username is taken
+    const isTaken = await isUsernameTaken(name);
+    if (isTaken) {
+      setError(`The username "${name}" is already taken. Please select a different one.`);
       return;
     }
 
