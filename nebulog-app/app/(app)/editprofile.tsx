@@ -271,7 +271,7 @@ export default function EditProfile() {
 
           {/* Profile Color Selection */}
           <Pressable onPress={handleColorSelect} className="mb-8">
-            <Text className="text-typography-700 text-sm font-medium mb-2">Profile Color</Text>
+            <Text className="text-typography-700 text-sm font-medium mb-2">Profile Colour</Text>
             <View className="flex-row items-center justify-between p-4 border border-background-100 rounded-2xl">
               <HStack className="items-center">
                 <View
