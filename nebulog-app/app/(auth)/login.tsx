@@ -13,10 +13,9 @@ import { logInUser } from "@/services/authServices";
 import { useUser } from "@/contexts/UserContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import nebulogText from "@/assets/images/nebulog-text-logo-white.png";
-import isEmail from "validator/lib/isEmail";
+import { isEmail } from "validator";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useToast } from "@/contexts/ToastContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,7 +23,6 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { user } = useUser();
-  const { showToast } = useToast();
 
   const handleLogin = async () => {
     // Check if email and password are filled
@@ -154,60 +152,6 @@ export default function Login() {
               {/* <Button className="mt-4" onPress={handleLogin} disabled={isLoading}>
               <ButtonText>{isLoading ? "Signing in..." : "Sign In"}</ButtonText>
             </Button> */}
-
-              {/* TODO: Delete Later - Test Toast Buttons */}
-              <VStack className="w-full gap-2 mt-4">
-                <Text className="text-typography-600 text-sm mb-2">Toast Test Buttons:</Text>
-                <Button
-                  onPress={() => {
-                    showToast({
-                      type: "success",
-                      text1: "Success Toast",
-                      text2:
-                        "This is a success message kdsfkhjasd dsafhsdkh cxi hdsfuer xoxjcvhf dsijh sdfxicjif hel odf six",
-                      visibilityTime: 4000,
-                    });
-                  }}
-                >
-                  <ButtonText>Test Success Toast</ButtonText>
-                </Button>
-                <Button
-                  onPress={() => {
-                    showToast({
-                      type: "error",
-                      text1: "Error Toast",
-                      text2: "This is an error message",
-                      visibilityTime: 4000,
-                    });
-                  }}
-                >
-                  <ButtonText>Test Error Toast</ButtonText>
-                </Button>
-                <Button
-                  onPress={() => {
-                    showToast({
-                      type: "info",
-                      text1: "Info Toast",
-                      text2: "This is an info message",
-                      visibilityTime: 4000,
-                    });
-                  }}
-                >
-                  <ButtonText>Test Info Toast</ButtonText>
-                </Button>
-                <Button
-                  onPress={() => {
-                    showToast({
-                      type: "warning",
-                      text1: "Warning Toast",
-                      text2: "This is a warning message",
-                      visibilityTime: 4000,
-                    });
-                  }}
-                >
-                  <ButtonText>Test Warning Toast</ButtonText>
-                </Button>
-              </VStack>
             </VStack>
           </VStack>
         </ScrollView>

@@ -16,7 +16,7 @@ import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { isUsernameTaken, updateUserDetails } from "@/services/userServices";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import { logOutUser } from "@/services/authServices";
 import { GetColorName } from "hex-color-to-color-name";
@@ -24,6 +24,7 @@ import { Textarea, TextareaInput } from "@/components/ui/textarea";
 
 export default function EditProfile() {
   const { user, loading, updateUserContext } = useUser();
+  const { showToast } = useToast();
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [profileIcon, setProfileIcon] = useState("ufo-outline");
@@ -59,14 +60,11 @@ export default function EditProfile() {
   const handleSave = async () => {
     // Check if username is at least 3 characters long
     if (username.length < 3) {
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Invalid Username",
         text2: "Your username must be at least 3 characters long",
-        position: "top",
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
       });
       return;
     }
@@ -75,14 +73,11 @@ export default function EditProfile() {
       // Check if username is already taken (and not the same as the current username)
       const isTaken = await isUsernameTaken(username);
       if (isTaken && username !== user.username) {
-        Toast.show({
+        showToast({
           type: "error",
           text1: `"${username}" is already taken`,
           text2: `Please choose a different username.`,
-          position: "top",
           visibilityTime: 4000,
-          autoHide: true,
-          topOffset: 50,
         });
         return;
       }
@@ -110,27 +105,21 @@ export default function EditProfile() {
           updateUserContext(updateData);
 
           // Show success toast
-          Toast.show({
+          showToast({
             type: "success",
             text1: "Profile Updated",
             text2: `Your profile has been updated successfully.`,
-            position: "top",
             visibilityTime: 3000,
-            autoHide: true,
-            topOffset: 50,
           });
 
           router.back();
         } catch (error) {
           // Show error toast
-          Toast.show({
+          showToast({
             type: "error",
             text1: "Update Failed",
             text2: "There was an error updating your profile. Please try again.",
-            position: "top",
             visibilityTime: 4000,
-            autoHide: true,
-            topOffset: 50,
           });
         }
       } else {
@@ -139,14 +128,11 @@ export default function EditProfile() {
       }
     } else {
       // Show error toast for missing user ID
-      Toast.show({
+      showToast({
         type: "error",
         text1: "User Not Found",
         text2: "Unable to update profile. Please try logging in again.",
-        position: "top",
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
       });
     }
   };

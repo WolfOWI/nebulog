@@ -31,12 +31,13 @@ import { useLocation } from "@/contexts/LocationContext";
 import { createReflection } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
 import { geohashForLocation } from "geofire-common";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import { getRandomPrompt } from "@/utils/promptUtility";
 import { calculateNewStreak } from "@/utils/streakUtility";
 
 const ThoughtLaunch = () => {
   const { user, updateUserContext, updateStreakOnReflection } = useUser();
+  const { showToast } = useToast();
   const [selectedMood, setSelectedMood] = useState<string>("unselected");
   const [comment, setComment] = useState("");
   const { selectedLocation } = useLocation();
@@ -68,28 +69,22 @@ const ThoughtLaunch = () => {
   };
 
   const showValidationError = (message: string) => {
-    Toast.show({
+    showToast({
       type: "error",
       text1: "Error Launching Reflection",
       text2: message,
-      position: "top",
       visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
     });
   };
 
   const showSuccessToast = () => {
-    Toast.show({
+    showToast({
       type: "success",
       text1: isPublic ? "Reflection Launched" : "Reflection Saved",
       text2: isPublic
         ? "Your reflection has been launched into the universe."
         : "Your reflection has been saved to your private reflections.",
-      position: "top",
-      visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
+      visibilityTime: 3000,
     });
   };
 

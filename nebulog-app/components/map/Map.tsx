@@ -9,7 +9,7 @@ import { PlaceDetails, Reflection } from "@/lib/types";
 import { getCurrentLocation } from "@/services/locationServices";
 import { getPublicReflectionsInRadius } from "@/services/reflectionServices";
 import { useUser } from "@/contexts/UserContext";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import { getMoodIcon, MoodIcons } from "@/constants/moodIcons";
 import { mood } from "@/constants/moods";
 import { ProfileIcon } from "../building-blocks/ProfileIcon";
@@ -61,6 +61,7 @@ const MapComponent = ({
   onHighlightedReflectionProcessed,
 }: MapComponentProps) => {
   const { user } = useUser();
+  const { showToast } = useToast();
   const mapRef = useRef<MapView>(null);
   const currentRegionRef = useRef<Region | null>(null);
 
@@ -221,7 +222,7 @@ const MapComponent = ({
       // Only show "no reflections found" message if this is the initial search
       // and we don't have any reflections yet (to avoid overshadowing success messages)
       if (reflections.length === 0 && mapReflections.length === 0) {
-        Toast.show({
+        showToast({
           type: "info",
           text1: "No Reflections Nearby",
           text2: "Try moving to a different area or be the first to share!",

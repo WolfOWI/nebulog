@@ -13,12 +13,13 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { getIconColourFromBgColour } from "@/utils/colourUtility";
 import ProfileAvatar from "@/components/avatars/ProfileAvatar";
 import { updateUserDetails } from "@/services/userServices";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import { GetColorName } from "hex-color-to-color-name";
 import LaunchButton from "@/components/buttons/LaunchButton";
 
 export default function ProfileColourPick() {
   const { user, updateUserContext } = useUser();
+  const { showToast } = useToast();
   const [selectedColor, setSelectedColor] = useState(user?.profileColor || "#4ECDC4");
 
   // Update local state when user context changes
@@ -43,37 +44,28 @@ export default function ProfileColourPick() {
         console.log("Backend updated successfully, updating user context");
         updateUserContext({ profileColor: selectedColor });
 
-        Toast.show({
+        showToast({
           type: "success",
           text1: "Profile Colour Updated",
           text2: `Your profile colour has been set to ${GetColorName(selectedColor)}.`,
-          position: "top",
           visibilityTime: 3000,
-          autoHide: true,
-          topOffset: 50,
         });
 
         router.back();
       } catch (error) {
-        Toast.show({
+        showToast({
           type: "error",
           text1: "Update Failed",
           text2: "There was an error updating your profile colour. Please try again.",
-          position: "top",
           visibilityTime: 4000,
-          autoHide: true,
-          topOffset: 50,
         });
       }
     } else {
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Update Failed",
         text2: "There was an error updating your profile colour. Please try again.",
-        position: "top",
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
       });
     }
   };

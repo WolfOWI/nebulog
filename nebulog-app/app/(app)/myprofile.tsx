@@ -25,7 +25,7 @@ import {
 import { getBlockedUsers, unblockUser } from "@/services/userServices";
 import UserReflectionCard from "@/components/cards/UserReflectionCard";
 import EchoedReflectionCard from "@/components/cards/EchoedReflectionCard";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import { unlikeReflection } from "@/services/echoService";
 
 type TabType = "reflections" | "echoed" | "blocked";
@@ -162,26 +162,20 @@ export default function MyProfile() {
   };
 
   const showErrorToast = (title: string, message: string) => {
-    Toast.show({
+    showToast({
       type: "error",
       text1: title,
       text2: message,
-      position: "top",
       visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
     });
   };
 
   const showSuccessToast = (title: string, message: string) => {
-    Toast.show({
+    showToast({
       type: "success",
       text1: title,
       text2: message,
-      position: "top",
       visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
     });
   };
 

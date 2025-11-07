@@ -12,11 +12,12 @@ import { useUser } from "@/contexts/UserContext";
 import { ProfileIcon } from "@/components/building-blocks/ProfileIcon";
 import { profileIconNames } from "@/constants/ProfileIconOptions";
 import { updateUserDetails } from "@/services/userServices";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 import LaunchButton from "@/components/buttons/LaunchButton";
 
 export default function ProfileIconSelect() {
   const { user, updateUserContext } = useUser();
+  const { showToast } = useToast();
   const [selectedIcon, setSelectedIcon] = useState(user?.profileIcon || "ufo-outline");
 
   // Update local state when user context changes
@@ -39,40 +40,31 @@ export default function ProfileIconSelect() {
         console.log("Backend updated successfully, updating user context");
         updateUserContext({ profileIcon: selectedIcon });
 
-        Toast.show({
+        showToast({
           type: "success",
           text1: "Profile Icon Updated",
           text2: `Your profile icon has been changed to the ${selectedIcon.replace(
             "-",
             " "
           )} icon.`,
-          position: "top",
           visibilityTime: 3000,
-          autoHide: true,
-          topOffset: 50,
         });
 
         router.back();
       } catch (error) {
-        Toast.show({
+        showToast({
           type: "error",
           text1: "Update Failed",
           text2: "There was an error updating your profile icon. Please try again.",
-          position: "top",
           visibilityTime: 4000,
-          autoHide: true,
-          topOffset: 50,
         });
       }
     } else {
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Update Failed",
         text2: "There was an error updating your profile icon. Please try again.",
-        position: "top",
         visibilityTime: 4000,
-        autoHide: true,
-        topOffset: 50,
       });
     }
   };

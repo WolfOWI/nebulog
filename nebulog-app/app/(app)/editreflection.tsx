@@ -32,10 +32,11 @@ import { updateReflection, deleteReflection } from "@/services/reflectionService
 import { useUser } from "@/contexts/UserContext";
 import { Reflection } from "@/lib/types";
 import { geohashForLocation } from "geofire-common";
-import Toast from "react-native-toast-message";
+import { useToast } from "@/contexts/ToastContext";
 
 const EditReflection = () => {
   const { user } = useUser();
+  const { showToast } = useToast();
   const { selectedLocation } = useLocation();
   const params = useLocalSearchParams();
 
@@ -84,26 +85,20 @@ const EditReflection = () => {
   };
 
   const showErrorToast = (title: string, message: string) => {
-    Toast.show({
+    showToast({
       type: "error",
       text1: title,
       text2: message,
-      position: "top",
       visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
     });
   };
 
   const showSuccessToast = (title: string, message: string) => {
-    Toast.show({
+    showToast({
       type: "success",
       text1: title,
       text2: message,
-      position: "top",
       visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
     });
   };
 

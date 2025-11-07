@@ -10,10 +10,10 @@ import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from "@gorhom/botto
 import MapComponent from "@/components/map/Map";
 import { Location as LocationType, PlaceDetails, Reflection } from "@/lib/types";
 import AvatarHoldBtn from "@/components/buttons/AvatarHoldBtn";
-import Toast from "react-native-toast-message";
 import LaunchThoughtSwipeBtn from "@/components/buttons/LaunchThoughtSwipeBtn";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/contexts/ToastContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 
 import { useLocation } from "@/contexts/LocationContext";
@@ -21,6 +21,7 @@ import { reverseGeocode } from "@/services/placesServices";
 import { isWithinLast20Seconds } from "@/utils/dateUtility";
 
 export default function Home() {
+  const { showToast } = useToast();
   const {
     user,
     validateAndUpdateStreak,
@@ -42,35 +43,32 @@ export default function Home() {
   const [highlightedReflection, setHighlightedReflection] = useState<Reflection | null>(null);
 
   // Handle highlighted reflection from nav params
-  // useEffect(() => {
-  //   if (params.highlightedReflection) {
-  //     try {
-  //       const reflectionData = JSON.parse(params.highlightedReflection as string);
-  //       setHighlightedReflection(reflectionData);
+  useEffect(() => {
+    if (params.highlightedReflection) {
+      try {
+        const reflectionData = JSON.parse(params.highlightedReflection as string);
+        setHighlightedReflection(reflectionData);
 
-  //       // Clear the params
-  //       router.setParams({});
+        // Clear the params
+        router.setParams({});
 
-  //       // Show success message (if reflection was created in the last 20 seconds)
-  //       if (reflectionData.createdAt && isWithinLast20Seconds(reflectionData.createdAt)) {
-  //         Toast.show({
-  //           type: "success",
-  //           text1: "Thought Launched!",
-  //           text2:
-  //             reflectionData.visibility === "public"
-  //               ? "Your reflection is now visible on the map"
-  //               : "Your reflection has been saved privately",
-  //           position: "top",
-  //           visibilityTime: 3000,
-  //           autoHide: true,
-  //           topOffset: 50,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Error accessing highlighted reflection:", error);
-  //     }
-  //   }
-  // }, [params.highlightedReflection]);
+        // Show success message (if reflection was created in the last 20 seconds)
+        if (reflectionData.createdAt && isWithinLast20Seconds(reflectionData.createdAt)) {
+          showToast({
+            type: "success",
+            text1: "Thought Launched!",
+            text2:
+              reflectionData.visibility === "public"
+                ? "Your reflection is now visible on the map"
+                : "Your reflection has been saved privately",
+            visibilityTime: 3000,
+          });
+        }
+      } catch (error) {
+        console.error("Error accessing highlighted reflection:", error);
+      }
+    }
+  }, [params.highlightedReflection]);
 
   // On mount, validate streak (only once)
   useEffect(() => {
@@ -86,29 +84,26 @@ export default function Home() {
   }, [user?.id, hasValidatedStreakOnStart]);
 
   // Show streak status when returning to home screen (only if we have cached validation)
-  // useEffect(() => {
-  //   // Don't show streak messages if user just created a reflection (within last 20 seconds)
-  //   if (
-  //     user?.lastReflectDate &&
-  //     streakValidationCache &&
-  //     !streakValidationCache.isValid &&
-  //     streakValidationCache.daysSinceLastReflection > 1 &&
-  //     !isWithinLast20Seconds(user.lastReflectDate)
-  //   ) {
-  //     // Show warning if streak is broken
-  //     setTimeout(() => {
-  //       Toast.show({
-  //         type: "warning",
-  //         text1: "Streak Broken",
-  //         text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
-  //         position: "top",
-  //         visibilityTime: 5000,
-  //         autoHide: true,
-  //         topOffset: 50,
-  //       });
-  //     }, 1000); // Delay a bit to avoid showing immediately
-  //   }
-  // }, [user?.lastReflectDate, streakValidationCache]);
+  useEffect(() => {
+    // Don't show streak messages if user just created a reflection (within last 20 seconds)
+    if (
+      user?.lastReflectDate &&
+      streakValidationCache &&
+      !streakValidationCache.isValid &&
+      streakValidationCache.daysSinceLastReflection > 1 &&
+      !isWithinLast20Seconds(user.lastReflectDate)
+    ) {
+      // Show warning if streak is broken
+      setTimeout(() => {
+        showToast({
+          type: "warning",
+          text1: "Streak Broken",
+          text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
+          visibilityTime: 5000,
+        });
+      }, 1000); // Delay a bit to avoid showing immediately
+    }
+  }, [user?.lastReflectDate, streakValidationCache]);
 
   // Show celebration only when a streak is actually extended (not for same-day reflections)
   useEffect(() => {
@@ -199,11 +194,12 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error refreshing map:", error);
-      // Toast.show({
-      //   type: "error",
-      //   text1: "Map Refresh Failed",
-      //   text2: "Please try again",
-      // });
+      showToast({
+        type: "error",
+        text1: "Map Refresh Failed",
+        text2: "Please try again",
+        visibilityTime: 4000,
+      });
     }
   };
 
@@ -229,58 +225,43 @@ export default function Home() {
         });
 
         if (streakValidationCache.isValid) {
-          // Toast.show({
-          //   type: "success",
-          //   text1: `${user.streakCount} Day Streak Active!`,
-          //   text2: "You've already reflected today!",
-          //   position: "top",
-          //   visibilityTime: 3000,
-          //   autoHide: true,
-          //   topOffset: 50,
-          // });
+          showToast({
+            type: "success",
+            text1: `${user.streakCount} Day Streak Active!`,
+            text2: "You've already reflected today!",
+            visibilityTime: 3000,
+          });
         } else if (streakValidationCache.daysSinceLastReflection === 1) {
-          // Toast.show({
-          //   type: "info",
-          //   text1: `${user.streakCount} Day Streak`,
-          //   text2: "You reflected yesterday. Post today to keep your streak alive!",
-          //   position: "top",
-          //   visibilityTime: 3000,
-          //   autoHide: true,
-          //   topOffset: 50,
-          // });
+          showToast({
+            type: "info",
+            text1: `${user.streakCount} Day Streak`,
+            text2: "You reflected yesterday. Post today to keep your streak alive!",
+            visibilityTime: 3000,
+          });
         } else {
-          // Toast.show({
-          //   type: "warning",
-          //   text1: "Streak Status Updated",
-          //   text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection`,
-          //   position: "top",
-          //   visibilityTime: 3000,
-          //   autoHide: true,
-          //   topOffset: 50,
-          // });
+          showToast({
+            type: "warning",
+            text1: "Streak Status Updated",
+            text2: `It's been ${streakValidationCache.daysSinceLastReflection} days since your last reflection`,
+            visibilityTime: 3000,
+          });
         }
       } else {
-        // Toast.show({
-        //   type: "info",
-        //   text1: "No Streak Yet",
-        //   text2: "Post your first reflection to start building a streak!",
-        //   position: "top",
-        //   visibilityTime: 3000,
-        //   autoHide: true,
-        //   topOffset: 50,
-        // });
+        showToast({
+          type: "info",
+          text1: "No Streak Yet",
+          text2: "Post your first reflection to start building a streak!",
+          visibilityTime: 3000,
+        });
       }
     } catch (error) {
       console.error("Error refreshing streak:", error);
-      // Toast.show({
-      //   type: "error",
-      //   text1: "Streak Update Failed",
-      //   text2: "Please try again",
-      //   position: "top",
-      //   visibilityTime: 3000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "error",
+        text1: "Streak Update Failed",
+        text2: "Please try again",
+        visibilityTime: 3000,
+      });
     } finally {
       setIsRefreshingStreak(false);
     }
@@ -289,15 +270,12 @@ export default function Home() {
   // Show streak celebration message
   const showStreakCelebration = (newStreak: number) => {
     if (newStreak > 1) {
-      // Toast.show({
-      //   type: "success",
-      //   text1: `🔥 ${newStreak} Day Streak!`,
-      //   text2: "Amazing! You're building a great habit!",
-      //   position: "top",
-      //   visibilityTime: 4000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "success",
+        text1: `🔥 ${newStreak} Day Streak!`,
+        text2: "Amazing! You're building a great habit!",
+        visibilityTime: 4000,
+      });
 
       setTimeout(() => {
         resetStreakExtendedFlag();
@@ -308,15 +286,12 @@ export default function Home() {
   // Show current streak status (only called on long press)
   const showStreakStatus = () => {
     if (!user?.lastReflectDate) {
-      // Toast.show({
-      //   type: "info",
-      //   text1: "No Streak Yet",
-      //   text2: "Post your first reflection to start building a streak!",
-      //   position: "top",
-      //   visibilityTime: 3000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "info",
+        text1: "No Streak Yet",
+        text2: "Post your first reflection to start building a streak!",
+        visibilityTime: 3000,
+      });
       return;
     }
 
@@ -337,37 +312,28 @@ export default function Home() {
 
     if (isValid) {
       // Streak is valid only if reflected today
-      // Toast.show({
-      //   type: "success",
-      //   text1: `${user.streakCount} Day Streak Active!`,
-      //   text2: "You've already reflected today! Keep it going!",
-      //   position: "top",
-      //   visibilityTime: 4000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "success",
+        text1: `${user.streakCount} Day Streak Active!`,
+        text2: "You've already reflected today! Keep it going!",
+        visibilityTime: 4000,
+      });
     } else if (daysSinceLastReflection === 1) {
       // Reflected yesterday - streak is still counting but needs today's reflection
-      // Toast.show({
-      //   type: "info",
-      //   text1: `${user.streakCount} Day Streak`,
-      //   text2: "You reflected yesterday. Post today to keep your streak alive!",
-      //   position: "top",
-      //   visibilityTime: 4000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "info",
+        text1: `${user.streakCount} Day Streak`,
+        text2: "You reflected yesterday. Post today to keep your streak alive!",
+        visibilityTime: 4000,
+      });
     } else {
       // Streak broken - more than 1 day gap
-      // Toast.show({
-      //   type: "warning",
-      //   text1: "Streak Broken",
-      //   text2: `It's been ${daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
-      //   position: "top",
-      //   visibilityTime: 4000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "warning",
+        text1: "Streak Broken",
+        text2: `It's been ${daysSinceLastReflection} days since your last reflection. Start a new streak today!`,
+        visibilityTime: 4000,
+      });
     }
   };
 
@@ -412,28 +378,22 @@ export default function Home() {
           mapRef.current.centerMap(latitude, longitude);
         }
 
-        // Toast.show({
-        //   type: "info",
-        //   text1: "Location Selected",
-        //   text2: placeDetails.formatted_address || "Swipe to reflect here",
-        //   position: "top",
-        //   visibilityTime: 3000,
-        //   autoHide: true,
-        //   topOffset: 50,
-        // });
+        showToast({
+          type: "info",
+          text1: "Location Selected",
+          text2: placeDetails.formatted_address || "Swipe to reflect here",
+          visibilityTime: 3000,
+        });
       }
     } catch (error) {
       console.error("Error getting place details:", error);
 
-      // Toast.show({
-      //   type: "error",
-      //   text1: "Error Selecting Location.",
-      //   text2: "Could not determine location details.",
-      //   position: "top",
-      //   visibilityTime: 3000,
-      //   autoHide: true,
-      //   topOffset: 50,
-      // });
+      showToast({
+        type: "error",
+        text1: "Error Selecting Location.",
+        text2: "Could not determine location details.",
+        visibilityTime: 3000,
+      });
     }
   };
 

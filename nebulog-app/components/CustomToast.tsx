@@ -30,7 +30,6 @@ const CustomToast: React.FC<CustomToastProps> = ({ toast, onHide }) => {
 
   useEffect(() => {
     if (toast) {
-      // Slide in and fade in with spring animation for natural feel
       translateY.value = withSpring(0, {
         damping: 20,
         stiffness: 300,
@@ -73,7 +72,7 @@ const CustomToast: React.FC<CustomToastProps> = ({ toast, onHide }) => {
       startY.value = translateY.value;
     })
     .onUpdate((event) => {
-      // Only allow swiping upward (negative translationY)
+      // Only allow swiping upward
       if (event.translationY < 0) {
         translateY.value = startY.value + event.translationY;
         // Reduce opacity as user swipes up
@@ -82,7 +81,6 @@ const CustomToast: React.FC<CustomToastProps> = ({ toast, onHide }) => {
       }
     })
     .onEnd((event) => {
-      // If user swiped up more than 50 pixels, dismiss the toast
       if (event.translationY < -50) {
         translateY.value = withTiming(-200, {
           duration: 350,
@@ -99,7 +97,6 @@ const CustomToast: React.FC<CustomToastProps> = ({ toast, onHide }) => {
           }
         );
       } else {
-        // Spring back to original position with smooth spring
         translateY.value = withSpring(0, {
           damping: 18,
           stiffness: 250,
