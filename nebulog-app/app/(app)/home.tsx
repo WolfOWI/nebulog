@@ -127,7 +127,7 @@ export default function Home() {
 
   // Bottom Sheet Ref, Snap Points, and Callbacks
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["25%"], []);
+  const snapPoints = useMemo(() => ["20%"], []);
   const handleSheetChanges = useCallback(
     (index: number) => {
       // console.log("handleSheetChanges", index);

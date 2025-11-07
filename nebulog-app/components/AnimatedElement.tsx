@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from "react";
-import { ActivityIndicator, Animated } from "react-native";
+import React, { useEffect } from "react";
+import { ActivityIndicator } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import LottieView from "lottie-react-native";
 
 interface AnimatedElementProps {
@@ -17,32 +18,28 @@ export const AnimatedElement: React.FC<AnimatedElementProps> = ({
   isVisible = true,
   fadeDuration = 300,
 }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const opacity = useSharedValue(isVisible ? 1 : 0);
 
   useEffect(() => {
     if (isVisible) {
       // Fade in
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: fadeDuration,
-        useNativeDriver: true,
-      }).start();
+      opacity.value = withTiming(1, { duration: fadeDuration });
     } else {
       // Fade out
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: fadeDuration,
-        useNativeDriver: true,
-      }).start();
+      opacity.value = withTiming(0, { duration: fadeDuration });
     }
-  }, [isVisible, fadeAnim, fadeDuration]);
+  }, [isVisible, fadeDuration]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
 
   return (
     <Animated.View
       className={`flex-1 justify-center items-center absolute top-0 left-0 right-0 bottom-0 ${className} pointer-events-none`}
-      style={{
-        opacity: fadeAnim,
-      }}
+      style={animatedStyle}
     >
       {animationSource ? (
         <LottieView
