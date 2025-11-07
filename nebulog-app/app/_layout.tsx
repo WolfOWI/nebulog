@@ -9,8 +9,7 @@ import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { UserProvider } from "@/contexts/UserContext";
 import { LocationProvider } from "@/contexts/LocationContext";
-import Toast from "react-native-toast-message";
-import { toastConfig } from "@/styles/toastStyles";
+import { ToastProvider } from "@/contexts/ToastContext";
 import { StatusBar } from "react-native";
 
 import {
@@ -76,17 +75,18 @@ function RootLayoutNav() {
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={true} />
       <UserProvider>
         <LocationProvider>
-          <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
-            <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(app)" options={{ headerShown: false }} />
-              </Stack>
-              <Toast config={toastConfig} />
-            </ThemeProvider>
-          </GluestackUIProvider>
+          <ToastProvider>
+            <GluestackUIProvider mode={colorScheme === "dark" ? "dark" : "light"}>
+              <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(app)" options={{ headerShown: false }} />
+                </Stack>
+              </ThemeProvider>
+            </GluestackUIProvider>
+          </ToastProvider>
         </LocationProvider>
       </UserProvider>
     </GestureHandlerRootView>
