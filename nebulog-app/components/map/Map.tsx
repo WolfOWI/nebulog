@@ -132,7 +132,7 @@ const MapComponent = ({
   // On startup, when user location is available, get reflections of user location
   useEffect(() => {
     if (userLocation && maySearchForReflections) {
-      // console.log("Getting reflections of user location", userLocation);
+      console.log("Getting reflections of user location", userLocation);
       getReflectionsByLocation({
         latitude: userLocation.coords.latitude,
         longitude: userLocation.coords.longitude,

@@ -163,6 +163,7 @@ export const getPublicReflectionsInRadius = async (
   currentUserId?: string
 ) => {
   try {
+    console.log("Getting public reflections in radius", lat, long, radius, currentUserId);
     const center = [lat, long] as [number, number];
     const radiusInM = radius * 1000;
 

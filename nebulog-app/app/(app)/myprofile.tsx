@@ -7,7 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View, Pressable } from "react-native";
+import { ScrollView, View, Pressable, FlatList } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
@@ -17,7 +17,6 @@ import { defaultProfileColour } from "@/constants/Colors";
 import MyReflectionCard from "@/components/cards/MyReflectionCard";
 import BlockedUserCard from "@/components/cards/BlockedUserCard";
 import { Reflection, User } from "@/lib/types";
-import { FlatList } from "react-native-gesture-handler";
 import {
   deleteReflection,
   getReflectionsForUser,
