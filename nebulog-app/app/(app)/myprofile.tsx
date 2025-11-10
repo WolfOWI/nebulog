@@ -7,7 +7,7 @@ import { Heading } from "@/components/ui/heading";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, View, Pressable, FlatList } from "react-native";
+import { ScrollView, View, Pressable, FlatList, RefreshControl } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
@@ -37,6 +37,7 @@ export default function MyProfile() {
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>("reflections");
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { user, updateUserContext } = useUser();
 
   const handleClose = () => {
@@ -239,6 +240,27 @@ export default function MyProfile() {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      switch (activeTab) {
+        case "reflections":
+          await handleGetReflections();
+          break;
+        case "echoed":
+          await handleGetEchoedReflections();
+          break;
+        case "blocked":
+          await handleGetBlockedUsers();
+          break;
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const renderTabButton = (tab: TabType, label: string, icon: string) => (
     <Pressable
       onPress={() => handleTabChange(tab)}
@@ -280,6 +302,7 @@ export default function MyProfile() {
             keyExtractor={(item) => item.id!}
             contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
             ListEmptyComponent={
               <View className="flex-1 justify-center items-center py-20">
                 <MaterialIcons name="article" size={64} color="#475569" />
@@ -299,6 +322,7 @@ export default function MyProfile() {
             keyExtractor={(item) => item.id!}
             contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
             ListEmptyComponent={
               <View className="flex-1 justify-center items-center py-20">
                 <MaterialIcons name="favorite" size={64} color="#475569" />
@@ -322,6 +346,7 @@ export default function MyProfile() {
             keyExtractor={(item) => item.id!}
             contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 16, gap: 16 }}
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
             ListEmptyComponent={
               <View className="flex-1 justify-center items-center py-20">
                 <Text className="text-typography-400 text-center">No Blocked Users</Text>
