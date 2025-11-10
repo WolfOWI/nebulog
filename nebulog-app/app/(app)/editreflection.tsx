@@ -6,26 +6,13 @@ import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectItem,
-} from "@/components/ui/select";
+import MoodSelector from "@/components/MoodSelector";
 import { FormControl, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
 import LeftwardSwipeBtn from "@/components/buttons/LeftwardSwipeBtn";
 import LaunchButton from "@/components/buttons/LaunchButton";
 import CircularSwitchBtn from "@/components/buttons/CircularSwitchBtn";
-import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { mood } from "@/constants/moods";
-import { getMoodIcon } from "@/constants/moodIcons";
 import LocationPicker from "@/components/LocationPicker";
 import { useLocation } from "@/contexts/LocationContext";
 import { updateReflection, deleteReflection } from "@/services/reflectionServices";
@@ -168,7 +155,6 @@ const EditReflection = () => {
     }
   };
 
-  const selectedMoodData = selectedMood ? mood[selectedMood as keyof typeof mood] : null;
   const currentCharacterCount = comment.length;
 
   if (!reflectionData) {
@@ -203,63 +189,7 @@ const EditReflection = () => {
 
             {/* Mood Selector */}
             <VStack className="gap-3">
-              <Select selectedValue={selectedMood} onValueChange={setSelectedMood}>
-                <SelectTrigger className="p-4 h-fit">
-                  <HStack className="items-center gap-3">
-                    {selectedMoodData ? (
-                      <>
-                        {getMoodIcon(selectedMood, {
-                          fill: selectedMoodData.colorHex,
-                          width: 48,
-                          height: 48,
-                        })}
-                        <VStack className="flex-1">
-                          <Text className={`font-medium ${selectedMoodData.textColor}`} size="lg">
-                            {selectedMoodData.spaceObject}
-                          </Text>
-                          <Text className="text-typography-600" size="sm">
-                            {selectedMoodData.subemotions}
-                          </Text>
-                        </VStack>
-                      </>
-                    ) : (
-                      <>
-                        {getMoodIcon("unselected", {
-                          fill: "#6A7282",
-                          width: 48,
-                          height: 48,
-                        })}
-                        <VStack className="flex-1">
-                          <Text className="text-typography-400" size="lg">
-                            Select your mood
-                          </Text>
-                          <Text className="text-typography-500" size="sm">
-                            Choose how you're feeling
-                          </Text>
-                        </VStack>
-                      </>
-                    )}
-                    <MaterialIcons name="arrow-drop-down" size={24} color="#6B7280" />
-                  </HStack>
-                </SelectTrigger>
-
-                <SelectPortal>
-                  <SelectBackdrop />
-                  <SelectContent>
-                    <SelectDragIndicatorWrapper>
-                      <SelectDragIndicator />
-                    </SelectDragIndicatorWrapper>
-
-                    {Object.entries(mood).map(([key, moodData]) => (
-                      <SelectItem key={key} label={moodData.spaceObject} value={key}>
-                        <Text className={`font-medium ${moodData.textColor}`}>
-                          {moodData.spaceObject}
-                        </Text>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectPortal>
-              </Select>
+              <MoodSelector selectedMood={selectedMood} onMoodChange={setSelectedMood} />
             </VStack>
 
             {/* Comment Text Field */}

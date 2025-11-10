@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, Pressable, Modal, Alert } from "react-native";
 import { Text } from "@/components/ui/text";
-import { Button } from "@/components/ui/button";
-import { BlurView } from "expo-blur";
 import { HStack } from "../ui/hstack";
 import { getMoodIcon } from "@/constants/moodIcons";
 import { mood } from "@/constants/moods";
@@ -14,15 +12,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { getIcon } from "@/constants/customIcons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import {
-  Actionsheet,
-  ActionsheetContent,
-  ActionsheetItem,
-  ActionsheetItemText,
-  ActionsheetBackdrop,
-} from "../ui/actionsheet";
-import { Alert } from "react-native";
-import { deleteReflection } from "@/services/reflectionServices";
 
 // Extend dayjs with relative time plugin
 dayjs.extend(relativeTime);
@@ -33,7 +22,7 @@ interface MyReflectionCardProps {
 }
 
 const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection, onDelete }) => {
-  const [isActionsheetOpen, setIsActionsheetOpen] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   if (!reflection) return null;
 
   const reflectionMood = reflection.mood?.toLowerCase() || "unselected";
@@ -53,7 +42,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection, onDelet
           style: "destructive",
           onPress: () => {
             onDelete(reflection.id || "");
-            setIsActionsheetOpen(false);
+            setIsModalVisible(false);
           },
         },
       ]
@@ -89,7 +78,7 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection, onDelet
               {moodData?.spaceObject || "Unknown Planet"}
             </Text>
           </HStack>
-          <Pressable onPress={() => setIsActionsheetOpen(true)}>
+          <Pressable onPress={() => setIsModalVisible(true)}>
             <MaterialIcons name="more-vert" size={24} color="#F8FAFC" />
           </Pressable>
         </HStack>
@@ -132,28 +121,55 @@ const MyReflectionCard: React.FC<MyReflectionCardProps> = ({ reflection, onDelet
         </HStack>
       </VStack>
 
-      <Actionsheet isOpen={isActionsheetOpen} onClose={() => setIsActionsheetOpen(false)}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-          <ActionsheetItem
-            onPress={() => {
-              // Navigate to edit page with reflection data
-              router.push({
-                pathname: "/(app)/editreflection",
-                params: { reflection: JSON.stringify(reflection) },
-              } as any);
-              setIsActionsheetOpen(false);
-            }}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <Pressable
+          className="flex-1 bg-black/50 justify-end"
+          onPress={() => setIsModalVisible(false)}
+        >
+          <Pressable
+            className="bg-background-100 rounded-t-3xl"
+            onPress={(e) => e.stopPropagation()}
           >
-            <MaterialIcons name="edit" size={24} color="#F8FAFC" />
-            <ActionsheetItemText>Edit</ActionsheetItemText>
-          </ActionsheetItem>
-          <ActionsheetItem onPress={handleDeletePress}>
-            <MaterialIcons name="delete" size={24} color="#F8FAFC" />
-            <ActionsheetItemText>Delete</ActionsheetItemText>
-          </ActionsheetItem>
-        </ActionsheetContent>
-      </Actionsheet>
+            <View className="pt-4 pb-2">
+              <View className="w-12 h-1 bg-typography-300 rounded-full self-center mb-4" />
+            </View>
+
+            <VStack className="pb-6">
+              <Pressable
+                onPress={() => {
+                  router.push({
+                    pathname: "/(app)/editreflection",
+                    params: { reflection: JSON.stringify(reflection) },
+                  } as any);
+                  setIsModalVisible(false);
+                }}
+                className="px-6 py-4 active:bg-typography-50"
+              >
+                <HStack className="items-center gap-4">
+                  <MaterialIcons name="edit" size={24} color="#F8FAFC" />
+                  <Text className="text-typography-900" size="lg">
+                    Edit
+                  </Text>
+                </HStack>
+              </Pressable>
+
+              <Pressable onPress={handleDeletePress} className="px-6 py-4 active:bg-typography-50">
+                <HStack className="items-center gap-4">
+                  <MaterialIcons name="delete" size={24} color="#EF4444" />
+                  <Text className="text-red-500" size="lg">
+                    Delete
+                  </Text>
+                </HStack>
+              </Pressable>
+            </VStack>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 };

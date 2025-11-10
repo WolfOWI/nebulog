@@ -31,6 +31,7 @@ import { unlikeReflection } from "@/services/echoService";
 type TabType = "reflections" | "echoed" | "blocked";
 
 export default function MyProfile() {
+  const { showToast } = useToast();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [echoedReflections, setEchoedReflections] = useState<Reflection[]>([]);
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
