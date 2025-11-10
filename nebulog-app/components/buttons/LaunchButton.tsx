@@ -1,5 +1,13 @@
 import React, { useState, useRef } from "react";
-import { View, Pressable, Animated } from "react-native";
+import { View, Pressable } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  cancelAnimation,
+} from "react-native-reanimated";
 import { Text } from "@/components/ui/text";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
@@ -38,9 +46,9 @@ export default function LaunchButton({
   const [progress, setProgress] = useState(0);
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Animation values
-  const fillHeight = useRef(new Animated.Value(0)).current;
-  const shakeAnimation = useRef(new Animated.Value(0)).current;
+  // Animation values using react-native-reanimated
+  const fillHeight = useSharedValue(0);
+  const shakeTranslateX = useSharedValue(0);
 
   const startHold = () => {
     // Prevent multiple starts
@@ -52,7 +60,7 @@ export default function LaunchButton({
     setIsHolding(true);
     setIsFull(false);
     setProgress(0);
-    fillHeight.setValue(0);
+    fillHeight.value = 0;
 
     const interval = 16; // ~60fps
     const steps = holdDuration / interval;
@@ -64,7 +72,7 @@ export default function LaunchButton({
       setProgress(newProgress);
 
       // Update fill height directly for smoother animation
-      fillHeight.setValue(newProgress / 100);
+      fillHeight.value = newProgress / 100;
 
       //   console.log(`Fill progress: ${newProgress}%`);
 
@@ -81,27 +89,20 @@ export default function LaunchButton({
   };
 
   const startShake = () => {
-    // Create shake animation
-    const shakeSequence = Animated.sequence([
-      Animated.timing(shakeAnimation, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimation, {
-        toValue: -1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]);
+    // Cancel any existing animation
+    cancelAnimation(shakeTranslateX);
 
-    // Repeat shake until released
-    Animated.loop(shakeSequence).start();
+    // Create shake animation sequence that repeats infinitely
+    shakeTranslateX.value = withRepeat(
+      withSequence(withTiming(1, { duration: 50 }), withTiming(-1, { duration: 50 })),
+      -1, // Infinite repetitions
+      false // Don't reverse
+    );
   };
 
   const stopShake = () => {
-    shakeAnimation.stopAnimation();
-    shakeAnimation.setValue(0);
+    cancelAnimation(shakeTranslateX);
+    shakeTranslateX.value = withTiming(0, { duration: 100 });
   };
 
   const completeLaunch = () => {
@@ -115,11 +116,7 @@ export default function LaunchButton({
         setIsFull(false);
         setProgress(0);
         // Reset fill animation
-        Animated.timing(fillHeight, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: false,
-        }).start();
+        fillHeight.value = withTiming(0, { duration: 200 });
       }, 100);
     }
   };
@@ -132,11 +129,7 @@ export default function LaunchButton({
     stopShake();
 
     // Reset fill animation
-    Animated.timing(fillHeight, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
+    fillHeight.value = withTiming(0, { duration: 200 });
 
     if (progressInterval.current) {
       clearInterval(progressInterval.current);
@@ -144,20 +137,30 @@ export default function LaunchButton({
     }
   };
 
-  // Interpolate shake values
-  const shakeTranslateX = shakeAnimation.interpolate({
-    inputRange: [-1, 1],
-    outputRange: [-1, 1],
+  // Animated style for shake
+  const shakeAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: shakeTranslateX.value }],
+    };
+  });
+
+  // Animated style for fill height
+  const fillAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      height: fillHeight.value * size,
+    };
   });
 
   return (
     <View style={{ width: "100%", height: size }}>
       <Animated.View
-        style={{
-          width: "100%",
-          height: size,
-          transform: [{ translateX: shakeTranslateX }],
-        }}
+        style={[
+          {
+            width: "100%",
+            height: size,
+          },
+          shakeAnimatedStyle,
+        ]}
       >
         <Pressable
           onPressIn={startHold}
@@ -170,20 +173,19 @@ export default function LaunchButton({
         >
           {/* Fill background */}
           <Animated.View
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: fillColor,
-              height: fillHeight.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, size],
-              }),
-              zIndex: 1,
-              borderBottomLeftRadius: 12,
-              borderBottomRightRadius: 12,
-            }}
+            style={[
+              {
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: fillColor,
+                zIndex: 1,
+                borderBottomLeftRadius: 12,
+                borderBottomRightRadius: 12,
+              },
+              fillAnimatedStyle,
+            ]}
           />
 
           {/* Icon */}
