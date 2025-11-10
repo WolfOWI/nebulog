@@ -10,7 +10,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
 } from "react-native-reanimated";
 import CircleHoldBtn from "../buttons/CircleHoldBtn";
 import CircleHoldTextBtn from "../buttons/CircleHoldTextBtn";
@@ -46,7 +45,7 @@ const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
   // Animate in when component mounts
   useEffect(() => {
     if (selectedLocation) {
-      translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
+      translateY.value = withTiming(0, { duration: 300 });
       opacity.value = withTiming(1, { duration: 300 });
     }
   }, [selectedLocation]);
@@ -61,7 +60,7 @@ const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
   }, []);
 
   const handleClose = () => {
-    translateY.value = withSpring(300, { damping: 20, stiffness: 100 });
+    translateY.value = withTiming(300, { duration: 300 });
     opacity.value = withTiming(0, { duration: 200 }, () => {
       runOnJS(onClose)();
     });
@@ -80,7 +79,7 @@ const LocSelectCreateBox: React.FC<LocSelectCreateBoxProps> = ({
       if (event.translationY > 50) {
         runOnJS(handleClose)();
       } else {
-        translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
+        translateY.value = withTiming(0, { duration: 300 });
       }
     });
 

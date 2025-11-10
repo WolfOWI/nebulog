@@ -5,7 +5,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withTiming,
   runOnJS,
 } from "react-native-reanimated";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -57,11 +57,10 @@ export default function RightwardSwipeBtn({
 
       if (event.translationX > swipeThreshold) {
         // User swiped enough - trigger the action with subtle spring
-        translateX.value = withSpring(
+        translateX.value = withTiming(
           maxSwipeDistance,
           {
-            damping: 20, // Higher damping = less bouncy
-            stiffness: 150, // Lower stiffness = softer spring
+            duration: 300,
           },
           () => {
             runOnJS(onSwipeComplete)();
@@ -69,9 +68,8 @@ export default function RightwardSwipeBtn({
         );
       } else {
         // User didn't swipe enough - reset to starting position with subtle spring
-        translateX.value = withSpring(0, {
-          damping: 20, // Higher damping = less bouncy
-          stiffness: 150, // Lower stiffness = softer spring
+        translateX.value = withTiming(0, {
+          duration: 300,
         });
       }
 

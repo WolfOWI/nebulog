@@ -17,7 +17,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withSpring,
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
@@ -87,7 +86,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   // Animate in when component mounts
   useEffect(() => {
     if (reflection) {
-      translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
+      translateY.value = withTiming(0, { duration: 300 });
       opacity.value = withTiming(1, { duration: 300 });
     }
   }, [reflection]);
@@ -118,7 +117,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
   }, [reflection?.id, user?.id]);
 
   const handleClose = () => {
-    translateY.value = withSpring(300, { damping: 20, stiffness: 100 });
+    translateY.value = withTiming(300, { duration: 300 });
     opacity.value = withTiming(0, { duration: 200 }, () => {
       runOnJS(onClose)();
     });
@@ -209,7 +208,7 @@ const ReflectionDetailPanel: React.FC<ReflectionDetailPanelProps> = ({
       if (event.translationY > 50) {
         runOnJS(handleClose)();
       } else {
-        translateY.value = withSpring(0, { damping: 20, stiffness: 100 });
+        translateY.value = withTiming(0, { duration: 300 });
       }
     });
 
