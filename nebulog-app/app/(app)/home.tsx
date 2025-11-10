@@ -15,6 +15,7 @@ import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/contexts/ToastContext";
 import CircleHoldBtn from "@/components/buttons/CircleHoldBtn";
+import { useFocusEffect } from "@react-navigation/native";
 
 import { useLocation } from "@/contexts/LocationContext";
 import { reverseGeocode } from "@/services/placesServices";
@@ -125,7 +126,9 @@ export default function Home() {
   const snapPoints = useMemo(() => ["20%"], []);
   const handleSheetChanges = useCallback(
     (index: number) => {
-      // console.log("handleSheetChanges", index);
+      // Track bottom sheet open/closed state
+      // index >= 0 means sheet is open, index === -1 means closed
+      setIsBottomSheetOpen(index >= 0);
 
       // Clear selected location when bottom sheet is closed (index = -1)
       if (index === -1 && selectedMapLocation) {
@@ -164,6 +167,28 @@ export default function Home() {
   const [isReflectionPanelOpen, setIsReflectionPanelOpen] = useState(false);
   const [isRefreshingStreak, setIsRefreshingStreak] = useState(false);
   const [isLocationPanelOpen, setIsLocationPanelOpen] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  // Sync location panel state with selectedMapLocation
+  // If selectedMapLocation is set, open the location panel
+  // If selectedMapLocation is cleared, close the location panel
+  useEffect(() => {
+    if (selectedMapLocation && !isLocationPanelOpen) {
+      setIsLocationPanelOpen(true);
+    } else if (!selectedMapLocation && isLocationPanelOpen) {
+      setIsLocationPanelOpen(false);
+    }
+  }, [selectedMapLocation, isLocationPanelOpen]);
+
+  // Reset panel states when screen comes into focus (e.g., returning from navigation)
+  useFocusEffect(
+    useCallback(() => {
+      // Reset panel states when returning to the screen
+      if (!selectedMapLocation) {
+        setIsLocationPanelOpen(false);
+      }
+    }, [selectedMapLocation])
+  );
 
   // Get Location of User
   const handleGetLocation = async () => {
@@ -409,8 +434,9 @@ export default function Home() {
     // Set the selected location in context
     setSelectedLocation(selectedMapLocation);
 
-    // Clear the selected map location
+    // Clear the selected map location and close the location panel
     setSelectedMapLocation(null);
+    setIsLocationPanelOpen(false);
 
     // Navigate to thought launch
     router.push("/thoughtlaunch" as any);
@@ -474,7 +500,7 @@ export default function Home() {
           className="absolute bottom-0 left-0 right-0 items-end px-4 gap-8 justify-end"
           style={{
             paddingBottom: insets.bottom,
-            opacity: isReflectionPanelOpen || isLocationPanelOpen ? 0 : 1,
+            opacity: isReflectionPanelOpen || isLocationPanelOpen || isBottomSheetOpen ? 0 : 1,
           }}
         >
           <CircleHoldBtn
