@@ -11,8 +11,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import CircleHoldBtn from "../buttons/CircleHoldBtn";
-import CircleHoldTextBtn from "../buttons/CircleHoldTextBtn";
 import LaunchThoughtSwipeBtn from "../buttons/LaunchThoughtSwipeBtn";
 
 interface LocSelectCreateBoxProps {

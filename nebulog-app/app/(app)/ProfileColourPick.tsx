@@ -126,7 +126,7 @@ export default function ProfileColourPick() {
         </View>
 
         {/* Color Picker Component */}
-        <View className="flex-1 min-h-[400px] mb-8">
+        <View className="flex-1 mb-8">
           <ColorPicker
             color={selectedColor}
             onColorChange={handleColorChange}
@@ -134,6 +134,7 @@ export default function ProfileColourPick() {
             sliderSize={48}
             noSnap={true}
             swatches={false}
+            useNativeLayout={true}
           />
         </View>
       </ScrollView>
