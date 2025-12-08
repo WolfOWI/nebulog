@@ -28,8 +28,6 @@
    <br />
    <br />
    <br />
-   <a href="https://youtu.be/Mpazc5BLJFs">View Demo</a>
-   ·
    <a href="https://github.com/WolfOWI/nebulog/issues">Report Bug</a>
     ·
     <a href="https://github.com/WolfOWI/nebulog/issues">Request Feature</a>
@@ -74,7 +72,6 @@
   - [Future Implementation](#future-implementation)
 - [Final Outcome](#final-outcome)
   - [Mockups](#mockups)
-  - [Video Demonstration](#video-demonstration)
 - [Conclusion](#conclusion)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -521,12 +518,6 @@ The `Development Process` is the technical implementations and functionality don
 <br>
 
 ![Final Mockup 2][final-mockup-2]
-
-### Video Demonstration
-
-To see a complete walkthrough of the Nebulog app, click below:
-
-[View Demonstration](https://youtu.be/Mpazc5BLJFs)
 
 ## Conclusion
 
